@@ -18,6 +18,7 @@ namespace CroatianProject.Pages
         public string ExceptionMessage { get; private set; } = "";
         public string filePath { get; set; }
         public int Rows { get; set; } = 20;
+        public int Cols { get; set; } = 50;
 
         private IHostingEnvironment _environment;
         public AddTextModel(IHostingEnvironment environment)
@@ -53,6 +54,7 @@ namespace CroatianProject.Pages
             engine.ExecuteFile("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Scripts\\analysis.py");
 
         }
+
 
     }
 }
