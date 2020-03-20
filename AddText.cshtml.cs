@@ -47,11 +47,15 @@ namespace CroatianProject.Pages
         {
 
             ScriptEngine engine = Python.CreateEngine();
+            ScriptScope scope = engine.CreateScope();
             var paths = engine.GetSearchPaths();
             paths.Add("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Packages\\");
             engine.SetSearchPaths(paths);
-            engine.GetSysModule().SetVariable("argv", processedString);
-            engine.ExecuteFile("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Scripts\\analysis.py");
+            engine.ExecuteFile("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Scripts\\analysis.py", scope);            
+            dynamic function = scope.GetVariable("analysis");
+            dynamic result = function(processedString);
+            // само собой, результат следует обрабатывать по-другому
+            ExceptionMessage = result.ToString();
 
         }
 

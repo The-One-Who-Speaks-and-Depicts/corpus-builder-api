@@ -4,8 +4,8 @@ import re
 import sys, argparse
 import io
 
-def main():
-    string = sys.argv
+def analysis(processed_string):
+    string = processed_string
     paragraphs = string.split('\n')
     words_by_paragraphs = []
     for p in paragraphs:
@@ -51,5 +51,5 @@ def main():
             for word in paragraph:
                 #do something
                 out.write(word[0])
-
-main()
+    #and do normal output, lol
+    return normal_length
