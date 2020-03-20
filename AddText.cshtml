@@ -12,7 +12,7 @@
 </form>
 
 <form asp-page-handler="process" method="post" >
+    <textarea cols="50" rows="@Model.Rows" asp-for="processedString"></textarea><br/>
     <button class="btn btn-default">Process</button> <br />
-    <div>@Model.ExceptionMessage</div><br />    
 </form>
 

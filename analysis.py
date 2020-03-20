@@ -1,16 +1,11 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# vim:fileencoding=utf-8
 
-import docx2txt
-import nltk
-nltk.download('punkt')
 import re
 import sys, argparse
 import io
 
 def main():
-    string = sys.argv;
+    string = sys.argv
     paragraphs = string.split('\n')
     words_by_paragraphs = []
     for p in paragraphs:

@@ -17,6 +17,7 @@ namespace CroatianProject.Pages
     {
         public string ExceptionMessage { get; private set; } = "";
         public string filePath { get; set; }
+        public int Rows { get; set; } = 20;
 
         private IHostingEnvironment _environment;
         public AddTextModel(IHostingEnvironment environment)
@@ -38,6 +39,9 @@ namespace CroatianProject.Pages
             }
         }
 
+        [BindProperty]
+        public string processedString { get; set; }
+
         public async Task OnPostProcess()
         {
 
@@ -45,7 +49,7 @@ namespace CroatianProject.Pages
             var paths = engine.GetSearchPaths();
             paths.Add("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Packages\\");
             engine.SetSearchPaths(paths);
-            engine.GetSysModule().SetVariable("argv", ".../18a/maûtь bʼdenʼê i mišʼlenʼê vʼ sebi • da bi bʼlago savʼkupili sebi i s(i)nomь sʼvoimь • I sʼvite edʼne na dʼruge vʼ pirehь čudʼnoga mešʼtarsʼtva premenu •");
+            engine.GetSysModule().SetVariable("argv", processedString);
             engine.ExecuteFile("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Scripts\\analysis.py");
 
         }
