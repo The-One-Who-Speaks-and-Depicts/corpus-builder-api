@@ -16,9 +16,9 @@ namespace CroatianProject.Pages
     public class AddTextModel : PageModel
     {
         public string ExceptionMessage { get; private set; } = "";
-        public string filePath { get; set; }
         public int Rows { get; set; } = 20;
         public int Cols { get; set; } = 50;
+        
 
         private IHostingEnvironment _environment;
         public AddTextModel(IHostingEnvironment environment)
@@ -28,16 +28,27 @@ namespace CroatianProject.Pages
         
         [BindProperty]
         public IFormFile Upload { get; set; }
+        [BindProperty]
+        public string filePath { get; set; } = "";
+
         public async Task OnPostAsync()
         {
             var dir = Path.Combine(_environment.ContentRootPath, "uploads");
             Directory.CreateDirectory(dir);
-            var file = Path.Combine(dir, Upload.FileName);
-            filePath = file;
-            using (var fileStream = new FileStream(file, FileMode.Create))
+            try
             {
-                await Upload.CopyToAsync(fileStream);
+                var file = Path.Combine(dir, Upload.FileName);            
+                using (var fileStream = new FileStream(file, FileMode.Create))
+                {
+                    await Upload.CopyToAsync(fileStream);
+                }
             }
+            catch (Exception e)
+            {
+                //implement logging
+                Debug.WriteLine(e.ToString());
+            }
+            
         }
 
         [BindProperty]
@@ -45,7 +56,6 @@ namespace CroatianProject.Pages
 
         public async Task OnPostProcess()
         {
-
             ScriptEngine engine = Python.CreateEngine();
             ScriptScope scope = engine.CreateScope();
             var paths = engine.GetSearchPaths();
