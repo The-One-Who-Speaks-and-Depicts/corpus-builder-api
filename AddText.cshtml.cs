@@ -53,10 +53,37 @@ namespace CroatianProject.Pages
             engine.SetSearchPaths(paths);
             engine.ExecuteFile("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Scripts\\analysis.py", scope);            
             dynamic function = scope.GetVariable("analysis");
-            dynamic result = function(processedString);
-            // само собой, результат следует обрабатывать по-другому
-            ExceptionMessage = result.ToString();
-
+            IList<object> result = function(processedString);
+            IList<object> paragraphs = (IList<object>)result[0]; // параграфы
+            IList<object> tagged_by_paragraphs = (IList<object>)result[1]; // параграфы по словах по параграфам
+            IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном
+            ExceptionMessage = "";
+            foreach (var paragraph in paragraphs)
+            {
+               // вот тут можно обращаться к параграфам
+            }
+            foreach (var paragraph in tagged_by_paragraphs)
+            {
+                IList<object> words = (IList<object>) paragraph; // слова в параграфах
+                foreach (var word in words)
+                {
+                    IList<object> tuple = (IList<object>) word; // кортеж для каждого слова
+                    string lexeme = (string) tuple[0];
+                    string PoS = (string) tuple[1];
+                    //а дальше уже можно делать с ними, что угодно
+                }
+            }
+            foreach(var unit in tagged_alphabetically)
+            {
+                IList<object> word = (IList<object>) unit; // список слов
+                foreach(var tuple in word)
+                {
+                    IList<object> element = (IList<object>) tuple; // кортеж для каждого слова
+                    string lexeme = (string) element[0];
+                    string PoS = (string) element[1];
+                    // дальше с ними можно делать, что хочется
+                }
+            }
         }
 
 

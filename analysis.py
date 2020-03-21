@@ -52,4 +52,4 @@ def analysis(processed_string):
                 #do something
                 out.write(word[0])
     #and do normal output, lol
-    return normal_length
+    return [paragraphs, tagged_by_paragraphs, tagged_by_paragraphs_alphabetically]
