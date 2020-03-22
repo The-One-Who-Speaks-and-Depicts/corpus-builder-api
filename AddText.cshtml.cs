@@ -65,6 +65,7 @@ namespace CroatianProject.Pages
             }
             catch (Exception e)
             {
+                // implement logging
                 FileStream fs = new FileStream("result1.txt", FileMode.Create);
                 using (StreamWriter w = new StreamWriter(fs))
                 {
@@ -80,45 +81,81 @@ namespace CroatianProject.Pages
 
         public async Task OnPostProcess()
         {
-            ScriptEngine engine = Python.CreateEngine();
-            ScriptScope scope = engine.CreateScope();
-            var paths = engine.GetSearchPaths();
-            var packagePath = Path.Combine(_environment.ContentRootPath, "Packages");
-            paths.Add(packagePath);
-            engine.SetSearchPaths(paths);
-            var pythonFilePath = Path.Combine(_environment.ContentRootPath, "Scripts\\analysis.py");
-            engine.ExecuteFile(pythonFilePath, scope);            
-            dynamic function = scope.GetVariable("analysis");
-            IList<object> result = function(processedString);
-            IList<object> paragraphs = (IList<object>)result[0]; // параграфы
-            IList<object> tagged_by_paragraphs = (IList<object>)result[1]; // параграфы по словах по параграфам
-            IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном
-            foreach (var paragraph in paragraphs)
+            try
             {
-               // вот тут можно обращаться к параграфам
-            }
-            foreach (var paragraph in tagged_by_paragraphs)
-            {
-                IList<object> words = (IList<object>) paragraph; // слова в параграфах
-                foreach (var word in words)
+                ScriptEngine engine = Python.CreateEngine();
+                ScriptScope scope = engine.CreateScope();
+                var paths = engine.GetSearchPaths();
+                var packagePath = Path.Combine(_environment.ContentRootPath, "Packages");
+                paths.Add(packagePath);
+                engine.SetSearchPaths(paths);
+                var pythonFilePath = Path.Combine(_environment.ContentRootPath, "Scripts\\analysis.py");
+                engine.ExecuteFile(pythonFilePath, scope);
+                dynamic function = scope.GetVariable("analysis");
+                IList<object> result = function(processedString);
+                IList<object> paragraphs = (IList<object>)result[0]; // параграфы
+                IList<object> tagged_by_paragraphs = (IList<object>)result[1]; // параграфы по словах по параграфам
+                IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном
+                var dirTexts = Path.Combine(_environment.ContentRootPath, "database", "texts");
+                DirectoryInfo textDirectoryInfo = new DirectoryInfo(dirTexts);
+                if (!textDirectoryInfo.Exists)
                 {
-                    IList<object> tuple = (IList<object>) word; // кортеж для каждого слова
-                    string lexeme = (string) tuple[0];
-                    string PoS = (string) tuple[1];
-                    //а дальше уже можно делать с ними, что угодно
+                    return;
+                }
+                var textsInfo = textDirectoryInfo.GetFiles();
+                List<Text> texts = new List<Text>();
+                foreach (var i in textsInfo)
+                {
+                    FileStream fs = new FileStream(i.FullName, FileMode.Open);
+                    using (StreamReader r = new StreamReader(fs))
+                    {
+                        string jsonizedText = r.ReadLine();
+                        texts.Add(JsonConvert.DeserializeObject<Text>(jsonizedText));
+                    }
+                }
+                if (texts.Count < 1)
+                {
+                    Exception e = new Exception("В базе данных нет текстов!");
+                    throw e;
+                }
+                foreach (var paragraph in paragraphs)
+                {
+
+                    // вот тут можно обращаться к параграфам
+                }
+                foreach (var paragraph in tagged_by_paragraphs)
+                {
+                    IList<object> words = (IList<object>)paragraph; // слова в параграфах
+                    foreach (var word in words)
+                    {
+                        IList<object> tuple = (IList<object>)word; // кортеж для каждого слова
+                        string lexeme = (string)tuple[0];
+                        string PoS = (string)tuple[1];
+                        //а дальше уже можно делать с ними, что угодно
+                    }
+                }
+                foreach (var unit in tagged_alphabetically)
+                {
+                    IList<object> word = (IList<object>)unit; // список слов
+                    foreach (var tuple in word)
+                    {
+                        IList<object> element = (IList<object>)tuple; // кортеж для каждого слова
+                        string lexeme = (string)element[0];
+                        string PoS = (string)element[1];
+                        // дальше с ними можно делать, что хочется
+                    }
                 }
             }
-            foreach(var unit in tagged_alphabetically)
+            catch (Exception e)
             {
-                IList<object> word = (IList<object>) unit; // список слов
-                foreach(var tuple in word)
+                // implement logging
+                FileStream fs = new FileStream("result1.txt", FileMode.Create);
+                using (StreamWriter w = new StreamWriter(fs))
                 {
-                    IList<object> element = (IList<object>) tuple; // кортеж для каждого слова
-                    string lexeme = (string) element[0];
-                    string PoS = (string) element[1];
-                    // дальше с ними можно делать, что хочется
+                    w.Write(e.Message);
                 }
             }
+            
         }
 
 
