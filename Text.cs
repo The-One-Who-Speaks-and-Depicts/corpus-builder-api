@@ -58,7 +58,7 @@ public class Text
     [JsonConstructor]
     public Text (string textNumber, string _textID, string _filepath)
     {
-            this.documentID = "ID_" + textNumber;
+            this.documentID = textNumber;
             this.textID = _textID;
             this.filePath = _filepath;
     }

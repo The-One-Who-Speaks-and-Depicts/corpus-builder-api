@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Newtonsoft.Json;
 
 namespace CorpusDraftCSharp
 {
@@ -49,21 +50,40 @@ namespace CorpusDraftCSharp
         #endregion
 
         #region objectValues
-        protected string documentID;
+        [JsonProperty]
+        public string documentID;
+        [JsonIgnore]
         protected Dictionary<string, DataTable> spreadsheets;
-        protected string filePath;
-        protected string textID;
-        protected Dictionary<string, string> clauseFields;        
-        protected string clauseID;
-        protected string clauseText;
+        [JsonProperty]
+        public string filePath;
+        [JsonProperty]
+        public string textID;
+        [JsonIgnore]
+        protected Dictionary<string, string> clauseFields;
+        [JsonProperty]
+        public string clauseID;
+        [JsonProperty]
+        public string clauseText;
+        [JsonIgnore]
         protected List<string> realizationIDs;
+        [JsonIgnore]
         public readonly List<Realization> realizations;
+        [JsonIgnore]
         private double clauseBrokenness = 0;
+        [JsonIgnore]
         private int wordCount = 0;
         #endregion
 
 
         #region Constructors
+        public Clause(Text text, string _clauseID, string _clauseText)
+        {
+            this.documentID = text.documentID;
+            this.filePath = text.filePath;
+            this.textID = text.textID;
+            this.clauseID = _clauseID;
+            this.clauseText = _clauseText;
+        }
         public Clause(string documentID, Dictionary<string, DataTable> spreadsheets, string filePath, string textID, string clauseID)
         {
             Console.WriteLine("Starting clause generation. Clause number is {0}, ID will be {2}{1}{0}", clauseID, textID, documentID);
@@ -123,7 +143,11 @@ namespace CorpusDraftCSharp
         #endregion
 
         #region publicMethods
-        
+        public string Jsonize()
+        {
+            string jsonedClause = JsonConvert.SerializeObject(this);
+            return jsonedClause;
+        }
         #endregion
 
         #region PrivateMethods

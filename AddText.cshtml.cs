@@ -118,9 +118,43 @@ namespace CroatianProject.Pages
                     Exception e = new Exception("В базе данных нет текстов!");
                     throw e;
                 }
+                List<int> textIDs = new List<int>();
+                foreach(Text text in texts)
+                {
+                    if (MyExtensions.isNum(text.documentID))
+                    {
+                        textIDs.Add(int.Parse(text.documentID)); 
+                    }
+                    else
+                    {
+                        Exception e = new Exception(new string("Cannot parse " + text.documentID));
+                        throw e;
+                    }
+                    
+                }
+                textIDs.Sort();
+                var currentText = texts.Where(text => text.documentID == textIDs[textIDs.Count - 1].ToString()).First();
+                var sections = new List<Clause>();
+                int currentParagraphID = 0; 
                 foreach (var paragraph in paragraphs)
                 {
-
+                    var section = new Clause(currentText, currentParagraphID.ToString(), paragraph.ToString());
+                    var dirData = Path.Combine(_environment.ContentRootPath, "database");
+                    Directory.CreateDirectory(dirData);
+                    var dirParagraphs = Path.Combine(dirData, "paragraphs");
+                    Directory.CreateDirectory(dirParagraphs);
+                    DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirParagraphs);
+                    string paragraphInJSON = section.Jsonize();
+                    var dirParagraphData = Path.Combine(dirParagraphs, currentText.textID);
+                    Directory.CreateDirectory(dirParagraphData);
+                    var TextDBfile = Path.Combine(dirParagraphData, "paragraph" + currentParagraphID.ToString() + ".json");
+                    FileStream fs = new FileStream(TextDBfile, FileMode.Create);
+                    using (StreamWriter w = new StreamWriter(fs))
+                    {
+                        w.Write(paragraphInJSON);
+                    }
+                    currentParagraphID += 1;
+                    sections.Add(section);
                     // вот тут можно обращаться к параграфам
                 }
                 foreach (var paragraph in tagged_by_paragraphs)
