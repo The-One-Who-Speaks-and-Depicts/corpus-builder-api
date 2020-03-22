@@ -51,8 +51,10 @@ namespace CroatianProject.Pages
                 Directory.CreateDirectory(dirTexts);
                 DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirTexts);
                 Text text = new Text(directoryTextsInfo.GetFiles().Length.ToString(), textName, file);                
-                string textInJSON = text.Jsonize();                
-                var TextDBfile = Path.Combine(dirTexts, textName + ".json");
+                string textInJSON = text.Jsonize();
+                var dirTextData = Path.Combine(dirTexts, textName);
+                Directory.CreateDirectory(dirTextData);
+                var TextDBfile = Path.Combine(dirTextData, textName + ".json");
                 FileStream fs = new FileStream(TextDBfile, FileMode.Create);
                 using (StreamWriter w = new StreamWriter(fs))
                 {
@@ -102,16 +104,20 @@ namespace CroatianProject.Pages
                 {
                     return;
                 }
-                var textsInfo = textDirectoryInfo.GetFiles();
+                var directoriesInfo = textDirectoryInfo.GetDirectories();
                 List<Text> texts = new List<Text>();
-                foreach (var i in textsInfo)
+                foreach (var directory in directoriesInfo)
                 {
-                    FileStream fs = new FileStream(i.FullName, FileMode.Open);
-                    using (StreamReader r = new StreamReader(fs))
+                    var textsInfo = directory.GetFiles();
+                    foreach (var text in textsInfo)
                     {
-                        string jsonizedText = r.ReadLine();
-                        texts.Add(JsonConvert.DeserializeObject<Text>(jsonizedText));
-                    }
+                        FileStream fs = new FileStream(text.FullName, FileMode.Open);
+                        using (StreamReader r = new StreamReader(fs))
+                        {
+                            string jsonizedText = r.ReadLine();
+                            texts.Add(JsonConvert.DeserializeObject<Text>(jsonizedText));
+                        }
+                    }                    
                 }
                 if (texts.Count < 1)
                 {
@@ -139,34 +145,52 @@ namespace CroatianProject.Pages
                 foreach (var paragraph in paragraphs)
                 {
                     var section = new Clause(currentText, currentParagraphID.ToString(), paragraph.ToString());
-                    var dirData = Path.Combine(_environment.ContentRootPath, "database");
-                    Directory.CreateDirectory(dirData);
-                    var dirParagraphs = Path.Combine(dirData, "paragraphs");
-                    Directory.CreateDirectory(dirParagraphs);
-                    DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirParagraphs);
-                    string paragraphInJSON = section.Jsonize();
-                    var dirParagraphData = Path.Combine(dirParagraphs, currentText.textID);
+                    var dirTextData = Path.Combine(dirTexts, currentText.textID);
+                    Directory.CreateDirectory(dirTextData);
+                    var dirParagraphData = Path.Combine(dirTextData, "paragraphs");
                     Directory.CreateDirectory(dirParagraphData);
-                    var TextDBfile = Path.Combine(dirParagraphData, "paragraph" + currentParagraphID.ToString() + ".json");
-                    FileStream fs = new FileStream(TextDBfile, FileMode.Create);
+                    string paragraphInJSON = section.Jsonize(); 
+                    var ClauseDBfile = Path.Combine(dirParagraphData, "paragraph" + currentParagraphID.ToString() + ".json");
+                    FileStream fs = new FileStream(ClauseDBfile, FileMode.Create);
                     using (StreamWriter w = new StreamWriter(fs))
                     {
                         w.Write(paragraphInJSON);
                     }
                     currentParagraphID += 1;
                     sections.Add(section);
-                    // вот тут можно обращаться к параграфам
                 }
+                List<Realization> realizations = new List<Realization>();
+                int currentParagraph = 0;
                 foreach (var paragraph in tagged_by_paragraphs)
                 {
                     IList<object> words = (IList<object>)paragraph; // слова в параграфах
+                    int currentWord = 0;
                     foreach (var word in words)
                     {
                         IList<object> tuple = (IList<object>)word; // кортеж для каждого слова
                         string lexeme = (string)tuple[0];
                         string PoS = (string)tuple[1];
-                        //а дальше уже можно делать с ними, что угодно
+                        var token = new Realization(sections[currentParagraph], currentWord.ToString(), lexeme, PoS);
+                        var dirData = Path.Combine(_environment.ContentRootPath, "database");
+                        Directory.CreateDirectory(dirData);
+                        var dirParagraphs = Path.Combine(dirData, "paragraphs");
+                        Directory.CreateDirectory(dirParagraphs);
+                        DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirParagraphs);
+                        string tokenInJSON = token.Jsonize();
+                        var dirParagraphData = Path.Combine(dirParagraphs, currentText.textID);
+                        Directory.CreateDirectory(dirParagraphData);
+                        var dirWordData = Path.Combine(dirParagraphData, sections[currentParagraph].clauseID);
+                        Directory.CreateDirectory(dirWordData);
+                        var wordDBfile = Path.Combine(dirWordData, "word" + currentWord.ToString() + ".json");
+                        FileStream fs = new FileStream(wordDBfile, FileMode.Create);
+                        using (StreamWriter w = new StreamWriter(fs))
+                        {
+                            w.Write(tokenInJSON);
+                        }
+                        currentWord += 1;
+                        realizations.Add(token);
                     }
+                    currentParagraph += 1;
                 }
                 foreach (var unit in tagged_alphabetically)
                 {

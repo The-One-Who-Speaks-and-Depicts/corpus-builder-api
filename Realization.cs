@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Newtonsoft.Json;
 
 namespace CorpusDraftCSharp
 {
@@ -81,26 +82,50 @@ namespace CorpusDraftCSharp
         }
         protected static FieldDummy _glossField;
         protected static List<FieldDummy> fieldDummies = new List<FieldDummy>();
-        
+
         #endregion
 
         #region objectValues
+        [JsonProperty]
         protected string documentID;
+        [JsonIgnore]
         protected Dictionary<string, DataTable> spreadsheets;
+        [JsonProperty]
         protected string filePath;
+        [JsonProperty]
         protected string textID;
+        [JsonProperty]
         protected string clauseID;
+        [JsonIgnore]
         protected Dictionary<string, string> realizationFields;
+        [JsonProperty]
         protected string realizationID;
+        [JsonIgnore]
         protected string lemmaOne;
+        [JsonIgnore]
         protected string lemmaTwo;
+        [JsonProperty]
         public string lexeme;
+        [JsonProperty]
         public string partOfSpeech;
+        [JsonIgnore]
         protected string gloss;
-        protected string fullID;        
+        [JsonIgnore]
+        protected string fullID;
         #endregion
 
-        
+        #region Constructors
+
+        public Realization(Clause clause, string _realizationID, string _lexeme, string _PoS)
+        {
+            this.documentID = clause.documentID;
+            this.filePath = clause.filePath;
+            this.textID = clause.textID;
+            this.clauseID = clause.clauseID;
+            this.realizationID = _realizationID;
+            this.lexeme = _lexeme;
+            this.partOfSpeech = _PoS;
+        }
 
         public Realization(string documentID, Dictionary<string, DataTable> spreadsheets, string filePath, string textID, string clauseID, string realizationID, string partOfSpeech)
         {
@@ -217,6 +242,17 @@ namespace CorpusDraftCSharp
             }
             
         }
+        #endregion
+
+        #region publicMethods
+
+        public string Jsonize()
+        {
+            string realizationToJson = JsonConvert.SerializeObject(this);
+            return realizationToJson;
+        }
+
+        #endregion
 
         #region privateMethods
         #endregion
