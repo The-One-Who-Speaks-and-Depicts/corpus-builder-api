@@ -15,6 +15,7 @@ namespace CroatianProject.Pages
 {
     public class AddTextModel : PageModel
     {
+       
         public string ExceptionMessage { get; private set; } = "";
         public int Rows { get; set; } = 20;
         public int Cols { get; set; } = 50;
@@ -24,9 +25,10 @@ namespace CroatianProject.Pages
         public AddTextModel(IHostingEnvironment environment)
         {
         _environment = environment;
-        }   
-        
-        [BindProperty]
+        }
+
+
+       [BindProperty]
         public IFormFile Upload { get; set; }
         [BindProperty]
         public string filePath { get; set; } = "";
@@ -53,6 +55,8 @@ namespace CroatianProject.Pages
 
         [BindProperty]
         public string processedString { get; set; }
+        [BindProperty]
+        public string textName { get; set; }
 
         public async Task OnPostProcess()
         {
