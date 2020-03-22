@@ -83,15 +83,16 @@ namespace CroatianProject.Pages
             ScriptEngine engine = Python.CreateEngine();
             ScriptScope scope = engine.CreateScope();
             var paths = engine.GetSearchPaths();
-            paths.Add("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Packages\\");
+            var packagePath = Path.Combine(_environment.ContentRootPath, "Packages");
+            paths.Add(packagePath);
             engine.SetSearchPaths(paths);
-            engine.ExecuteFile("C:\\Users\\user\\source\\repos\\CroatianProject\\CroatianProject\\Scripts\\analysis.py", scope);            
+            var pythonFilePath = Path.Combine(_environment.ContentRootPath, "Scripts\\analysis.py");
+            engine.ExecuteFile(pythonFilePath, scope);            
             dynamic function = scope.GetVariable("analysis");
             IList<object> result = function(processedString);
             IList<object> paragraphs = (IList<object>)result[0]; // параграфы
             IList<object> tagged_by_paragraphs = (IList<object>)result[1]; // параграфы по словах по параграфам
             IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном
-            ExceptionMessage = "";
             foreach (var paragraph in paragraphs)
             {
                // вот тут можно обращаться к параграфам
