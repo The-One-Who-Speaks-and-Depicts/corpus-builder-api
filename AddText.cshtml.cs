@@ -41,8 +41,8 @@ namespace CroatianProject.Pages
         public async Task OnPostAsync()
         {
             var dirUploads = Path.Combine(_environment.ContentRootPath, "uploads");
-            var dirData = Path.Combine(_environment.ContentRootPath, "database");
             Directory.CreateDirectory(dirUploads);
+            var dirData = Path.Combine(_environment.ContentRootPath, "database");            
             Directory.CreateDirectory(dirData);            
             try
             {
@@ -209,10 +209,10 @@ namespace CroatianProject.Pages
                 List<DictionaryUnit> alphabeticalDictionary = new List<DictionaryUnit>();
                 foreach (string unit_realization in dictionaryUnits_realizations)
                 {
-                    var units = dictionary.Where((unit) => unit.Item1 == unit_realization);
+                    var units = dictionary.Where((unit) => unit.Item1 == unit_realization.ToLower());
                     foreach (var unit in units)
                     {
-                        var dictionaryUnits = realizations.Where((realization) => (realization.lexeme == unit.Item1) && (realization.partOfSpeech == unit.Item2));
+                        var dictionaryUnits = realizations.Where((realization) => (realization.lexeme.ToLower() == unit.Item1) && (realization.partOfSpeech == unit.Item2));
                         List<Realization> dictionaryUnitsConverted = new List<Realization>();
                         foreach (var dictionaryunit in dictionaryUnits)
                         {
@@ -221,9 +221,22 @@ namespace CroatianProject.Pages
                         alphabeticalDictionary.Add(new DictionaryUnit(unit_realization, dictionaryUnitsConverted));
                     }                    
                 }
-                foreach (var i in alphabeticalDictionary)
+                var dirData = Path.Combine(_environment.ContentRootPath, "database");
+                Directory.CreateDirectory(dirData);
+                var dirDictionary = Path.Combine(dirData, "dictionary");
+                Directory.CreateDirectory(dirDictionary);
+                var dirTextDictionary = Path.Combine(dirDictionary, currentText.textID);
+                Directory.CreateDirectory(dirTextDictionary);
+                var unitNumber = 0;
+                foreach (var wordInOrder in alphabeticalDictionary)
                 {
-                    // запись в файл тут
+                    var wordInDictfile = Path.Combine(dirTextDictionary, "dictionaryUnit[" + unitNumber + "]" + ".json");
+                    FileStream fs = new FileStream(wordInDictfile, FileMode.Create);
+                    using (StreamWriter w = new StreamWriter(fs))
+                    {
+                        w.Write(wordInOrder.Jsonize());
+                    }
+                    unitNumber++;
                 }
             }
             catch (Exception e)
