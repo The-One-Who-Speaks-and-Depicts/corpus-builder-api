@@ -5,11 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IronPython.Hosting;
+using LiteDB;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Scripting.Hosting;
+using CorpusDraftCSharp;
+using Newtonsoft.Json;
 
 namespace CroatianProject.Pages
 {
@@ -28,18 +31,33 @@ namespace CroatianProject.Pages
         }
 
 
-       [BindProperty]
+        [BindProperty]
         public IFormFile Upload { get; set; }
         [BindProperty]
         public string filePath { get; set; } = "";
+        [BindProperty]
+        public string textName { get; set; }
 
         public async Task OnPostAsync()
         {
-            var dir = Path.Combine(_environment.ContentRootPath, "uploads");
-            Directory.CreateDirectory(dir);
+            var dirUploads = Path.Combine(_environment.ContentRootPath, "uploads");
+            var dirData = Path.Combine(_environment.ContentRootPath, "database");
+            Directory.CreateDirectory(dirUploads);
+            Directory.CreateDirectory(dirData);            
             try
             {
-                var file = Path.Combine(dir, Upload.FileName);            
+                var file = Path.Combine(dirUploads, Upload.FileName);
+                var dirTexts = Path.Combine(dirData, "texts");
+                Directory.CreateDirectory(dirTexts);
+                DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirTexts);
+                Text text = new Text(directoryTextsInfo.GetFiles().Length.ToString(), textName, file);                
+                string textInJSON = text.Jsonize();                
+                var TextDBfile = Path.Combine(dirTexts, textName + ".json");
+                FileStream fs = new FileStream(TextDBfile, FileMode.Create);
+                using (StreamWriter w = new StreamWriter(fs))
+                {
+                    w.Write(textInJSON);
+                }               
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
                     await Upload.CopyToAsync(fileStream);
@@ -47,16 +65,18 @@ namespace CroatianProject.Pages
             }
             catch (Exception e)
             {
-                //implement logging
-                Debug.WriteLine(e.ToString());
+                FileStream fs = new FileStream("result1.txt", FileMode.Create);
+                using (StreamWriter w = new StreamWriter(fs))
+                {
+                    w.Write(e.Message);
+                }
             }
             
         }
 
         [BindProperty]
         public string processedString { get; set; }
-        [BindProperty]
-        public string textName { get; set; }
+       
 
         public async Task OnPostProcess()
         {
