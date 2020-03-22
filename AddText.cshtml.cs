@@ -189,6 +189,12 @@ namespace CroatianProject.Pages
                     }
                     currentParagraph += 1;
                 }
+                SortedSet<string> dictionaryUnits_realizations = new SortedSet<string>();
+                foreach (Realization realization in realizations)
+                {
+                    dictionaryUnits_realizations.Add(realization.lexeme);
+                }
+                List<(string, string)> dictionary = new List<(string, string)>();
                 foreach (var unit in tagged_alphabetically)
                 {
                     IList<object> word = (IList<object>)unit; // список слов
@@ -197,8 +203,27 @@ namespace CroatianProject.Pages
                         IList<object> element = (IList<object>)tuple; // кортеж для каждого слова
                         string lexeme = (string)element[0];
                         string PoS = (string)element[1];
-                        // дальше с ними можно делать, что хочется
+                        dictionary.Add((lexeme, PoS));
                     }
+                }
+                List<DictionaryUnit> alphabeticalDictionary = new List<DictionaryUnit>();
+                foreach (string unit_realization in dictionaryUnits_realizations)
+                {
+                    var units = dictionary.Where((unit) => unit.Item1 == unit_realization);
+                    foreach (var unit in units)
+                    {
+                        var dictionaryUnits = realizations.Where((realization) => (realization.lexeme == unit.Item1) && (realization.partOfSpeech == unit.Item2));
+                        List<Realization> dictionaryUnitsConverted = new List<Realization>();
+                        foreach (var dictionaryunit in dictionaryUnits)
+                        {
+                            dictionaryUnitsConverted.Add(dictionaryunit);
+                        }
+                        alphabeticalDictionary.Add(new DictionaryUnit(unit_realization, dictionaryUnitsConverted));
+                    }                    
+                }
+                foreach (var i in alphabeticalDictionary)
+                {
+                    // запись в файл тут
                 }
             }
             catch (Exception e)
