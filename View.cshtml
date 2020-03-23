@@ -3,15 +3,36 @@
 @{
     ViewData["Title"] = "Просмотр корпуса";
 }
-    <div>
+
+    <div style="margin-top:25px;">
         <form method="post">
+            <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="1" cols="20" asp-for="wordSearched"></textarea><br />
             <select asp-for="textName">
-                @foreach (var text in Model.textList)
+                @foreach(var text in Model.textList)
                 {
                     <option>@text</option>
                 }
             </select>
-            <button asp-page-handler="show">Вывести слова в порядке появления</button>
-            <button asp-page-handler="showAlphabetically">Вывести слова в алфавитном порядке</button>
+            <select asp-for="PoS">
+                @foreach(var part in Model.partsOfSpeech)
+                {
+                    <option>@part</option>
+                }
+            </select><br />
+            <button asp-page-handler="show">Вывести слова в порядке появления</button><br />
+            <button asp-page-handler="showAlphabetically">Вывести слова в алфавитном порядке</button><br />
         </form>
     </div>
+
+<div style="width:50%; float:left;">
+    <div align="center"></div>
+    <table>
+
+    </table>
+</div>
+<div style="width:50%; float:right;">
+    <table>
+
+    </table>
+</div>
+<div style="clear:both;"></div>

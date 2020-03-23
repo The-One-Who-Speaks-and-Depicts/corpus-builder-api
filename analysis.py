@@ -46,10 +46,4 @@ def analysis(processed_string):
       for word in paragraph:
         tagged_by_paragraphs_alphabetically[len(tagged_by_paragraphs_alphabetically) - 1].append((word[0].lower(), word[1]))
     tagged_by_paragraphs_alphabetically = sorted(tagged_by_paragraphs_alphabetically)
-    with io.open('D:\\result.txt', 'w', 1, encoding='utf-8') as out:
-        for paragraph in tagged_by_paragraphs_alphabetically:
-            for word in paragraph:
-                #do something
-                out.write(word[0])
-    #and do normal output, lol
     return [paragraphs, tagged_by_paragraphs, tagged_by_paragraphs_alphabetically]
