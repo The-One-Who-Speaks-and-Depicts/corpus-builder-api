@@ -116,12 +116,24 @@ namespace CorpusDraftCSharp
 
         #region Constructors
 
+        
         public Realization(Clause clause, string _realizationID, string _lexeme, string _PoS)
         {
             this.documentID = clause.documentID;
             this.filePath = clause.filePath;
             this.textID = clause.textID;
             this.clauseID = clause.clauseID;
+            this.realizationID = _realizationID;
+            this.lexeme = _lexeme;
+            this.partOfSpeech = _PoS;
+        }
+        [JsonConstructor]
+        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, string _realizationID, string _lexeme, string _PoS)
+        {
+            this.documentID = _documentID;
+            this.filePath = _filePath;
+            this.textID = _textID;
+            this.clauseID = _clauseID;
             this.realizationID = _realizationID;
             this.lexeme = _lexeme;
             this.partOfSpeech = _PoS;

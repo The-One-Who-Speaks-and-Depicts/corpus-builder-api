@@ -24,15 +24,12 @@
         </form>
     </div>
 
-<div style="width:50%; float:left;">
-    <div align="center"></div>
+<div align="center">
     <table>
-
-    </table>
-</div>
-<div style="width:50%; float:right;">
-    <table>
-
+        @foreach (var word in Model.wordsWithTags)
+        {
+            <tr><td align="left">@word.Key</td><td align="right">@word.Value</td></tr>
+        }
     </table>
 </div>
 <div style="clear:both;"></div>
