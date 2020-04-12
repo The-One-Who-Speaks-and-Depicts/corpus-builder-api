@@ -9,37 +9,15 @@ def analysis(processed_string):
     paragraphs = string.split('\n')
     words_by_paragraphs = []
     for p in paragraphs:
-        words_by_paragraphs.append(p.split(' '))
-    verb_endings = ['ûtь$', 'eli$', 'ili$', 'ite$', 'etь$', 'utь$', 'ete$', 'itь$', 'ti$', 'ate$', 'ĉi$']
-    irregular_verbs = ['e']
-    pre_tagged = [('vasʼpetь', 'ADVB')]
-    normal_length = 3
+        words_by_paragraphs.append(p.split(' '))    
     tagged_by_paragraphs = []
     for paragraph in words_by_paragraphs:
       tagged_by_paragraphs.append([])
-      for word in paragraph:    
-        word_tagged = False
-        for unit in pre_tagged:
-          if (word == unit[0]):
-            tagged_by_paragraphs[len(tagged_by_paragraphs) - 1].append((word, unit[1]))
-            word_tagged = True
-            break
-        for ending in verb_endings:
-          if (word_tagged):
-            break
-          if re.search(ending, word) and len(word) > normal_length:
-            tagged_by_paragraphs[len(tagged_by_paragraphs) - 1].append((word, 'V'))
-            word_tagged = True
-            break
-        for form in irregular_verbs:
-          if (word_tagged):
-            break
-          if (word == form):
-            tagged_by_paragraphs[len(tagged_by_paragraphs) - 1].append((word, 'V'))
-            word_tagged = True
-            break
-        if (not word_tagged):
-          tagged_by_paragraphs[len(tagged_by_paragraphs) - 1].append((word, 'N'))
+      for word in paragraph:
+           processed_word = word.split('{')
+           tags = processed_word[1][0:len(processed_word[1]) - 1]
+           tags = re.sub("PoS=", "", tags)
+           tagged_by_paragraphs[len(tagged_by_paragraphs) - 1].append((processed_word[0], tags))
     tagged_by_paragraphs_alphabetically = []
     for paragraph in tagged_by_paragraphs:
       tagged_by_paragraphs_alphabetically.append([])
