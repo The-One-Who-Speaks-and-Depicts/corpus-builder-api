@@ -29,7 +29,14 @@ namespace CroatianProject.Pages
         public ViewModel(IHostingEnvironment environment)
         {
             _environment = environment;
-            textList = getTexts();
+            try
+            {
+                textList = getTexts();
+            }
+            catch
+            {
+                Redirect("./Error");
+            }
         }
 
         public List<string> getTexts()
@@ -60,18 +67,18 @@ namespace CroatianProject.Pages
             }
             else
             {
-                foreach (var text in textList)
+                foreach (var text in getTexts())
                 {
-                    if (text == "Any")
+                    if (text != "Any")
                     {
-                        continue;
-                    }
-                    searchedTexts.Add(SearchForText(text, directory));
+                        searchedTexts.Add(SearchForText(text, directory));
+                    }                    
                 }
             }
             List<Realization> acquiredForms = new List<Realization>();
             foreach (var text in searchedTexts)
             {
+                
                 DirectoryInfo dirWords = new DirectoryInfo(Path.Combine(directory, text.Name, "paragraphs"));
                 var dirResults = dirWords.GetDirectories();
                 foreach (var wordDirectory in dirResults)
@@ -85,7 +92,7 @@ namespace CroatianProject.Pages
                         {
                             while ((s = f.ReadLine()) != null)
                             {
-                                acquiredForms.Add(JsonConvert.DeserializeObject<Realization>(s));                                
+                                acquiredForms.Add(JsonConvert.DeserializeObject<Realization>(s));
                             }
                         }
                     }
@@ -94,7 +101,14 @@ namespace CroatianProject.Pages
             var neededWords = new List<Realization>();
             if (PoS == "Any")
             {
-                neededWords = acquiredForms.Where((realization) => realization.lexeme == wordSearched).ToList();
+                if (wordSearched == null)
+                {
+                    neededWords = acquiredForms;
+                }
+                else
+                {
+                    neededWords = acquiredForms.Where((realization) => realization.lexeme == wordSearched).ToList();
+                }                
             }
             else
             {
@@ -139,7 +153,7 @@ namespace CroatianProject.Pages
             }
             else
             {
-                foreach (var text in textList)
+                foreach (var text in getTexts())
                 {
                     if (text == "Any")
                     {
@@ -169,16 +183,23 @@ namespace CroatianProject.Pages
             var neededWords = new List<DictionaryUnit>();
             if (PoS == "Any")
             {
-                foreach (var unit in acquiredForms)
+                if (wordSearched == null)
                 {
-                    foreach (var realization in unit.realizations)
+                    neededWords = acquiredForms;
+                }
+                else
+                {
+                    foreach (var unit in acquiredForms)
                     {
-                        if (realization.lexeme == wordSearched)
+                        foreach (var realization in unit.realizations)
                         {
-                            neededWords.Add(unit);
+                            if (realization.lexeme == wordSearched)
+                            {
+                                neededWords.Add(unit);
+                            }
                         }
                     }
-                }
+                }                
             }
             else
             {
