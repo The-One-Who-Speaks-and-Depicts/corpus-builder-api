@@ -1,13 +1,11 @@
 ﻿window.onload = function () {
 
     //получаем идентификатор элемента
-    var a = document.getElementById('word');
+    var a = document.getElementById('text');
 
     //вешаем на него событие
     a.onclick = function () {
-        //производим какие-то действия
-        if (this.innerHTML == 'On') this.innerHTML = 'Off';
-        else this.innerHTML = 'On';
+        console.log("Initialized!");
         //предотвращаем переход по ссылке href
         return false;
     }

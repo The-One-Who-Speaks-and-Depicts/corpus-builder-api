@@ -3,16 +3,22 @@
 @{
     ViewData["Title"] = "Анализ";
 }
+<html>
+<head>
+    <script src="~/js/wordEditingController.js"></script>
+</head>
+<body>
+    <h2>Добавление возможностей для анализа</h2>
+    <form method="get">
+        <select asp-for="textName">
+            @foreach (var text in Model.textList)
+            {
+                <option>@text</option>
+            }
+        </select>
+        <button asp-page-handler="show" id="text">Показать текст</button><br />
+    </form>
+</body>
+</html>
 
-<h2>Добавление возможностей для анализа</h2>
-
-<form method="get">    
-    <select asp-for="textName">
-        @foreach (var text in Model.textList)
-        {
-            <option>@text</option>
-        }
-    </select>    
-    <button asp-page-handler="show">Показать текст</button><br />
-</form>
 
