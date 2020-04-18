@@ -84,7 +84,7 @@ namespace CroatianProject.Pages.Admin
             }
             foreach (var foundWord in acquiredForms)
             {
-                textByWords.Add("<span onclick=\"textShow();\"> " + foundWord.lexeme + "</span>");
+                textByWords.Add("<span class=\"word\"> " + foundWord.lexeme + "</span>");
             }
             }
             textList = getTexts();
