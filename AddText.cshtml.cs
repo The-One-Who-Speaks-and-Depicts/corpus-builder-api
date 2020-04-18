@@ -19,7 +19,6 @@ namespace CroatianProject.Pages
     public class AddTextModel : PageModel
     {
        
-        public string ExceptionMessage { get; private set; } = "";
         public int Rows { get; set; } = 20;
         public int Cols { get; set; } = 50;
         
@@ -50,7 +49,7 @@ namespace CroatianProject.Pages
                 var dirTexts = Path.Combine(dirData, "texts");
                 Directory.CreateDirectory(dirTexts);
                 DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirTexts);
-                Text text = new Text(directoryTextsInfo.GetFiles().Length.ToString(), textName, file);                
+                Text text = new Text(directoryTextsInfo.GetDirectories().Length.ToString(), textName, file);                
                 string textInJSON = text.Jsonize();
                 var dirTextData = Path.Combine(dirTexts, textName);
                 Directory.CreateDirectory(dirTextData);
@@ -81,10 +80,10 @@ namespace CroatianProject.Pages
         public string processedString { get; set; }
        
 
-        public async Task OnPostProcess()
+        public IActionResult OnPostProcess()
         {
             try
-            {
+            {                
                 ScriptEngine engine = Python.CreateEngine();
                 ScriptScope scope = engine.CreateScope();
                 var paths = engine.GetSearchPaths();
@@ -97,12 +96,12 @@ namespace CroatianProject.Pages
                 IList<object> result = function(processedString);
                 IList<object> paragraphs = (IList<object>)result[0]; // параграфы
                 IList<object> tagged_by_paragraphs = (IList<object>)result[1]; // параграфы по словах по параграфам
-                IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном
+                IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном                
                 var dirTexts = Path.Combine(_environment.ContentRootPath, "database", "texts");
                 DirectoryInfo textDirectoryInfo = new DirectoryInfo(dirTexts);
                 if (!textDirectoryInfo.Exists)
                 {
-                    return;
+                    throw new Exception("Не существует директории с текстами!");
                 }
                 var directoriesInfo = textDirectoryInfo.GetDirectories();
                 List<Text> texts = new List<Text>();
@@ -118,7 +117,7 @@ namespace CroatianProject.Pages
                             texts.Add(JsonConvert.DeserializeObject<Text>(jsonizedText));
                         }
                     }                    
-                }
+                }                
                 if (texts.Count < 1)
                 {
                     Exception e = new Exception("В базе данных нет текстов!");
@@ -240,6 +239,8 @@ namespace CroatianProject.Pages
                     w.Write(e.Message);
                 }
             }
+
+            return RedirectToPage();
             
         }
 
