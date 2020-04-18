@@ -1,0 +1,18 @@
+﻿@page
+@model CroatianProject.Pages.Admin.AddFeatureModel
+@{
+    ViewData["Title"] = "Анализ";
+}
+
+<h2>Добавление возможностей для анализа</h2>
+
+<form method="get">    
+    <select asp-for="textName">
+        @foreach (var text in Model.textList)
+        {
+            <option>@text</option>
+        }
+    </select>    
+    <button asp-page-handler="show">Показать текст</button><br />
+</form>
+
