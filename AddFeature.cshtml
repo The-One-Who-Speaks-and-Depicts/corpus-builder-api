@@ -9,17 +9,21 @@
 </head>
 <body>
     <h2>Добавление возможностей для анализа</h2>
-    <form method="get">
+    <form asp-page-handler="show" method="post">
         <select asp-for="textName">
             @foreach (var text in Model.textList)
             {
                 <option>@text</option>
             }
         </select>
-        <button asp-page-handler="show" onclick="textShow();">Показать текст</button><br />
+        <button>Показать текст</button><br />
     </form>
 
     <div align="center"></div>
+    @foreach(var word in Model.textByWords)
+    {
+        @Html.Raw(word)
+    }
     <div style="clear:both;"></div>
 
 </body>
