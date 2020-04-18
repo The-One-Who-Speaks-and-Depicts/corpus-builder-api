@@ -167,10 +167,9 @@ namespace CroatianProject.Pages
                     int currentWord = 0;
                     foreach (var word in words)
                     {
-                        IList<object> tuple = (IList<object>)word; // кортеж для каждого слова
-                        string lexeme = (string)tuple[0];
-                        string PoS = (string)tuple[1];
-                        var token = new Realization(sections[currentParagraph], currentWord.ToString(), lexeme, PoS);
+                        //IList<object> tuple = (IList<object>)word; // кортеж для каждого слова
+                        string lexeme = (string)word;
+                        var token = new Realization(sections[currentParagraph], currentWord.ToString(), lexeme);
                         var dirTextData = Path.Combine(dirTexts, currentText.textID);
                         Directory.CreateDirectory(dirTextData);
                         var dirParagraphData = Path.Combine(dirTextData, "paragraphs");
@@ -194,25 +193,18 @@ namespace CroatianProject.Pages
                 {
                     dictionaryUnits_realizations.Add(realization.lexeme);
                 }
-                List<(string, string)> dictionary = new List<(string, string)>();
-                foreach (var unit in tagged_alphabetically)
+                List<string> dictionary = new List<string>();
+                foreach (var word in tagged_alphabetically)
                 {
-                    IList<object> word = (IList<object>)unit; // список слов
-                    foreach (var tuple in word)
-                    {
-                        IList<object> element = (IList<object>)tuple; // кортеж для каждого слова
-                        string lexeme = (string)element[0];
-                        string PoS = (string)element[1];
-                        dictionary.Add((lexeme, PoS));
-                    }
+                        dictionary.Add((string) word);
                 }
                 List<DictionaryUnit> alphabeticalDictionary = new List<DictionaryUnit>();
                 foreach (string unit_realization in dictionaryUnits_realizations)
                 {
-                    var units = dictionary.Where((unit) => unit.Item1 == unit_realization.ToLower());
+                    var units = dictionary.Where((unit) => unit == unit_realization.ToLower());
                     foreach (var unit in units)
                     {
-                        var dictionaryUnits = realizations.Where((realization) => (realization.lexeme.ToLower() == unit.Item1) && (realization.partOfSpeech == unit.Item2));
+                        var dictionaryUnits = realizations.Where((realization) => realization.lexeme.ToLower() == unit);
                         List<Realization> dictionaryUnitsConverted = new List<Realization>();
                         foreach (var dictionaryunit in dictionaryUnits)
                         {

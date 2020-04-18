@@ -96,7 +96,7 @@ namespace CorpusDraftCSharp
         protected string textID;
         [JsonProperty]
         protected string clauseID;
-        [JsonIgnore]
+        [JsonProperty]
         protected Dictionary<string, string> realizationFields;
         [JsonProperty]
         protected string realizationID;
@@ -106,7 +106,7 @@ namespace CorpusDraftCSharp
         protected string lemmaTwo;
         [JsonProperty]
         public string lexeme;
-        [JsonProperty]
+        [JsonIgnore]
         public string partOfSpeech;
         [JsonIgnore]
         protected string gloss;
@@ -116,7 +116,16 @@ namespace CorpusDraftCSharp
 
         #region Constructors
 
-        
+        public Realization(Clause clause, string _realizationID, string _lexeme)
+        {
+            this.documentID = clause.documentID;
+            this.filePath = clause.filePath;
+            this.textID = clause.textID;
+            this.clauseID = clause.clauseID;
+            this.realizationID = _realizationID;
+            this.lexeme = _lexeme;
+        }
+
         public Realization(Clause clause, string _realizationID, string _lexeme, string _PoS)
         {
             this.documentID = clause.documentID;
@@ -127,7 +136,17 @@ namespace CorpusDraftCSharp
             this.lexeme = _lexeme;
             this.partOfSpeech = _PoS;
         }
-        [JsonConstructor]
+
+        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, string _realizationID, string _lexeme)
+        {
+            this.documentID = _documentID;
+            this.filePath = _filePath;
+            this.textID = _textID;
+            this.clauseID = _clauseID;
+            this.realizationID = _realizationID;
+            this.lexeme = _lexeme;
+        }
+
         public Realization(string _documentID, string _filePath, string _textID, string _clauseID, string _realizationID, string _lexeme, string _PoS)
         {
             this.documentID = _documentID;
@@ -138,6 +157,7 @@ namespace CorpusDraftCSharp
             this.lexeme = _lexeme;
             this.partOfSpeech = _PoS;
         }
+        
 
         public Realization(string documentID, Dictionary<string, DataTable> spreadsheets, string filePath, string textID, string clauseID, string realizationID, string partOfSpeech)
         {
