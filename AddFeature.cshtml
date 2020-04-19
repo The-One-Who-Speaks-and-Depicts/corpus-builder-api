@@ -9,7 +9,7 @@
 </head>
 <body>
     <h2>Добавление признаков в текст</h2>
-    <form asp-page-handler="show" method="post">
+    <form align="center" asp-page-handler="show" method="post">
         <select asp-for="textName">
             @foreach (var text in Model.textList)
             {
@@ -17,14 +17,24 @@
             }
         </select>
         <button>Показать текст</button><br />
-    </form>
+    </form><br /><br /><br />
 
-    <div align="center"></div>
-    @foreach(var word in Model.textByWords)
-    {
-        @Html.Raw(word)
-    }
-    <div style="clear:both;"></div>
+    <div>
+        <div align="center" style="float:left;">
+            @foreach (var word in Model.textByWords)
+            {
+                @Html.Raw(word)
+            }
+        </div>
+
+        <div align="center" style="float:right;">
+            <form method="post">
+                <div id="info"></div>
+                <button asp-page-handler="change">Изменить</button>
+            </form>
+        </div>
+    </div>
+        <div style="clear:both;"></div>
 
 </body>
 </html>
