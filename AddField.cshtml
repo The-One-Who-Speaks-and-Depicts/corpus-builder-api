@@ -1,0 +1,45 @@
+﻿@page
+@model CroatianProject.Pages.Admin.AddFieldModel
+@{
+    ViewData["Title"] = "Добавление полей для разметки";
+}
+    <div>
+        <div style="float:left;">
+            <h3>Добавить поле</h3>
+            <form method="post">
+                Название признака:<br />
+                <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="1" cols="20" asp-for="FieldName"></textarea><br />
+                Описание признака: <br />
+                <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="3" cols="20" asp-for="FieldDesc"></textarea><br />
+                Значения признака: <br/>
+                <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="5" cols="20" asp-for="FieldVals"></textarea><br />
+                <button asp-page-handler="add">Добавить признак</button>
+            </form>
+        </div>
+        <div style="float:right;">
+            <h3>Редактировать поле</h3>
+            <form method="post">
+                <select>
+                    @try
+                    {
+                        if (Model.FieldList.Count > 0)
+                        {
+                        @foreach (var field in Model.FieldList)
+                        {
+                            <option>@field</option>
+                        }
+                        }
+                    }
+                    catch {
+
+                    }
+                </select>
+                <br />
+            </form>
+        </div>
+    </div>
+
+    <div style="clear:both;"></div>
+    
+
+
