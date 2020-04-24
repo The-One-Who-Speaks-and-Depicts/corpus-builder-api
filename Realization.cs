@@ -169,6 +169,11 @@ namespace CorpusDraftCSharp
             this.lexeme = _lexeme;
             this.partOfSpeech = _PoS;
         }
+
+        public Realization()
+        {
+
+        }
         
         /*
         public Realization(string documentID, Dictionary<string, DataTable> spreadsheets, string filePath, string textID, string clauseID, string realizationID, string partOfSpeech)

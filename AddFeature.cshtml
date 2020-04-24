@@ -30,10 +30,10 @@
 
         <div align="center" style="float:right;">
             <form method="post">
-                <div id="identificator" style="display:none;"></div>
+                <textarea id="identificator" style="display:none;" asp-for="currentWordId"></textarea>
                 <div id="info"></div>
-                <select id="keys"></select>
-                <select id="thisFieldValues"></select>
+                <select id="keys" asp-for="currentField"></select>
+                <select id="thisFieldValues" asp-for="currentFieldValue"></select>
                 <button asp-page-handler="change">Добавить признак</button>
             </form>
         </div>
