@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +19,35 @@ namespace CroatianProject.Pages.Admin
         [BindProperty]
         public string textName { get; set; }
         public List<string> textByWords = new List<string>();
+        [BindProperty]
+        public List<string> fieldsList { get; set; } = new List<string>();
 
+        public List<string> getFields()
+        {
+            List<string> existingFields = new List<string>();
+            try
+            {
+                var directory = Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields");
+                DirectoryInfo fieldsDirectory = new DirectoryInfo(directory);
+                var fields = fieldsDirectory.GetFiles();
+                for (int i = 0; i < fields.Length; i++)
+                {                    
+                    if (i < fields.Length - 1)
+                    {
+                        existingFields.Add(fields[i].Name + "|");
+                    }
+                    else
+                    {
+                        existingFields.Add(fields[i].Name);
+                    }
+                } 
+            }
+            catch
+            {
+
+            }
+            return existingFields;
+        }
         public List<string> getTexts()
         {
             var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
@@ -47,6 +76,7 @@ namespace CroatianProject.Pages.Admin
             try
             {
                 textList = getTexts();
+                fieldsList = getFields();
             }
             catch
             {
@@ -84,15 +114,39 @@ namespace CroatianProject.Pages.Admin
             }
             foreach (var foundWord in acquiredForms)
             {
-                textByWords.Add("<span class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
+                    try
+                    {
+                        string fieldsOfWord = "";
+                        foreach (var field in foundWord.realizationFields)
+                        {
+                            fieldsOfWord += field;
+                            fieldsOfWord += ":";
+                            foreach (var fieldValue in field.Value)
+                            {
+                                fieldsOfWord += fieldValue;
+                                fieldsOfWord += "";
+                            }
+                            fieldsOfWord += "\n";
+                        }
+                        textByWords.Add("<span class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + fieldsOfWord + "</span>");
+                    }
+                    catch
+                    {
+                        textByWords.Add("<span class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
+                    }
+                
             }
             }
             textList = getTexts();
+            fieldsList = getFields();
         }
-
+        
         public void OnPostChange()
         {
             textList = getTexts();
+            fieldsList = getFields();
         }
+
+        
     }
 }

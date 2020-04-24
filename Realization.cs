@@ -87,19 +87,19 @@ namespace CorpusDraftCSharp
 
         #region objectValues
         [JsonProperty]
-        protected string documentID;
+        public string documentID;
         [JsonIgnore]
         protected Dictionary<string, DataTable> spreadsheets;
         [JsonProperty]
-        protected string filePath;
+        public string filePath;
         [JsonProperty]
-        protected string textID;
+        public string textID;
         [JsonProperty]
-        protected string clauseID;
+        public string clauseID;
         [JsonProperty]
-        protected Dictionary<string, string> realizationFields;
+        public Dictionary<string, List<string>> realizationFields;
         [JsonProperty]
-        protected string realizationID;
+        public string realizationID;
         [JsonIgnore]
         protected string lemmaOne;
         [JsonIgnore]
@@ -115,6 +115,18 @@ namespace CorpusDraftCSharp
         #endregion
 
         #region Constructors
+
+        [JsonConstructor]
+        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, Dictionary<string, List<string>> _fields, string _realizationID, string _lexeme)
+        {
+            this.documentID = _documentID;
+            this.filePath = _filePath;
+            this.textID = _textID;
+            this.clauseID = _clauseID;
+            this.realizationFields = _fields;
+            this.realizationID = _realizationID;
+            this.lexeme = _lexeme;
+        }
 
         public Realization(Clause clause, string _realizationID, string _lexeme)
         {
@@ -158,7 +170,7 @@ namespace CorpusDraftCSharp
             this.partOfSpeech = _PoS;
         }
         
-
+        /*
         public Realization(string documentID, Dictionary<string, DataTable> spreadsheets, string filePath, string textID, string clauseID, string realizationID, string partOfSpeech)
         {
             Console.WriteLine("Generating realizations. Starting realization generation. Realization number is {0}, ID will be {1}{2}{3}{0}", realizationID, documentID, textID, clauseID);
@@ -274,6 +286,7 @@ namespace CorpusDraftCSharp
             }
             
         }
+        */
         #endregion
 
         #region publicMethods

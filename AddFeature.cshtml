@@ -8,6 +8,7 @@
     <script src="~/js/wordEditingController.js"></script>
 </head>
 <body>
+    <div id="values" style="display:none;">@foreach (var field in Model.fieldsList){@field}</div>
     <h2>Добавление признаков в текст</h2>
     <form align="center" asp-page-handler="show" method="post">
         <select asp-for="textName">
@@ -29,8 +30,11 @@
 
         <div align="center" style="float:right;">
             <form method="post">
+                <div id="identificator" style="display:none;"></div>
                 <div id="info"></div>
-                <button asp-page-handler="change">Изменить</button>
+                <select id="keys"></select>
+                <select id="thisFieldValues"></select>
+                <button asp-page-handler="change">Добавить признак</button>
             </form>
         </div>
     </div>

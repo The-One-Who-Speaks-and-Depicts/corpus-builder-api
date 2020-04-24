@@ -138,7 +138,7 @@ namespace CorpusDraftCSharp
             }
             this.realizationIDs = MyExtensions.SingleFieldIntoList(spreadsheets, "realization indexes", "clause indexes", clauseID, realizationIDsField.tableName, 
                realizationIDsField.colName, realizationIDsField.colNumber);            
-            this.realizations = GenerateRealizations(realizationIDs);
+           // this.realizations = GenerateRealizations(realizationIDs);
         }
         #endregion
 
@@ -149,7 +149,7 @@ namespace CorpusDraftCSharp
             return jsonedClause;
         }
         #endregion
-
+        /*
         #region PrivateMethods
         private List<Realization> GenerateRealizations(List<string> realizationIDs)
         {
@@ -192,7 +192,8 @@ namespace CorpusDraftCSharp
             }
             this.clauseBrokenness = (1 - this.clauseBrokenness / this.wordCount) * 100;
             return realizations;
-        }        
-        #endregion
+        }
+        
+        #endregion*/
     }
 }

@@ -12,29 +12,38 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string name { get; private set; }
         [JsonProperty]
-        public List<object> values { get; private set; }
+        public List<object> values { get; private set; } = new List<object>();
+        [JsonProperty]
+        public string description { get; private set;  }
         [JsonProperty]
         public bool isActive { get; private set; } = true;
         [JsonProperty]
         public bool isMultiple { get; private set; } = false;
 
         [JsonConstructor]
-        Field(string _name, List<object> _values, bool _isActive, bool _isMultiple)
+        Field(string _name, List<object> _values, string _description,  bool _isActive, bool _isMultiple)
         {
             this.name = _name;
             this.values = _values;
+            this.description = _description;
             this.isActive = _isActive;
             this.isMultiple = _isMultiple;
         }
 
-        public Field(string _name)
+        public Field(string _name, string _description)
         {
             this.name = _name;
+            this.description = _description;
         }
 
         public void ChangeName(string _name)
         {
             this.name = _name;
+        }
+
+        public void ChangeDesc(string _description)
+        {
+            this.description = _description;
         }
 
 
@@ -101,14 +110,22 @@ namespace CorpusDraftCSharp
 
         public void MakeSingle()
         {
-            if (this.values.Count > 1)
+            try
             {
-                throw new Exception("Сначала необходимо оставить только одно значение!");
+                if (this.values.Count > 1)
+                {
+                    throw new Exception("Сначала необходимо оставить только одно значение!");
+                }
+                else
+                {
+                    this.isMultiple = false;
+                }
             }
-            else
+            catch
             {
                 this.isMultiple = false;
-            }            
+            }
+                        
         }
 
         public string Jsonize()

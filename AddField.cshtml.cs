@@ -29,13 +29,13 @@ namespace CroatianProject.Pages.Admin
             List<string> existingFields = new List<string>();
             try
             {
-                var directory = Path.Combine(_environment.ContentRootPath, "database", "fields");
+                var directory = Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields");
                 DirectoryInfo fieldsDirectory = new DirectoryInfo(directory);
-                var fields = fieldsDirectory.GetDirectories();
+                var fields = fieldsDirectory.GetFiles();
                 existingFields.Add("Any");
                 foreach (var field in fields)
                 {
-                    existingFields.Add(field.Name);
+                    existingFields.Add(field.Name.Split(".json")[0]);
                 }
             }
             catch
@@ -77,14 +77,12 @@ namespace CroatianProject.Pages.Admin
                     field.AddValue(Regex.Replace(value, @"\r", ""));
                 }
                 
-                var dirData = Path.Combine(_environment.ContentRootPath, "database");
+                var dirData = Path.Combine(_environment.ContentRootPath, "wwwroot", "database");
                 Directory.CreateDirectory(dirData);
                 var dirFields = Path.Combine(dirData, "fields");
                 Directory.CreateDirectory(dirFields);
-                string fieldInJSON = field.Jsonize();
-                var dirFieldsData = Path.Combine(dirFields, field.name);
-                Directory.CreateDirectory(dirFieldsData);
-                var FieldDBfile = Path.Combine(dirFieldsData, field.name + ".json");
+                string fieldInJSON = field.Jsonize();                
+                var FieldDBfile = Path.Combine(dirFields, field.name + ".json");
                 FileStream fs = new FileStream(FieldDBfile, FileMode.Create);
                 using (StreamWriter w = new StreamWriter(fs))
                 {
