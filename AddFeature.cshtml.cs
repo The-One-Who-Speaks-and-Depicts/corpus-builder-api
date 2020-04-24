@@ -241,6 +241,71 @@ namespace CroatianProject.Pages.Admin
                                         }
                                     }
                                 }
+                                var textDictDir = Path.Combine(_environment.ContentRootPath, "database", "dictionary", currentText.textID);
+                                var dictFiles = new DirectoryInfo(textDictDir).GetFiles();
+                                foreach (var dictFile in dictFiles)
+                                {
+                                    string s2;
+                                    var current = new DictionaryUnit();
+                                    using (var f2 = new StreamReader(dictFile.FullName))
+                                    {
+                                        while ((s2 = f2.ReadLine()) != null)
+                                        {
+                                            current = JsonConvert.DeserializeObject<DictionaryUnit>(s2);
+
+                                        }
+                                    }
+                                    foreach (var realization in current.realizations)
+                                    {
+                                        if (realization.documentID == ids[0] && realization.clauseID == ids[1] && realization.realizationID == ids[2])
+                                        {
+                                            try
+                                            {
+                                                bool fieldExists = false;
+                                                foreach (var field in realization.realizationFields)
+                                                {
+                                                    if (field.Key == currentField)
+                                                    {
+                                                        if (realization.realizationFields[field.Key].Contains(currentFieldValue))
+                                                        {
+                                                            fieldExists = true;
+                                                            break;
+                                                        }
+                                                        realization.realizationFields[field.Key].Add(currentFieldValue);
+                                                        FileStream fs = new FileStream(dictFile.FullName, FileMode.Create);
+                                                        using (StreamWriter w = new StreamWriter(fs))
+                                                        {
+                                                            w.Write(current.Jsonize());
+                                                        }
+                                                        fieldExists = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if (!fieldExists)
+                                                {
+                                                    realization.realizationFields.Add(currentField, new List<string>());
+                                                    realization.realizationFields[currentField].Add(currentFieldValue);
+                                                    FileStream fs = new FileStream(dictFile.FullName, FileMode.Create);
+                                                    using (StreamWriter w = new StreamWriter(fs))
+                                                    {
+                                                        w.Write(current.Jsonize());
+                                                    }
+                                                }
+                                            }
+                                            catch
+                                            {
+                                                realization.realizationFields = new Dictionary<string, List<string>>();
+                                                realization.realizationFields.Add(currentField, new List<string>());
+                                                realization.realizationFields[currentField].Add(currentFieldValue);
+                                                FileStream fs = new FileStream(dictFile.FullName, FileMode.Create);
+                                                using (StreamWriter w = new StreamWriter(fs))
+                                                {
+                                                    w.Write(current.Jsonize());
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }                    

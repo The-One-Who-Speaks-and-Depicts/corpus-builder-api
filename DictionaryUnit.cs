@@ -27,6 +27,10 @@ namespace CorpusDraftCSharp
             this.realizations = realizations;
         }
         
+        public DictionaryUnit()
+        {
+
+        }
         public string Jsonize()
         {
             string DictionaryUnitJsoned = JsonConvert.SerializeObject(this);
