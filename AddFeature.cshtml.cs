@@ -121,31 +121,40 @@ namespace CroatianProject.Pages.Admin
                             }
                         }
                     }
+                        acquiredForms.Add(new Realization());
                 }
             }
             foreach (var foundWord in acquiredForms)
             {
                     try
                     {
-                        string fieldsOfWord = "";
-                        string hoverFields = "";
-                        foreach (var field in foundWord.realizationFields)
+                        if (!String.IsNullOrEmpty(foundWord.documentID))
                         {
-                            fieldsOfWord += field.Key;
-                            hoverFields += field.Key;
-                            fieldsOfWord += ":";
-                            hoverFields += ":";
-                            foreach (var fieldValue in field.Value)
+                            string fieldsOfWord = "";
+                            string hoverFields = "";
+                            foreach (var field in foundWord.realizationFields)
                             {
-                                fieldsOfWord += fieldValue;
-                                hoverFields += fieldValue;
-                                fieldsOfWord += ";";
-                                hoverFields += ";";
+                                fieldsOfWord += field.Key;
+                                hoverFields += field.Key;
+                                fieldsOfWord += ":";
+                                hoverFields += ":";
+                                foreach (var fieldValue in field.Value)
+                                {
+                                    fieldsOfWord += fieldValue;
+                                    hoverFields += fieldValue;
+                                    fieldsOfWord += ";";
+                                    hoverFields += ";";
+                                }
+                                fieldsOfWord += "<br />";
+                                hoverFields += "\n";
                             }
-                            fieldsOfWord += "<br />";
-                            hoverFields += "\n";
+                            textByWords.Add("<span title=\"" + hoverFields + "\" data-content=\"" + fieldsOfWord + "\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
+
                         }
-                        textByWords.Add("<span title=\"" + hoverFields + "\" data-content=\"" + fieldsOfWord + "\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
+                        else
+                        {
+                            textByWords.Add("<br />");
+                        }
                     }
                     catch
                     {
