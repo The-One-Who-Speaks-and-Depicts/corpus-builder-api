@@ -28,8 +28,12 @@ namespace CroatianProject.Pages.Admin
         public string currentField { get; set; }
         [BindProperty]
         public string currentFieldValue { get; set; }
+        [BindProperty]
+        public string isFieldMultiple { get; set; }
+        
+    
 
-        public List<string> getFields()
+    public List<string> getFields()
         {
             List<string> existingFields = new List<string>();
             try
@@ -206,17 +210,20 @@ namespace CroatianProject.Pages.Admin
                                                     {
                                                         if (field.Key == currentField)
                                                         {
-                                                            if (current.realizationFields[field.Key].Contains(currentFieldValue))
+                                                            if (isFieldMultiple == "true")
                                                             {
-                                                                fieldExists = true;
-                                                                break;
-                                                            }
-                                                            current.realizationFields[field.Key].Add(currentFieldValue);
-                                                            FileStream fs = new FileStream(word.FullName, FileMode.Create);
-                                                            using (StreamWriter w = new StreamWriter(fs))
-                                                            {
-                                                                w.Write(current.Jsonize());
-                                                            }
+                                                                if (current.realizationFields[field.Key].Contains(currentFieldValue))
+                                                                {
+                                                                    fieldExists = true;
+                                                                    break;
+                                                                }
+                                                                current.realizationFields[field.Key].Add(currentFieldValue);
+                                                                FileStream fs = new FileStream(word.FullName, FileMode.Create);
+                                                                using (StreamWriter w = new StreamWriter(fs))
+                                                                {
+                                                                    w.Write(current.Jsonize());
+                                                                }
+                                                            }                                                            
                                                             fieldExists = true;
                                                             break;
                                                         }
@@ -272,17 +279,20 @@ namespace CroatianProject.Pages.Admin
                                                 {
                                                     if (field.Key == currentField)
                                                     {
-                                                        if (realization.realizationFields[field.Key].Contains(currentFieldValue))
+                                                        if (isFieldMultiple == "true")
                                                         {
-                                                            fieldExists = true;
-                                                            break;
-                                                        }
-                                                        realization.realizationFields[field.Key].Add(currentFieldValue);
-                                                        FileStream fs = new FileStream(dictFile.FullName, FileMode.Create);
-                                                        using (StreamWriter w = new StreamWriter(fs))
-                                                        {
-                                                            w.Write(current.Jsonize());
-                                                        }
+                                                            if (realization.realizationFields[field.Key].Contains(currentFieldValue))
+                                                            {
+                                                                fieldExists = true;
+                                                                break;
+                                                            }
+                                                            realization.realizationFields[field.Key].Add(currentFieldValue);
+                                                            FileStream fs = new FileStream(dictFile.FullName, FileMode.Create);
+                                                            using (StreamWriter w = new StreamWriter(fs))
+                                                            {
+                                                                w.Write(current.Jsonize());
+                                                            }
+                                                        }                                                        
                                                         fieldExists = true;
                                                         break;
                                                     }

@@ -32,6 +32,7 @@ window.onload = function () {
                     var currValue = jsons[i].values[j];
                     $("#thisFieldValues").append("<option>" + currValue + "</option>");
                 }
+                $("#fieldInfo").append(jsons[i].isMultiple);
             }
         }
     });
