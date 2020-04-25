@@ -3,9 +3,13 @@
 window.onload = function () {
     $(".word").dblclick(function () {
         $('#info').text("");
+        $('#info').append("Lexeme:");
         $('#info').append(this.innerHTML);
+        $('#info').append("<br /><br /> Features:<br />");
+        $('#info').append($(this).attr('data-content'));
+        $('#info').append("<br /><br /><br />");
         $("#identificator").text("");
-        $("#identificator").append($(this).attr('id')); // gets the id of a clicked link that has a class of menu        
+        $("#identificator").append($(this).attr('id'));     
     });    
 
     

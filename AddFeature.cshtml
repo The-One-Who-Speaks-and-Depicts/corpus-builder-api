@@ -21,14 +21,14 @@
     </form><br /><br /><br />
 
     <div>
-        <div align="center" style="float:left;">
+        <div align="center" style="float:left; width:50%;">
             @foreach (var word in Model.textByWords)
             {
                 @Html.Raw(word)
             }
         </div>
 
-        <div align="center" style="float:right;">
+        <div align="center" style="float:right;width:50%;">
             <form method="post">
                 <textarea id="identificator" style="display:none;" asp-for="currentWordId"></textarea>
                 <div id="info"></div>

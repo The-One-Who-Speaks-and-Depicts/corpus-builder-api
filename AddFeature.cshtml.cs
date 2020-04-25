@@ -124,22 +124,28 @@ namespace CroatianProject.Pages.Admin
                     try
                     {
                         string fieldsOfWord = "";
+                        string hoverFields = "";
                         foreach (var field in foundWord.realizationFields)
                         {
-                            fieldsOfWord += field;
+                            fieldsOfWord += field.Key;
+                            hoverFields += field.Key;
                             fieldsOfWord += ":";
+                            hoverFields += ":";
                             foreach (var fieldValue in field.Value)
                             {
                                 fieldsOfWord += fieldValue;
-                                fieldsOfWord += "";
+                                hoverFields += fieldValue;
+                                fieldsOfWord += ";";
+                                hoverFields += ";";
                             }
-                            fieldsOfWord += "\n";
+                            fieldsOfWord += "<br />";
+                            hoverFields += "\n";
                         }
-                        textByWords.Add("<span class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + fieldsOfWord + "</span>");
+                        textByWords.Add("<span title=\"" + hoverFields + "\" data-content=\"" + fieldsOfWord + "\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
                     }
                     catch
                     {
-                        textByWords.Add("<span class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
+                        textByWords.Add("<span title= \"\" data-content=\"\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
                     }
                 
             }
