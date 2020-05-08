@@ -38,12 +38,12 @@ window.onload = function () {
                 }
             }
         }
-        $("#features").append("<button onclick=\"Depict();\" id=\"" + selectedOption + "\">Отобразить признак</button>");
+        $("#features").append("<button onclick=\"Depict('"+ selectedOption + "');\" id=\"" + selectedOption + "\">Отобразить признак</button>");
         $("#features").append("</div>");
     });
 };
 
-function Depict() {
-    console.log("Stonks!");
+function Depict(selectedOption) {
+    console.log(selectedOption);
 };
 
