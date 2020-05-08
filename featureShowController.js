@@ -44,6 +44,31 @@ window.onload = function () {
 };
 
 function Depict(selectedOption) {
-    console.log(selectedOption);
+    var words = document.getElementsByClassName('word');
+    var contents = "";
+    for (var i = 0; i < words.length; i++) {        
+        contents = $(words[i]).attr('data-content');
+        contents = contents.split(':');
+        if (contents[0] == selectedOption) {
+            wordFeatures = contents[1].split(";");
+            for (var j = 0; j < wordFeatures.length; j++) {
+                if (wordFeatures[j] != "<br />") {
+                    var features = document.getElementsByTagName("input");
+                    console.log(features.length);
+                    for (var k = 1; k < features.length; k++) {
+                        console.log($(features[k]).attr('name').split('_')[1]);
+                        console.log(wordFeatures[j]);
+                        if ($(features[k]).attr('name').split('_')[1] == wordFeatures[j]) {
+                            var color = $(features[k]).val();
+                            words[i].style.backgroundColor = color;
+                        }
+                    }
+                }
+            } 
+        }               
+    }
+
+    
+
 };
 
