@@ -25,7 +25,25 @@ window.onload = function () {
         }
     });
     $("#showFeature").click(function () {
-        console.log("Stonks");
+        var selectedOption = $("#keys option:selected").text();
+        $("#features").append("<div id=\"" + selectedOption + "\">");
+        $("#features").append(selectedOption + ":<br />");
+        for (var i = 0; i < jsons.length; i++) {
+            if (jsons[i].name == selectedOption) {
+                for (var j = 0; j < jsons[i].values.length; j++) {
+                    var currValue = jsons[i].values[j];
+                    $("#features").append(currValue + " ");
+                    $("#features").append("<input type=\"color\" value=\"#FFFFFF\" name=\"" + selectedOption + "_" + currValue + "\">");
+                    $("#features").append("<br />");
+                }
+            }
+        }
+        $("#features").append("<button onclick=\"Depict();\" id=\"" + selectedOption + "\">Отобразить признак</button>");
+        $("#features").append("</div>");
     });
-}
+};
+
+function Depict() {
+    console.log("Stonks!");
+};
 
