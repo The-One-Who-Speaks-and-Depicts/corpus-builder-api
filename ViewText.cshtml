@@ -11,6 +11,7 @@
 </head>
 <body>
     <h2>Просмотр текста</h2>
+    <div id="values" style="display:none;">@foreach (var field in Model.fieldsList) {@(field + "|")}</div>
     <div style="margin-top:25px;">
         <form align="center" asp-page-handler="show" method="post">
             <select asp-for="textName">
@@ -25,14 +26,25 @@
 
     <div>
         <div align="center" style="float:left; width:50%;">
+            <textarea id="wordFilter"></textarea> <br />
+            <select id="keysFilter">
+                @foreach (var part in Model.fieldsList)
+                {
+                    <option>@part</option>
+                }
+            </select>
+            <select id="valuesFilter">
+                <option>Any</option>
+            </select><br />
+            <textarea id="featureFilter"></textarea><br />
+            <button id="buttonFilter">Фильтровать по слову/признакам</button>
             @foreach (var word in Model.textByWords)
             {
                 @Html.Raw(word)
             }
         </div>
         <div align="center" style="float:right; width:50%;">
-            <div id="values" style="display:none;">@foreach (var field in Model.fieldsList){@field}</div>
-            <select id="keys" ></select>
+            <select id="keys"></select>
             <button id="showFeature">Добавить признак</button>
             <div id="features"></div>
 
