@@ -41,6 +41,7 @@ window.onload = function () {
         $("#features").append("<button onclick=\"Depict('"+ selectedOption + "');\" id=\"" + selectedOption + "\">Отобразить признак</button>");
         $("#features").append("</div>");
     });
+
 };
 
 function Depict(selectedOption) {

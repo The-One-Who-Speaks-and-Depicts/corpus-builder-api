@@ -6,41 +6,59 @@
 <html>
 <head>
     <script src="~/js/wordEditingController.js"></script>
+    <script src="~/js/filterCondionAdditionController.js"></script>
 </head>
 <body>
-    <div id="values" style="display:none;">@foreach (var field in Model.fieldsList){@field}</div>
-    <h2>Добавление признаков в текст</h2>
-    <form align="center" asp-page-handler="show" method="post">
-        <select asp-for="textName">
-            @foreach (var text in Model.textList)
-            {
-                <option>@text</option>
-            }
-        </select>
-        <button>Показать текст</button><br />
-    </form><br /><br /><br />
+    <div id="values" style="display:none;">
+        @foreach (var field in Model.fieldsList)
+        {@(field + "|")}
+</div>
+<h2>Добавление признаков в текст</h2>
+<form align="center" asp-page-handler="show" method="post">
+    <select asp-for="textName">
+        @foreach (var text in Model.textList)
+        {
+            <option>@text</option>
+        }
+    </select>
+    <button>Показать текст</button><br />
+</form><br /><br /><br />
 
-    <div>
-        <div align="center" style="float:left; width:50%;">
-            @foreach (var word in Model.textByWords)
-            {
-                @Html.Raw(word)
-            }
-        </div>
+<div align="center">
+    <textarea id="wordFilter"></textarea> <br />
+    <select id="keysFilter"></select>
+    <select id="valuesFilter">
+        <option>Any</option>
+    </select> <button id="featureAdditionButton">Добавить признак</button><br />
+    <textarea id="featureFilter"></textarea><br />
+    <button id="buttonFilter">Фильтровать по слову/признакам</button>
+</div><br /><br /><br />
 
-        <div align="center" style="float:right;width:50%;">
-            <form method="post">
-                <textarea id="identificator" style="display:none;" asp-for="currentWordId"></textarea>
-                <div id="info"></div>
-                <textarea id="fieldInfo" style="display:none;" asp-for="isFieldMultiple"></textarea>
-                <select id="keys" asp-for="currentField"></select>
-                <select id="thisFieldValues" asp-for="currentFieldValue"></select>                
-                <button asp-page-handler="change">Добавить признак</button>
-            </form>
-        </div>
+<div>
+    <div align="center" style="float:left; width:50%;">
+        @foreach (var word in Model.textByWords)
+        {
+            @Html.Raw(word)
+        }
     </div>
-        <div style="clear:both;"></div>
 
+    <div align="center" style="float:right;width:50%;">
+        <form method="post">
+            <textarea id="identificator" style="display:none;" asp-for="currentWordId"></textarea>
+            <div id="info"></div>
+            <textarea id="fieldInfo" style="display:none;" asp-for="isFieldMultiple"></textarea>
+            <select id="keys" asp-for="currentField"></select>
+            <select id="thisFieldValues" asp-for="currentFieldValue"></select>
+            <button asp-page-handler="change">Добавить признак</button>
+        </form>
+    </div>
+</div>
+
+
+<div style="clear:both;"></div>
+<div align="center">
+    <a href="http://localhost:50412/Admin/AddFeature" align="center">Вернуться назад</a>
+</div>
 </body>
 </html>
 

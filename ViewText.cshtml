@@ -22,22 +22,11 @@
             </select>
             <button>Показать текст</button><br />
         </form><br /><br /><br />
+        
     </div>
 
     <div>
-        <div align="center" style="float:left; width:50%;">
-            <textarea id="wordFilter"></textarea> <br />
-            <select id="keysFilter">
-                @foreach (var part in Model.fieldsList)
-                {
-                    <option>@part</option>
-                }
-            </select>
-            <select id="valuesFilter">
-                <option>Any</option>
-            </select><br />
-            <textarea id="featureFilter"></textarea><br />
-            <button id="buttonFilter">Фильтровать по слову/признакам</button>
+        <div align="center" style="float:left; width:50%;">            
             @foreach (var word in Model.textByWords)
             {
                 @Html.Raw(word)
