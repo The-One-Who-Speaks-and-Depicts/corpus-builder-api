@@ -2,6 +2,7 @@
 
 window.onload = function () {
 
+    
     $(".word").dblclick(function () {
         $('#info').text("");
         $('#info').append("Lexeme:");
@@ -92,7 +93,7 @@ window.onload = function () {
             var words = document.getElementsByClassName('word');
             for (var i = 0; i < words.length; i++) {
                 if (selectedWord.length > 0) {
-                    if (words[i].innerText != selectedWord) {
+                    if (!isMatch(selectedWord, words[i].innerText)) {
                         words[i].setAttribute("style", "display:none;");
                     }
                 }
@@ -155,6 +156,21 @@ window.onload = function () {
     });
 
 };
+
+function isMatch(pattern, word) {
+    if (pattern.includes('*')) {
+        pattern = pattern.split('*').join("\.*");
+    }
+    pattern = "\^" + pattern + "\$";    
+    pattern = new RegExp(pattern); 
+    if (word.match(pattern)) {
+        return true;
+    }
+    else {        
+        return false;
+    }
+    
+}
 
 function Depict(selectedOption) {
     var words = document.getElementsByClassName('word');
