@@ -19,7 +19,7 @@ namespace CroatianProject.Pages
         public string wordSearched { get; set; }
         [BindProperty]
         public string feature { get; set; }
-        public Dictionary<string, string> wordsWithTags = new Dictionary<string, string>();
+        public List<List<Dictionary<string, string>>>wordsWithTags = new List<List<Dictionary<string, string>>>();
         [BindProperty]
         public List<string> textList { get; set; }
         [BindProperty]
@@ -125,317 +125,325 @@ namespace CroatianProject.Pages
                         }
                     }
                 }
-                var neededWords = new List<Realization>();
+                var neededWords = new List<List<Realization>>();
                 if (String.IsNullOrEmpty(feature))
                 {
                     if (wordSearched == null)
                     {
-                        neededWords = acquiredForms;
+                        neededWords.Add(acquiredForms);
                     }
                     else
                     {
-                        neededWords = acquiredForms.Where((realization) => realization.lexeme == wordSearched).ToList();
+                        neededWords.Add(acquiredForms.Where((realization) => realization.lexeme == wordSearched).ToList());
                     }
                 }
                 else
                 {
                     if (wordSearched == null)
-                    {                        
-                        var currentList = new List<Realization>();
-                        List<string> features = feature.Split(' ').ToList();
-                        Debug.WriteLine(feature);
-                        Debug.WriteLine(features.Count);
-                        for (int i = 0; i < features.Count; i++)
-                        {
-                            if (!String.IsNullOrEmpty(features[i]))
+                    {                     
+                        
+                        List<string> groupsOfFeaures = feature.Split(" & ").ToList();
+                        for (int l = 0; l < groupsOfFeaures.Count; l++)
+                        {                            
+                            List<string> features = groupsOfFeaures[l].Split(' ').ToList();
+                            for (int i = 0; i < features.Count; i++)
                             {
-                                var searchedFeature = features[i];
-                                if (searchedFeature[0] == '!')
-                                {
-                                    searchedFeature = searchedFeature.Replace("!", "");
-                                    var searchedKeyAndValue = searchedFeature.Split(":");
-                                    Debug.WriteLine(searchedKeyAndValue[0] + searchedKeyAndValue[1]);
-                                    if (i == 0)
+                                var currentList = new List<Realization>();
+                                if (!String.IsNullOrEmpty(features[i]))
+                                {                                    
+                                    var searchedFeature = features[i];
+                                    if (searchedFeature[0] == '!')
                                     {
-                                        try
-                                        {
-                                            var wordsWithFeatures = new List<Realization>();
-                                            foreach (var unit in acquiredForms)
-                                            {
-                                                try
-                                                {
-                                                    unit.realizationFields.ContainsKey(searchedKeyAndValue[0]);
-                                                    wordsWithFeatures.Add(unit);
-                                                }
-                                                catch
-                                                {
-                                                    Debug.WriteLine("Word without fields caught!");
-                                                }
-                                            }
-                                            var wordsWithoutKey = wordsWithFeatures.Where((realization) => !realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                            var wordsWithOtherValue = wordsWithFeatures.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                            wordsWithOtherValue = wordsWithOtherValue.Where((realization) => !realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
-                                            var wordsWithNoFields = acquiredForms.Where((realization) => realization.realizationFields == null);
-                                            currentList.AddRange(wordsWithoutKey);
-                                            currentList.AddRange(wordsWithOtherValue);
-                                            currentList.AddRange(wordsWithNoFields);
-                                            Debug.WriteLine(currentList.Count);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            Debug.WriteLine(e.Message);
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        if (currentList.Count > 0)
+                                        searchedFeature = searchedFeature.Replace("!", "");
+                                        var searchedKeyAndValue = searchedFeature.Split(":");
+                                        if (i == 0)
                                         {
                                             try
                                             {
-                                                var wordsWithNoValues = currentList.Where(((realization) => realization.realizationFields == null)).ToList();
-                                                var wordsWithValues = currentList.Where((realization) => realization.realizationFields != null);
-                                                var wordsWithoutKey = wordsWithValues.Where((realization) => !realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                                var wordsWithOtherValue = wordsWithValues.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                                wordsWithOtherValue = wordsWithOtherValue.Where((realization) => !realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();                                                
-                                                currentList.Clear();
+                                                var wordsWithFeatures = new List<Realization>();
+                                                foreach (var unit in acquiredForms)
+                                                {
+                                                    try
+                                                    {
+                                                        unit.realizationFields.ContainsKey(searchedKeyAndValue[0]);
+                                                        wordsWithFeatures.Add(unit);
+                                                    }
+                                                    catch
+                                                    {
+                                                        Debug.WriteLine("Word without fields caught!");
+                                                    }
+                                                }
+                                                var wordsWithoutKey = wordsWithFeatures.Where((realization) => !realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                var wordsWithOtherValue = wordsWithFeatures.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                wordsWithOtherValue = wordsWithOtherValue.Where((realization) => !realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
+                                                var wordsWithNoFields = acquiredForms.Where((realization) => realization.realizationFields == null);
                                                 currentList.AddRange(wordsWithoutKey);
                                                 currentList.AddRange(wordsWithOtherValue);
-                                                currentList.AddRange(wordsWithNoValues);
+                                                currentList.AddRange(wordsWithNoFields);
                                                 Debug.WriteLine(currentList.Count);
                                             }
                                             catch (Exception e)
                                             {
                                                 Debug.WriteLine(e.Message);
                                             }
+
                                         }
-                                    }
-                                }
-                                else
-                                {
-                                    var searchedKeyAndValue = searchedFeature.Split(":");
-                                    Debug.WriteLine(searchedKeyAndValue[0] + searchedKeyAndValue[1]);
-                                    if (i == 0)
-                                    {
-                                        try
+                                        else
                                         {
-                                            var wordsWithFeatures = new List<Realization>();
-                                            foreach (var unit in acquiredForms)
+                                            if (currentList.Count > 0)
                                             {
                                                 try
                                                 {
-                                                    unit.realizationFields.ContainsKey(searchedKeyAndValue[0]);
-                                                    wordsWithFeatures.Add(unit);
+                                                    var wordsWithNoValues = currentList.Where(((realization) => realization.realizationFields == null)).ToList();
+                                                    var wordsWithValues = currentList.Where((realization) => realization.realizationFields != null);
+                                                    var wordsWithoutKey = wordsWithValues.Where((realization) => !realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                    var wordsWithOtherValue = wordsWithValues.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                    wordsWithOtherValue = wordsWithOtherValue.Where((realization) => !realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
+                                                    currentList.Clear();
+                                                    currentList.AddRange(wordsWithoutKey);
+                                                    currentList.AddRange(wordsWithOtherValue);
+                                                    currentList.AddRange(wordsWithNoValues);
+                                                    Debug.WriteLine(currentList.Count);
                                                 }
-                                                catch
+                                                catch (Exception e)
                                                 {
-                                                    Debug.WriteLine("Word without fields caught!");
+                                                    Debug.WriteLine(e.Message);
                                                 }
                                             }
-                                            var wordsWithKey = wordsWithFeatures.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                            Debug.WriteLine(wordsWithKey.Count);
-                                            var wordsWithValue = wordsWithKey.Where((realization) => realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
-                                            currentList.AddRange(wordsWithValue);
-                                            Debug.WriteLine(currentList.Count);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            Debug.WriteLine(e.Message);
                                         }
                                     }
                                     else
                                     {
-                                        if (currentList.Count > 0)
+                                        var searchedKeyAndValue = searchedFeature.Split(":");
+                                        if (i == 0)
                                         {
                                             try
                                             {
-                                                var wordswithFields = currentList.Where((realization) => realization.realizationFields != null).ToList();
-                                                var wordsWithKey = wordswithFields.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                var wordsWithFeatures = new List<Realization>();
+                                                foreach (var unit in acquiredForms)
+                                                {
+                                                    try
+                                                    {
+                                                        unit.realizationFields.ContainsKey(searchedKeyAndValue[0]);
+                                                        wordsWithFeatures.Add(unit);
+                                                    }
+                                                    catch
+                                                    {
+                                                        Debug.WriteLine("Word without fields caught!");
+                                                    }
+                                                }
+                                                var wordsWithKey = wordsWithFeatures.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
                                                 var wordsWithValue = wordsWithKey.Where((realization) => realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
-                                                currentList.Clear();
                                                 currentList.AddRange(wordsWithValue);
-                                                Debug.WriteLine(currentList.Count);
                                             }
                                             catch (Exception e)
                                             {
                                                 Debug.WriteLine(e.Message);
                                             }
                                         }
-                                    }
+                                        else
+                                        {
+                                            if (currentList.Count > 0)
+                                            {
+                                                try
+                                                {
+                                                    var wordswithFields = currentList.Where((realization) => realization.realizationFields != null).ToList();
+                                                    var wordsWithKey = wordswithFields.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                    var wordsWithValue = wordsWithKey.Where((realization) => realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
+                                                    currentList.Clear();
+                                                    currentList.AddRange(wordsWithValue);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    Debug.WriteLine(e.Message);
+                                                }
+                                            }
+                                        }
+                                    }                                    
                                 }
-                            }                         
-                            
+                                if (currentList.Count > 0)
+                                {
+                                    List<Realization> finalList = currentList.OrderBy(realization => realization.documentID).ThenBy(realization => realization.clauseID).ThenBy(realization => realization.realizationID).ToList();
+                                    neededWords.Add(finalList);
+                                }
 
-                        }
-                        if (currentList.Count > 0)
-                        {
-                            List<Realization> finalList = currentList.OrderBy(realization => realization.documentID).ThenBy(realization => realization.clauseID).ThenBy(realization => realization.realizationID).ToList();
-                            neededWords.AddRange(finalList);
-                        }
+                            }                            
+                        }                        
                     }
                     else
                     {
                         var neededLexemes = acquiredForms.Where((realization) => (realization.lexeme == wordSearched)).ToList();
-                        var currentList = new List<Realization>();
-                        List<string> features = feature.Split(' ').ToList();
-                        Debug.WriteLine(feature);
-                        Debug.WriteLine(features.Count);
-                        for (int i = 0; i < features.Count; i++)
+                        List<string> groupsOfFeatures = feature.Split(" & ").ToList();
+                        for (int l = 0; l < groupsOfFeatures.Count; l++)
                         {
-                            if (!String.IsNullOrEmpty(features[i]))
+                            List<string> features = feature.Split(' ').ToList();
+                            for (int i = 0; i < features.Count; i++)
                             {
-                                var searchedFeature = features[i];
-                                if (searchedFeature[0] == '!')
+                                var currentList = new List<Realization>();
+                                if (!String.IsNullOrEmpty(features[i]))
                                 {
-                                    searchedFeature = searchedFeature.Replace("!", "");
-                                    var searchedKeyAndValue = searchedFeature.Split(":");
-                                    Debug.WriteLine(searchedKeyAndValue[0] + searchedKeyAndValue[1]);
-                                    if (i == 0)
+                                    var searchedFeature = features[i];
+                                    if (searchedFeature[0] == '!')
                                     {
-                                        try
-                                        {
-                                            var wordsWithFeatures = new List<Realization>();
-                                            foreach (var unit in neededLexemes)
-                                            {
-                                                try
-                                                {
-                                                    unit.realizationFields.ContainsKey(searchedKeyAndValue[0]);
-                                                    wordsWithFeatures.Add(unit);
-                                                }
-                                                catch
-                                                {
-                                                    Debug.WriteLine("Word without fields caught!");
-                                                }
-                                            }
-                                            var wordsWithoutKey = wordsWithFeatures.Where((realization) => !realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                            var wordsWithOtherValue = wordsWithFeatures.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                            wordsWithOtherValue = wordsWithOtherValue.Where((realization) => !realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
-                                            var wordsWithNoFields = neededLexemes.Where((realization) => realization.realizationFields == null);
-                                            currentList.AddRange(wordsWithoutKey);
-                                            currentList.AddRange(wordsWithOtherValue);
-                                            currentList.AddRange(wordsWithNoFields);
-                                            Debug.WriteLine(currentList.Count);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            Debug.WriteLine(e.Message);
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        if (currentList.Count > 0)
+                                        searchedFeature = searchedFeature.Replace("!", "");
+                                        var searchedKeyAndValue = searchedFeature.Split(":");
+                                        if (i == 0)
                                         {
                                             try
                                             {
-                                                var wordsWithNoValues = currentList.Where(((realization) => realization.realizationFields == null)).ToList();
-                                                var wordsWithValues = currentList.Where((realization) => realization.realizationFields != null);
-                                                var wordsWithoutKey = wordsWithValues.Where((realization) => !realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                                var wordsWithOtherValue = wordsWithValues.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                var wordsWithFeatures = new List<Realization>();
+                                                foreach (var unit in neededLexemes)
+                                                {
+                                                    try
+                                                    {
+                                                        unit.realizationFields.ContainsKey(searchedKeyAndValue[0]);
+                                                        wordsWithFeatures.Add(unit);
+                                                    }
+                                                    catch
+                                                    {
+                                                        Debug.WriteLine("Word without fields caught!");
+                                                    }
+                                                }
+                                                var wordsWithoutKey = wordsWithFeatures.Where((realization) => !realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                var wordsWithOtherValue = wordsWithFeatures.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
                                                 wordsWithOtherValue = wordsWithOtherValue.Where((realization) => !realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
-                                                currentList.Clear();
+                                                var wordsWithNoFields = neededLexemes.Where((realization) => realization.realizationFields == null);
                                                 currentList.AddRange(wordsWithoutKey);
                                                 currentList.AddRange(wordsWithOtherValue);
-                                                currentList.AddRange(wordsWithNoValues);
-                                                Debug.WriteLine(currentList.Count);
+                                                currentList.AddRange(wordsWithNoFields);
                                             }
                                             catch (Exception e)
                                             {
                                                 Debug.WriteLine(e.Message);
                                             }
+
                                         }
-                                    }
-                                }
-                                else
-                                {
-                                    var searchedKeyAndValue = searchedFeature.Split(":");
-                                    Debug.WriteLine(searchedKeyAndValue[0] + searchedKeyAndValue[1]);
-                                    if (i == 0)
-                                    {
-                                        try
+                                        else
                                         {
-                                            var wordsWithFeatures = new List<Realization>();
-                                            foreach (var unit in neededLexemes)
+                                            if (currentList.Count > 0)
                                             {
                                                 try
                                                 {
-                                                    unit.realizationFields.ContainsKey(searchedKeyAndValue[0]);
-                                                    wordsWithFeatures.Add(unit);
+                                                    var wordsWithNoValues = currentList.Where(((realization) => realization.realizationFields == null)).ToList();
+                                                    var wordsWithValues = currentList.Where((realization) => realization.realizationFields != null);
+                                                    var wordsWithoutKey = wordsWithValues.Where((realization) => !realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                    var wordsWithOtherValue = wordsWithValues.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                    wordsWithOtherValue = wordsWithOtherValue.Where((realization) => !realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
+                                                    currentList.Clear();
+                                                    currentList.AddRange(wordsWithoutKey);
+                                                    currentList.AddRange(wordsWithOtherValue);
+                                                    currentList.AddRange(wordsWithNoValues);
                                                 }
-                                                catch
+                                                catch (Exception e)
                                                 {
-                                                    Debug.WriteLine("Word without fields caught!");
+                                                    Debug.WriteLine(e.Message);
                                                 }
                                             }
-                                            var wordsWithKey = wordsWithFeatures.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
-                                            Debug.WriteLine(wordsWithKey.Count);
-                                            var wordsWithValue = wordsWithKey.Where((realization) => realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
-                                            currentList.AddRange(wordsWithValue);
-                                            Debug.WriteLine(currentList.Count);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            Debug.WriteLine(e.Message);
                                         }
                                     }
                                     else
                                     {
-                                        if (currentList.Count > 0)
+                                        var searchedKeyAndValue = searchedFeature.Split(":");
+                                        if (i == 0)
                                         {
                                             try
                                             {
-                                                var wordswithFields = currentList.Where((realization) => realization.realizationFields != null).ToList();
-                                                var wordsWithKey = wordswithFields.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                var wordsWithFeatures = new List<Realization>();
+                                                foreach (var unit in neededLexemes)
+                                                {
+                                                    try
+                                                    {
+                                                        unit.realizationFields.ContainsKey(searchedKeyAndValue[0]);
+                                                        wordsWithFeatures.Add(unit);
+                                                    }
+                                                    catch
+                                                    {
+                                                        Debug.WriteLine("Word without fields caught!");
+                                                    }
+                                                }
+                                                var wordsWithKey = wordsWithFeatures.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
                                                 var wordsWithValue = wordsWithKey.Where((realization) => realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
-                                                currentList.Clear();
                                                 currentList.AddRange(wordsWithValue);
-                                                Debug.WriteLine(currentList.Count);
                                             }
                                             catch (Exception e)
                                             {
                                                 Debug.WriteLine(e.Message);
                                             }
                                         }
+                                        else
+                                        {
+                                            if (currentList.Count > 0)
+                                            {
+                                                try
+                                                {
+                                                    var wordswithFields = currentList.Where((realization) => realization.realizationFields != null).ToList();
+                                                    var wordsWithKey = wordswithFields.Where((realization) => realization.realizationFields.ContainsKey(searchedKeyAndValue[0])).ToList();
+                                                    var wordsWithValue = wordsWithKey.Where((realization) => realization.realizationFields[searchedKeyAndValue[0]].Contains(searchedKeyAndValue[1])).ToList();
+                                                    currentList.Clear();
+                                                    currentList.AddRange(wordsWithValue);
+                                                    Debug.WriteLine(currentList.Count);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    Debug.WriteLine(e.Message);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                            }
-
-
-                        }
-                        if (currentList.Count > 0)
-                        {
-                            List<Realization> finalList = currentList.OrderBy(realization => realization.documentID).ThenBy(realization => realization.clauseID).ThenBy(realization => realization.realizationID).ToList();
-                            neededWords.AddRange(finalList);
-                        }
+                                if (currentList.Count > 0)
+                                {
+                                    List<Realization> finalList = currentList.OrderBy(realization => realization.documentID).ThenBy(realization => realization.clauseID).ThenBy(realization => realization.realizationID).ToList();
+                                    neededWords.Add(finalList);
+                                }
+                            }                            
+                        }                     
+                        
+                        
                     }
                 }
-                foreach (var foundWord in neededWords)
+                foreach (var foundWords in neededWords)
                 {
                     string finalWordValues = " ";
                     int fieldCounter = 0;
-                    foreach (var field in foundWord.realizationFields)
+                    List<Dictionary<string, string>> searchUnit = new List<Dictionary<string, string>>();
+                    foreach (var foundWord in foundWords)
                     {
-                        try
+                        Dictionary<string, string> foundItem = new Dictionary<string, string>();
+                        if (foundWord.realizationFields == null)
                         {
-                            finalWordValues += field.Key;
-                            finalWordValues += ":";
-                            for (int i = 0; i < field.Value.Count; i++)
-                            {
-                                finalWordValues += field.Value[i];
-                                finalWordValues += " ";
-                            }
-                            fieldCounter++;
-                            if (fieldCounter < foundWord.realizationFields.Count)
-                            {
-                                finalWordValues += " ||";
-                            }                            
+                            foundItem.Add(foundWord.lexeme, "");
                         }
-                        catch
+                        else
                         {
+                            foreach (var field in foundWord.realizationFields)
+                            {
+                                try
+                                {
+                                    finalWordValues += field.Key;
+                                    finalWordValues += ":";
+                                    for (int i = 0; i < field.Value.Count; i++)
+                                    {
+                                        finalWordValues += field.Value[i];
+                                        finalWordValues += " ";
+                                    }
+                                    fieldCounter++;
+                                    if (fieldCounter < foundWord.realizationFields.Count)
+                                    {
+                                        finalWordValues += " ||";
+                                    }
+                                    foundItem.Add(foundWord.lexeme + "  ", finalWordValues);
+                                }
+                                catch
+                                {
 
+                                }
+                            }
                         }
+                        searchUnit.Add(foundItem);
+                        
                     }
-                    wordsWithTags.Add(foundWord.lexeme + "  ", finalWordValues);
+                    wordsWithTags.Add(searchUnit);
                 }
                 textList = getTexts();
                 fieldsList = getFields();
@@ -840,7 +848,7 @@ namespace CroatianProject.Pages
                 }
                 foreach (var foundWord in neededWords)
                 {
-                    wordsWithTags.Add(foundWord.lemma, foundWord.realizations.Count.ToString());
+                   // wordsWithTags.Add(foundWord.lemma, foundWord.realizations.Count.ToString());
                 }
 
                 textList = getTexts();
