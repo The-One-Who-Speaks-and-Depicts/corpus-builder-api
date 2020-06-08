@@ -5,6 +5,8 @@ using System.Data;
 using System.Linq;
 using ExcelDataReader;
 using System.IO;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace CorpusDraftCSharp
 {
@@ -53,6 +55,20 @@ namespace CorpusDraftCSharp
                 return head;
             }
             }
+
+        public static bool MaskMatches (this Realization realization, string query)
+        {
+            string regexQuery = "^" + String.Join(".*", query.Split('*')) + "$";
+            Debug.WriteLine(regexQuery);
+            if (Regex.IsMatch(realization.lexeme, regexQuery))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         public static void ConsoleSettings()
         {
