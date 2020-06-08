@@ -277,7 +277,7 @@ namespace CroatianProject.Pages
 
                         for (int l = 0; l < groupsOfFeatures.Count; l++)
                         {
-                            List<string> features = feature.Split(' ').ToList();
+                            List<string> features = groupsOfFeatures[l].Split(' ').ToList();
                             for (int i = 0; i < features.Count; i++)
                             {
                                 var currentList = new List<Realization>();
