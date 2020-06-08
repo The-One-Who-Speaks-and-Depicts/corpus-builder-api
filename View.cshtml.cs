@@ -134,7 +134,7 @@ namespace CroatianProject.Pages
                     }
                     else
                     {
-                        neededWords.Add(acquiredForms.Where((realization) => realization.lexeme == wordSearched).ToList());
+                        neededWords.Add(acquiredForms.Where((realization) => realization.MaskMatches(wordSearched)).ToList());
                     }
                 }
                 else
@@ -517,7 +517,7 @@ namespace CroatianProject.Pages
                         {
                             foreach (var realization in unit.realizations)
                             {
-                                if (realization.lexeme == wordSearched)
+                                if (realization.MaskMatches(wordSearched))
                                 {
                                     acquiredWords.Add(unit);
                                 }
@@ -696,7 +696,7 @@ namespace CroatianProject.Pages
                         {
                             foreach (var realization in unit.realizations)
                             {
-                                if (realization.lexeme == wordSearched)
+                                if (realization.MaskMatches(wordSearched))
                                 {
                                     neededLexemes.Add(unit);
                                 }

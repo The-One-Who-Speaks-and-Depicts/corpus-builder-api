@@ -58,7 +58,7 @@ namespace CorpusDraftCSharp
 
         public static bool MaskMatches (this Realization realization, string query)
         {
-            string regexQuery = "^" + String.Join(".*", query.Split('*')) + "$";
+            string regexQuery = "^" + String.Join(".{1,}", query.Split('*')) + "$";
             Debug.WriteLine(regexQuery);
             if (Regex.IsMatch(realization.lexeme, regexQuery))
             {
