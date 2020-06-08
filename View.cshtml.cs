@@ -272,7 +272,7 @@ namespace CroatianProject.Pages
                     }
                     else
                     {
-                        var neededLexemes = acquiredForms.Where((realization) => (realization.lexeme == wordSearched)).ToList();
+                        var neededLexemes = acquiredForms.Where((realization) => (realization.MaskMatches(wordSearched))).ToList();
                         List<string> groupsOfFeatures = feature.Split(" & ").ToList();
 
                         for (int l = 0; l < groupsOfFeatures.Count; l++)
