@@ -168,6 +168,7 @@ namespace CroatianProject.Pages
                     {
                         //IList<object> tuple = (IList<object>)word; // кортеж для каждого слова
                         string lexeme = (string)word;
+                        lexeme = lexeme.Trim();
                         var token = new Realization(sections[currentParagraph], currentWord.ToString(), lexeme);
                         var dirTextData = Path.Combine(dirTexts, currentText.textID);
                         Directory.CreateDirectory(dirTextData);
@@ -195,7 +196,9 @@ namespace CroatianProject.Pages
                 List<string> dictionary = new List<string>();
                 foreach (var word in tagged_alphabetically)
                 {
-                        dictionary.Add((string) word);
+                    string new_word = (string)word;
+                    new_word = new_word.Trim();
+                    dictionary.Add(new_word);
                 }
                 List<DictionaryUnit> alphabeticalDictionary = new List<DictionaryUnit>();
                 foreach (string unit_realization in dictionaryUnits_realizations)
