@@ -88,10 +88,11 @@ window.onload = function () {
 
     $('#buttonFilter').click(function () {
         var selectedWord = document.getElementById('wordFilter').value;
-        var selectedOptions = $('#featureFilter').text();
+        var selectedOptions = $('#featureFilter').val();
         if (selectedWord.length > 0 | selectedOptions.length > 0) {
             var words = document.getElementsByClassName('word');
             for (var i = 0; i < words.length; i++) {
+                console.log('nw');
                 if (selectedWord.length > 0) {
                     if (!isMatch(selectedWord, words[i].innerText)) {
                         words[i].setAttribute("style", "display:none;");
@@ -109,8 +110,8 @@ window.onload = function () {
                         extantList[k] = extantList[k].split(":");
                     }                    
                     var wordAttributes = words[i].getAttribute("data-content");
-                    if (wordAttributes.length > 0) {
-                        wordAttributes = wordAttributes.split(";<br />");
+                    //if (wordAttributes.length > 0) {
+                    wordAttributes = wordAttributes.split(";<br />");
                         var extantAttributes = [];
                         for (var k = 0; k < wordAttributes.length; k++) {
                             if (wordAttributes[k].length > 0) {
@@ -122,30 +123,57 @@ window.onload = function () {
                         }
                         coincidingAttributes = 0;
                         for (var j = 0; j < extantList.length; j++) {
-                            for (var m = 0; m < extantAttributes.length; m++) {
-                                if (extantList[j][0] == extantAttributes[m][0]) {
-                                    for (var l = 0; l < extantAttributes[m][1].split(';').length; l++) {
-                                        console.log(extantAttributes[m][1].split(';')[l]);
-                                        if (extantAttributes[m][1].split(';')[l] == extantList[j][1]) {                                            
-                                            coincidingAttributes++;
-                                        }
-                                    }                                    
+                            coincidenceFound = false;
+                            if (extantList[j][0][0] == '!') {
+                                if (extantAttributes.length < 1) {
+                                    coincidenceFound = true;
                                 }
                             }
+                            exact = false;
+                            for (var m = 0; m < extantAttributes.length; m++) {
+                                
+                                if (extantList[j][0][0] != '!') {
+                                    if (extantList[j][0] == extantAttributes[m][0]) {
+                                        if (extantAttributes[m][1].match(extantList[j][1])) {
+                                            coincidenceFound = true;
+                                        }
+                                    }
+                                }
+                                else {
+                                    var positive = extantList[j][0].slice(1);
+                                    if (positive == extantAttributes[m][0]) {
+                                        if (extantAttributes[m][1].match(extantList[j][1])) {
+                                            exact = true;
+                                        }
+                                        else {
+                                            coincidenceFound = true;
+                                        }
+                                    }
+                                    else {
+                                        coincidenceFound = true;
+                                    }
+                                }
+                                
+                            }
+                            if (exact) {
+                                coincidenceFound = false;
+                            }
+                            if (coincidenceFound) {
+                                coincidingAttributes++;
+                            }
                         }
-                        console.log(coincidingAttributes);
-                        if (coincidingAttributes == extantList.length) {
-                            console.log(coincidingAttributes);
+                    if (coincidingAttributes == extantList.length) {
+                        console.log("ok");
                         }
                         else {
                             words[i].setAttribute("style", "display:none;");
                         }
 
 
-                    }
+                    /*}
                     else {
                         words[i].setAttribute("style", "display:none;");
-                    }
+                    }*/
                 }
                 
             }
