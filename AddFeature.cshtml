@@ -14,7 +14,7 @@
         {@(field + "|")}
 </div>
 <h2>Добавление признаков в текст</h2>
-<form align="center" asp-page-handler="show" method="post">
+<form align="center" method="post">
     <select asp-for="textName">
         @foreach (var text in Model.textList)
         {
@@ -36,30 +36,34 @@
 
 <div>
     <div align="center" style="float:left; width:50%;">
-        @foreach (var word in Model.textByWords)
-        {
-            @Html.Raw(word)
-        }
+    <button id="SaveChanges">Сохранить изменения</button>
+    <form method="post">
+    <textarea id="changedText" asp-for="currentText" style="display:none;"></textarea>
+			<div id="currText">
+			@foreach (var word in Model.textByWords)
+        		{
+            		@Html.Raw(word)
+        		}
+			</div>
+      <button asp-page-handler="change">Внести изменения</button>
+      </form>
+
     </div>
 
     <div align="center" style="float:right;width:50%;">
-        <form method="post">
-            <textarea id="identificator" style="display:none;" asp-for="currentWordId"></textarea>
-            <div id="info"></div>
-            <textarea id="fieldInfo" style="display:none;" asp-for="isFieldMultiple"></textarea>
-            <select id="keys" asp-for="currentField"></select>
-            <select id="thisFieldValues" asp-for="currentFieldValue"></select>
-            <button asp-page-handler="change">Добавить признак</button>
-        </form>
+        <textarea id="identificator" style="display:none;"></textarea>
+        <div id="info"></div>
+        <textarea id="fieldInfo" style="display:none;"></textarea>
+        <select id="keys"></select>
+        <select id="thisFieldValues"></select>
+        <button id="changeButton">Добавить признак</button>
     </div>
 </div>
 
 
 <div style="clear:both;"></div>
 <div align="center">
-    <a href="http://localhost:50412/Admin/AddFeature" align="center">Вернуться назад</a>
+    <a href="/Admin/AddFeature" align="center">Вернуться назад</a>
 </div>
 </body>
 </html>
-
-

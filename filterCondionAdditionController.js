@@ -2,7 +2,7 @@
 
 window.onload = function () {
 
-    
+
     $(".word").dblclick(function () {
         $('#info').text("");
         $('#info').append("Lexeme:");
@@ -28,6 +28,7 @@ window.onload = function () {
 
     $("#keys").change(function () {
         $("#thisFieldValues").text("");
+		$("#fieldInfo").text("");
         var selectedOption = $("#keys option:selected").text();
         for (var i = 0; i < jsons.length; i++) {
             if (jsons[i].name == selectedOption) {
@@ -108,7 +109,7 @@ window.onload = function () {
                     }
                     for (var k = 0; k < extantList.length; k++) {
                         extantList[k] = extantList[k].split(":");
-                    }                    
+                    }
                     var wordAttributes = words[i].getAttribute("data-content");
                     //if (wordAttributes.length > 0) {
                     wordAttributes = wordAttributes.split(";<br />");
@@ -131,7 +132,7 @@ window.onload = function () {
                             }
                             exact = false;
                             for (var m = 0; m < extantAttributes.length; m++) {
-                                
+
                                 if (extantList[j][0][0] != '!') {
                                     if (extantList[j][0] == extantAttributes[m][0]) {
                                         if (extantAttributes[m][1].match(extantList[j][1])) {
@@ -153,7 +154,7 @@ window.onload = function () {
                                         coincidenceFound = true;
                                     }
                                 }
-                                
+
                             }
                             if (exact) {
                                 coincidenceFound = false;
@@ -168,14 +169,8 @@ window.onload = function () {
                         else {
                             words[i].setAttribute("style", "display:none;");
                         }
-
-
-                    /*}
-                    else {
-                        words[i].setAttribute("style", "display:none;");
-                    }*/
                 }
-                
+
             }
         }
         else {
@@ -183,21 +178,85 @@ window.onload = function () {
         }
     });
 
+	$("#changeButton").click(function() {
+        var currentFeatures = document.getElementById($("#identificator").val()).getAttribute("data-content").split(';<br />');
+        var addedFeature = $("#keys option:selected").text();
+		var addedValue = $("#thisFieldValues option:selected").text();
+		var isFeatureMultiple = $("#fieldInfo").text();
+		var coincidenceFound = false;
+		for (let i = 0; i < currentFeatures.length; i++) {
+			if (currentFeatures[i] != "") {
+				var feature = currentFeatures[i].split(':');
+				if (feature[0] == addedFeature) {
+					var valuesOfFeature = feature[1].split(';');
+					for (let j = 0; j < valuesOfFeature.length; j++){
+						if (valuesOfFeature[j] != "") {
+							if (valuesOfFeature[j] == addedValue) {
+								coincidenceFound = true;
+								alert('У слова есть этот признак и это значение!');
+								break;
+							}
+						}
+					}
+					if (coincidenceFound) break;
+					if (isFeatureMultiple != "true") {
+						coincidenceFound = true;
+						alert('Этому признаку может соответствовать только одно значение!');
+						break;
+					}
+					else {
+                        currentFeatures[i] += ";";
+                        currentFeatures[i] += addedValue;
+                        var new_features = "";
+                        for (let feature in currentFeatures) {
+                            if (feature != "") {
+                                new_features += feature;
+                                new_features += ";<br />";
+                            }
+                        }
+                        document.getElementById($("#identificator").val()).setAttribute("data-content", currentFeatures);
+                        coincidenceFound = true;
+                        alert('Добавлено значение');
+						break;
+					}
+				}
+			}
+		}
+		if (!coincidenceFound) {
+            alert('Добавлен признак и присвоено значение.');
+            document.getElementById($("#identificator").val()).setAttribute("data-content", document.getElementById($("#identificator").val()).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />");
+		}
+	});
+
+  $('#SaveChanges').click(function() {
+    $('changedText').text();
+    var words = document.getElementsByClassName('word');
+    for (let i = 0; i < words.length; i++) {
+      if (words[i].dataset.content == "") {
+        $('#changedText').append('{' + words[i].id + '}');
+      }
+      else {
+        $('#changedText').append('{' + words[i].id + ' => ' + words[i].dataset.content + '}');
+      }
+
+    }
+  });
+
 };
 
 function isMatch(pattern, word) {
     if (pattern.includes('*')) {
         pattern = pattern.split('*').join("\.*");
     }
-    pattern = "\^" + pattern + "\$";    
-    pattern = new RegExp(pattern); 
+    pattern = "\^" + pattern + "\$";
+    pattern = new RegExp(pattern);
     if (word.match(pattern)) {
         return true;
     }
-    else {        
+    else {
         return false;
     }
-    
+
 }
 
 function Depict(selectedOption) {
@@ -227,5 +286,6 @@ function Depict(selectedOption) {
 
 
 
-};
 
+
+};

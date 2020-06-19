@@ -1,4 +1,4 @@
-﻿window.onload = function () { 
+﻿window.onload = function () {
 
     $("#keys").change(function () {
         $("#thisFieldValues").text("");
@@ -15,7 +15,7 @@
         else {
             $('#thisFieldValues').append("<option>Any</option>");
         }
-        
+
     });
 
     $('#addFeature').click(function () {
@@ -27,6 +27,6 @@
             }
             $('#feature').append(selectedFeature + ":" + selectedValue + " ");
         }
-    });
+    });    
 
 }

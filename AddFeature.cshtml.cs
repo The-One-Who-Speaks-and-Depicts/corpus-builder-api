@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using System.Xml;
 
 namespace CroatianProject.Pages.Admin
 {
@@ -30,8 +31,10 @@ namespace CroatianProject.Pages.Admin
         public string currentFieldValue { get; set; }
         [BindProperty]
         public string isFieldMultiple { get; set; }
-        
-    
+        [BindProperty]
+        public string currentText { get; set; }
+
+
 
     public List<string> getFields()
         {
@@ -42,7 +45,7 @@ namespace CroatianProject.Pages.Admin
                 DirectoryInfo fieldsDirectory = new DirectoryInfo(directory);
                 var fields = fieldsDirectory.GetFiles();
                 for (int i = 0; i < fields.Length; i++)
-                {                    
+                {
                     if (i < fields.Length - 1)
                     {
                         existingFields.Add(fields[i].Name + "|");
@@ -51,7 +54,7 @@ namespace CroatianProject.Pages.Admin
                     {
                         existingFields.Add(fields[i].Name);
                     }
-                } 
+                }
             }
             catch
             {
@@ -94,18 +97,19 @@ namespace CroatianProject.Pages.Admin
                 Redirect("./Error");
             }
         }
-        public void OnPostShow()
+        public void OnPost()
         {
             var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
             List<DirectoryInfo> searchedTexts = new List<DirectoryInfo>();
             if (textName != "Any")
             {
-                searchedTexts.Add(SearchForText(textName, directory));            
+                searchedTexts.Add(SearchForText(textName, directory));
             List<Realization> acquiredForms = new List<Realization>();
             foreach (var text in searchedTexts)
             {
                 DirectoryInfo dirWords = new DirectoryInfo(Path.Combine(directory, text.Name, "paragraphs"));
                 var dirResults = dirWords.GetDirectories();
+		dirResults = dirResults.OrderBy(dirResult => dirResult.FullName).ToArray();
                 foreach (var wordDirectory in dirResults)
                 {
                     var words = wordDirectory.GetFiles();
@@ -124,6 +128,7 @@ namespace CroatianProject.Pages.Admin
                         acquiredForms.Add(new Realization());
                 }
             }
+	    acquiredForms = acquiredForms.OrderBy(realization => realization.documentID).ThenBy(realization => realization.clauseID).ThenBy(realization => realization.realizationID).ToList();
             foreach (var foundWord in acquiredForms)
             {
                     try
@@ -160,187 +165,199 @@ namespace CroatianProject.Pages.Admin
                     {
                         textByWords.Add("<span title= \"\" data-content=\"\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
                     }
-                
+
             }
             }
             textList = getTexts();
             fieldsList = getFields();
         }
-        
+
         public void OnPostChange()
         {
-            List<string> ids = currentWordId.Split('|').ToList<string>();
-            var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
-            DirectoryInfo textsDirectory = new DirectoryInfo(directory);
-            var texts = textsDirectory.GetDirectories();
+          string pattern = @"\{.*?\}";
+          Regex rgx = new Regex(pattern);
+          var words = rgx.Matches(currentText);
+          var dirTexts = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "texts"));
+          var texts = dirTexts.GetDirectories();
+          foreach (Match word in words)
+          {
+            string pattern_id = @"[0-9]{1,}\|[0-9]{1,}\|[0-9]{1,}";
+            Regex rgx_id = new Regex(pattern_id);
+            var acquiredId = Regex.Match(word.Value, pattern_id);
+            var commonId = acquiredId.Value.Split('|');
+            var textId = commonId[0];
+            var clauseId = commonId[1];
+            var wordId = commonId[2];
             foreach (var text in texts)
             {
-                var textFiles = text.GetFiles();
-                foreach (var file in textFiles)
+              var files = text.GetFiles();
+              using (StreamReader r = new StreamReader(files[0].FullName))
+              {
+                var textInJSON = JsonConvert.DeserializeObject<Text>(r.ReadToEnd());
+                if (textId == textInJSON.documentID)
                 {
-                    string s;
-                    using (var f = new StreamReader(file.FullName))
+                  var dirParagraphs = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "texts", textInJSON.textID, "paragraphs"));
+                  var paragraphs = dirParagraphs.GetDirectories();
+                  foreach (var paragraph in paragraphs)
+                  {
+                    if (paragraph.Name.Contains('[' + clauseId + ']'))
                     {
-                        while ((s = f.ReadLine()) != null)
+                      var wordFiles = paragraph.GetFiles();
+                      foreach (var wordFile in wordFiles)
+                      {
+                        Realization transferredRealization = new Realization();
+                        using (StreamReader rWord = new StreamReader(wordFile.FullName))
                         {
-                            var currentText = JsonConvert.DeserializeObject<Text>(s);
-                            if (currentText.documentID == ids[0])
+                          transferredRealization = JsonConvert.DeserializeObject<Realization>(rWord.ReadToEnd());
+                        }//
+                          if (transferredRealization.realizationID == wordId)
+                          {
+                            if (transferredRealization.realizationFields == null && !word.Value.Contains(" => "))
                             {
-                                var paragraphsDirectory = Path.Combine(text.FullName, "paragraphs");
-                                var paragraphDirectories = new DirectoryInfo(paragraphsDirectory).GetDirectories(); 
-                                foreach (var paragraph in paragraphDirectories)
-                                {
-                                    var paragraphNames = paragraph.Name.Split(']');
-                                    paragraphNames = paragraphNames[0].Split('[');
-                                    var paragraphName = paragraphNames[1];
-                                    if (paragraphName == ids[1])
-                                    {
-                                        var words = paragraph.GetFiles();
-                                        foreach (var word in words)
-                                        {
-                                            var wordName = word.Name.Split(".json")[0];
-                                            wordName = Regex.Replace(wordName, @"word", "");
-                                            if (wordName == ids[2])
-                                            {
-                                                string s1;
-                                                Realization current = new Realization();
-                                                using (var f1 = new StreamReader(word.FullName))
-                                                {
-                                                    while ((s1 = f1.ReadLine()) != null)
-                                                    {
-                                                        current = JsonConvert.DeserializeObject<Realization>(s1);
-                                                        
-                                                    }
-                                                }
-                                                try
-                                                {
-                                                    bool fieldExists = false;
-                                                    foreach (var field in current.realizationFields)
-                                                    {
-                                                        if (field.Key == currentField)
-                                                        {
-                                                            if (isFieldMultiple == "true")
-                                                            {
-                                                                if (current.realizationFields[field.Key].Contains(currentFieldValue))
-                                                                {
-                                                                    fieldExists = true;
-                                                                    break;
-                                                                }
-                                                                current.realizationFields[field.Key].Add(currentFieldValue);
-                                                                FileStream fs = new FileStream(word.FullName, FileMode.Create);
-                                                                using (StreamWriter w = new StreamWriter(fs))
-                                                                {
-                                                                    w.Write(current.Jsonize());
-                                                                }
-                                                            }                                                            
-                                                            fieldExists = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (!fieldExists)
-                                                    {
-                                                        current.realizationFields.Add(currentField, new List<string>());
-                                                        current.realizationFields[currentField].Add(currentFieldValue);
-                                                        FileStream fs = new FileStream(word.FullName, FileMode.Create);
-                                                        using (StreamWriter w = new StreamWriter(fs))
-                                                        {
-                                                            w.Write(current.Jsonize());
-                                                        }
-                                                    }
-                                                }
-                                                catch
-                                                {
-                                                    current.realizationFields = new Dictionary<string, List<string>>();
-                                                    current.realizationFields.Add(currentField, new List<string>());
-                                                    current.realizationFields[currentField].Add(currentFieldValue);
-                                                    FileStream fs = new FileStream(word.FullName, FileMode.Create);
-                                                    using (StreamWriter w = new StreamWriter(fs))
-                                                    {
-                                                        w.Write(current.Jsonize());
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                var textDictDir = Path.Combine(_environment.ContentRootPath, "database", "dictionary", currentText.textID);
-                                var dictFiles = new DirectoryInfo(textDictDir).GetFiles();
-                                foreach (var dictFile in dictFiles)
-                                {
-                                    string s2;
-                                    var current = new DictionaryUnit();
-                                    using (var f2 = new StreamReader(dictFile.FullName))
-                                    {
-                                        while ((s2 = f2.ReadLine()) != null)
-                                        {
-                                            current = JsonConvert.DeserializeObject<DictionaryUnit>(s2);
-
-                                        }
-                                    }
-                                    foreach (var realization in current.realizations)
-                                    {
-                                        if (realization.documentID == ids[0] && realization.clauseID == ids[1] && realization.realizationID == ids[2])
-                                        {
-                                            try
-                                            {
-                                                bool fieldExists = false;
-                                                foreach (var field in realization.realizationFields)
-                                                {
-                                                    if (field.Key == currentField)
-                                                    {
-                                                        if (isFieldMultiple == "true")
-                                                        {
-                                                            if (realization.realizationFields[field.Key].Contains(currentFieldValue))
-                                                            {
-                                                                fieldExists = true;
-                                                                break;
-                                                            }
-                                                            realization.realizationFields[field.Key].Add(currentFieldValue);
-                                                            FileStream fs = new FileStream(dictFile.FullName, FileMode.Create);
-                                                            using (StreamWriter w = new StreamWriter(fs))
-                                                            {
-                                                                w.Write(current.Jsonize());
-                                                            }
-                                                        }                                                        
-                                                        fieldExists = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if (!fieldExists)
-                                                {
-                                                    realization.realizationFields.Add(currentField, new List<string>());
-                                                    realization.realizationFields[currentField].Add(currentFieldValue);
-                                                    FileStream fs = new FileStream(dictFile.FullName, FileMode.Create);
-                                                    using (StreamWriter w = new StreamWriter(fs))
-                                                    {
-                                                        w.Write(current.Jsonize());
-                                                    }
-                                                }
-                                            }
-                                            catch
-                                            {
-                                                realization.realizationFields = new Dictionary<string, List<string>>();
-                                                realization.realizationFields.Add(currentField, new List<string>());
-                                                realization.realizationFields[currentField].Add(currentFieldValue);
-                                                FileStream fs = new FileStream(dictFile.FullName, FileMode.Create);
-                                                using (StreamWriter w = new StreamWriter(fs))
-                                                {
-                                                    w.Write(current.Jsonize());
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                              //do nothing
                             }
+                            else if (transferredRealization.realizationFields != null && !word.Value.Contains(" => "))
+                            {
+                              transferredRealization.realizationFields = null;
+                            }
+                            else if (transferredRealization.realizationFields == null && word.Value.Contains(" => "))
+                            {
+                              var allFields = word.Value.Split(" => ")[1];
+                              var splitFields = allFields.Split(";<br>");
+                              foreach (var field in splitFields)
+                              {
+                                if (field.Contains(":"))
+                                {
+                                  var FieldAndValue = field.Split(":");
+                                  List<string> fieldValues = new List<string>();
+                                  if (FieldAndValue[1].Contains(";"))
+                                  {
+                                    var preliminaryValues = FieldAndValue[1].Split(";").ToList();
+                                    foreach (var value in preliminaryValues)
+                                    {
+                                      if (value != "}" && value != "")
+                                      {
+                                        fieldValues.Add(value);
+                                      }
+                                    }
+                                  }
+                                  else
+                                  {
+                                      fieldValues.Add(FieldAndValue[1].Split('}')[0]);
+                                  }
+                                  transferredRealization.realizationFields = new Dictionary<string, List<string>>();
+                                  transferredRealization.realizationFields[FieldAndValue[0]] = fieldValues;
+                                }
+                              }
+                            }
+                            else
+                            {
+                              var allFields = word.Value.Split(" => ")[1];
+                              var splitFields = allFields.Split(";<br>");
+                              foreach (var field in splitFields)
+                              {
+                                if (field.Contains(":"))
+                                {
+                                  var FieldAndValue = field.Split(":");
+                                  List<string> fieldValues = new List<string>();
+                                  if (FieldAndValue[1].Contains(";"))
+                                  {
+                                    var preliminaryValues = FieldAndValue[1].Split(";").ToList();
+                                    foreach (var value in preliminaryValues)
+                                    {
+                                      if (value != "}" && value != "")
+                                      {
+                                        fieldValues.Add(value);
+                                      }
+                                    }
+                                  }
+                                  else
+                                  {
+                                      fieldValues.Add(FieldAndValue[1].Split('}')[0]);
+                                  }
+                                  bool keyPresent = false;
+                                  foreach (var key in transferredRealization.realizationFields.Keys)
+                                  {
+                                    if (key == FieldAndValue[0])
+                                    {
+                                      foreach (var value in fieldValues)
+                                      {
+                                        if (!transferredRealization.realizationFields[key].Contains(value) && value != "}" && value != "")
+                                        {
+                                          transferredRealization.realizationFields[key].Add(value);
+                                        }
+                                      }
+                                    }
+                                    keyPresent = true;
+                                  }
+                                  if (!keyPresent)
+                                  {
+                                    transferredRealization.realizationFields[FieldAndValue[0]] = fieldValues;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        using (StreamWriter wr = new StreamWriter(wordFile.FullName))
+                        {
+                          wr.WriteLine(transferredRealization.Jsonize());
                         }
-                    }                    
-                }
-            }
+                        var dirDict = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "dictionary", textInJSON.textID));
+                        var dictFiles = dirDict.GetFiles();
+                        DictionaryUnit transferredDictionary = new DictionaryUnit();
+                        foreach (var file in dictFiles)
+                        {
+                          try
+                          {
+                            using (StreamReader rDict = new StreamReader(file.FullName))
+                            {
+                              transferredDictionary = JsonConvert.DeserializeObject<DictionaryUnit>(rDict.ReadToEnd());
+                            }
+                              List<Realization> ChangedRealizations = transferredDictionary.realizations
+                                                                    .Where(realization => realization.documentID == transferredRealization.documentID && realization.clauseID == transferredRealization.clauseID && realization.realizationID == transferredRealization.realizationID)
+                                                                    .ToList();
+                              if (ChangedRealizations.Count == 1)
+                              {
+                                if (transferredDictionary.realizations.Count == 1)
+                                {
+                                  List<Realization> newRealizations = new List<Realization>();
+                                  newRealizations.Add(transferredRealization);
+                                  transferredDictionary.realizations = newRealizations;
+                                  using (StreamWriter wrDict = new StreamWriter(file.FullName))
+                                  {
+                                    wrDict.WriteLine(transferredDictionary.Jsonize());
+                                  }
+                                }
+                                else
+                                {
+                                  List<Realization> NonChangedRealizations = transferredDictionary.realizations
+                                                                        .Where(realization => realization.documentID != transferredRealization.documentID || realization.clauseID != transferredRealization.clauseID || realization.realizationID != transferredRealization.realizationID)
+                                                                        .ToList();
+                                  NonChangedRealizations.Add(transferredRealization);
+                                  transferredDictionary.realizations = NonChangedRealizations;
+                                  using (StreamWriter wrDict = new StreamWriter(file.FullName))
+                                  {
+                                      wrDict.WriteLine(transferredDictionary.Jsonize());
+                                  }
+                                }
 
-            textList = getTexts();
-            fieldsList = getFields();
+                              }
+
+                          }
+                          catch
+                          {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
 
-        
+
     }
 }
