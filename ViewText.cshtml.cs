@@ -51,9 +51,9 @@ namespace CroatianProject.Pages
 
         public DirectoryInfo SearchForText(string textName, string directory)
         {
-            DirectoryInfo dirTexts = new DirectoryInfo(directory);            
+            DirectoryInfo dirTexts = new DirectoryInfo(directory);
             var searchedDirectory = dirTexts.GetDirectories().Where((dir) => dir.Name == textName).First();
-            return searchedDirectory;            
+            return searchedDirectory;
         }
 
         public List<string> getFields()
@@ -113,8 +113,15 @@ namespace CroatianProject.Pages
                         acquiredForms.Add(new Realization());
                     }
                 }
+                acquiredForms = acquiredForms.OrderBy(realization => Convert.ToInt32(realization.documentID)).ThenBy(realization => Convert.ToInt32(realization.clauseID)).ThenBy(realization => Convert.ToInt32(realization.realizationID)).ToList();
+                int currClause = 0;
                 foreach (var foundWord in acquiredForms)
                 {
+                  if (Convert.ToInt32(foundWord.clauseID) > currClause)
+                  {
+                    currClause++;
+                    textByWords.Add("<br />");
+                  }
                     try
                     {
                         if (!String.IsNullOrEmpty(foundWord.documentID))
@@ -139,10 +146,6 @@ namespace CroatianProject.Pages
                             }
                             textByWords.Add("<span title=\"" + hoverFields + "\" data-content=\"" + fieldsOfWord + "\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
 
-                        }
-                        else
-                        {
-                            textByWords.Add("<br />");
                         }
                     }
                     catch

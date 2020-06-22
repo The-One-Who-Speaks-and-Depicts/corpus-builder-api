@@ -73,7 +73,12 @@ window.onload = function () {
 
     $("#featureAdditionButton").click(function () {
         var selectedOption = $("#keysFilter option:selected").text();
-        $("#featureFilter").append(selectedOption + ":");
+        isNegative = "";
+        if ($("#isNegative").is(':checked'))
+        {
+          isNegative = "!";
+        }
+        $("#featureFilter").append(isNegative + selectedOption + ":");
         for (var i = 0; i < jsons.length; i++) {
             if (jsons[i].name == selectedOption) {
                 for (var j = 0; j < jsons[i].values.length; j++) {
@@ -182,6 +187,9 @@ window.onload = function () {
         var currentFeatures = document.getElementById($("#identificator").val()).getAttribute("data-content").split(';<br />');
         var addedFeature = $("#keys option:selected").text();
 		var addedValue = $("#thisFieldValues option:selected").text();
+    if (addedFeature != "Any" && addedValue != "Any")
+    {
+
 		var isFeatureMultiple = $("#fieldInfo").text();
 		var coincidenceFound = false;
 		for (let i = 0; i < currentFeatures.length; i++) {
@@ -226,6 +234,7 @@ window.onload = function () {
             alert('Добавлен признак и присвоено значение.');
             document.getElementById($("#identificator").val()).setAttribute("data-content", document.getElementById($("#identificator").val()).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />");
 		}
+    }
 	});
 
   $('#SaveChanges').click(function() {

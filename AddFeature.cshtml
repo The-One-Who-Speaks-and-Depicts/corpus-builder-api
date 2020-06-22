@@ -26,7 +26,10 @@
 
 <div align="center">
     <textarea id="wordFilter"></textarea> <br />
-    <select id="keysFilter"></select>
+    <input id="isNegative" type="checkbox" value="Искать слова без этого признака" />
+    <select id="keysFilter">
+        <option>Any</option>
+    </select>
     <select id="valuesFilter">
         <option>Any</option>
     </select> <button id="featureAdditionButton">Добавить признак</button><br />
@@ -54,8 +57,12 @@
         <textarea id="identificator" style="display:none;"></textarea>
         <div id="info"></div>
         <textarea id="fieldInfo" style="display:none;"></textarea>
-        <select id="keys"></select>
-        <select id="thisFieldValues"></select>
+        <select id="keys">
+          <option>Any</option>
+        </select>
+        <select id="thisFieldValues">
+          <option>Any</option>
+        </select>
         <button id="changeButton">Добавить признак</button>
     </div>
 </div>
