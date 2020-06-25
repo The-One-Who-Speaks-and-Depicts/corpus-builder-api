@@ -19,7 +19,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string clauseID;
         [JsonProperty]
-        public Dictionary<string, List<string>> realizationFields;
+        public Dictionary<string, List<IValue>> realizationFields;
         [JsonProperty]
         public string realizationID;
         [JsonProperty]
@@ -29,7 +29,7 @@ namespace CorpusDraftCSharp
         #region Constructors
 
         [JsonConstructor]
-        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, Dictionary<string, List<string>> _fields, string _realizationID, string _lexeme)
+        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, Dictionary<string, List<IValue>> _fields, string _realizationID, string _lexeme)
         {
             this.documentID = _documentID;
             this.filePath = _filePath;

@@ -8,46 +8,7 @@ namespace CorpusDraftCSharp
     [Serializable]
     public class Clause
     {
-        #region classValues
-        protected static bool areFieldsAdded 
-        {
-            get
-            {
-            return _areFieldsAdded;
-            }
-            set
-            {
-                _areFieldsAdded = value;
-            }
-        }
-        protected static bool _areFieldsAdded = false;
-        protected static FieldDummy clauseTextField
-        {
-            get
-            {
-                return _clauseTextField;
-            }
-            set
-            {
-                _clauseTextField = value;
-            }
-        }
-        protected static FieldDummy _clauseTextField;
-        protected static List<FieldDummy> fieldDummies = new List<FieldDummy>();
-        protected static FieldDummy realizationIDsField
-        {
-            get
-            {
-                return _realizationIDsField;
-            }
-            set
-            {
-                _realizationIDsField = value;
-            }
-        }
-        protected static FieldDummy _realizationIDsField;
         
-        #endregion
 
         #region objectValues
         [JsonProperty]
@@ -84,62 +45,7 @@ namespace CorpusDraftCSharp
             this.clauseID = _clauseID;
             this.clauseText = _clauseText;
         }
-        public Clause(string documentID, Dictionary<string, DataTable> spreadsheets, string filePath, string textID, string clauseID)
-        {
-            Console.WriteLine("Starting clause generation. Clause number is {0}, ID will be {2}{1}{0}", clauseID, textID, documentID);
-            this.documentID = documentID;
-            this.spreadsheets = spreadsheets;
-            this.filePath = filePath;
-            this.textID = textID;
-            this.clauseID = clauseID;
-            Console.WriteLine("Getting clause graphic forms...");
-            if (clauseTextField == null)
-            {
-                clauseTextField = new FieldDummy("clause", MyExtensions.InsertString("name of table where clauses are stored"), 
-                    MyExtensions.InsertString("name of column where clauses are stored(name is usually contained in the first row of your file)"),
-                    int.Parse(MyExtensions.InsertString("number of field where clause name is stored")));
-            }
-            this.clauseText = MyExtensions.SingleFieldIntoList(spreadsheets, "clause text data", "clause", clauseID, clauseTextField.tableName, clauseTextField.colName, clauseTextField.colNumber)[0];
-           
-            this.clauseFields = new Dictionary<string, string>();
-            if ((fieldDummies.Count < 1) && (!_areFieldsAdded))
-            {
-                _areFieldsAdded = true;
-                bool createFields = true;
-                while(createFields) { 
-                Console.WriteLine("Do you want to add fields? [Y/N]");
-                string decision_to_quit = Console.ReadLine();
-                string negative = "N";
-                if (decision_to_quit == negative)
-                {
-                    createFields = false;
-                }
-                else
-                {                   
-                    fieldDummies.Add(new FieldDummy(MyExtensions.InsertString("names of field you want to create"), MyExtensions.InsertString("name of table where desired field data are stored"),
-                            MyExtensions.InsertString("name of column where clauses are stored (name is usually contained in the first row of your file)"),
-                            MyExtensions.KeyCreation("desired field data field number")));
-
-                }
-                }
-            }
-            if (fieldDummies.Count > 0)
-            {            
-                foreach (FieldDummy field in fieldDummies)
-                { 
-                    this.clauseFields = MyExtensions.CreateAdditionalFields(clauseID, spreadsheets, "clause data", field.fieldName, field.tableName, field.colName, field.colNumber);
-                }
-            }
-            Console.WriteLine("Getting realizations...");
-            if (realizationIDsField == null)
-            {
-                realizationIDsField = new FieldDummy("realizationIDs", MyExtensions.InsertString("name of table where realization data are stored"), 
-                    MyExtensions.InsertString("name of column where clause indexes are stored"), MyExtensions.KeyCreation("number of column where realizations are stored"));
-            }
-            this.realizationIDs = MyExtensions.SingleFieldIntoList(spreadsheets, "realization indexes", "clause indexes", clauseID, realizationIDsField.tableName, 
-               realizationIDsField.colName, realizationIDsField.colNumber);            
-           // this.realizations = GenerateRealizations(realizationIDs);
-        }
+        
         #endregion
 
         #region publicMethods
