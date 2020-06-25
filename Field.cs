@@ -19,15 +19,26 @@ namespace CorpusDraftCSharp
         public bool isActive { get; private set; } = true;
         [JsonProperty]
         public bool isMultiple { get; private set; } = false;
+        [JsonProperty]
+        public bool isByLetter { get; private set; } = false;       
+        [JsonProperty]
+        public bool isMWE { get; private set; } = false;
 
         [JsonConstructor]
-        Field(string _name, List<object> _values, string _description,  bool _isActive, bool _isMultiple)
+        Field(string _name, List<object> _values, string _description,  bool _isActive, bool _isMultiple, bool _isByLetter, bool _isMWE)
         {
             this.name = _name;
             this.values = _values;
             this.description = _description;
             this.isActive = _isActive;
             this.isMultiple = _isMultiple;
+            this.isByLetter = _isByLetter;
+            this.isMWE = _isMWE;
+        }
+
+        protected Field()
+        {
+
         }
 
         public Field(string _name, string _description)
@@ -48,31 +59,10 @@ namespace CorpusDraftCSharp
 
 
         public void AddValue(object _value)
-        {
-            if (this.isActive)
-            {
-                if (this.values.Count > 0)
-                {
-                    if (this.isMultiple)
-                    {
-                        this.values.Add(_value);
-                    }
-                    else
-                    {
-                        throw new Exception("В поле допустимо только одно значение!");
-                    }
-                }
-                else
-                {
-                    this.values.Add(_value);
-                }
-            }
-            else
-            {
-                throw new Exception("Попытка добавить значение в неактивное поле!"); 
-            }
-            
+        {            
+            this.values.Add(_value); 
         }
+        
 
         public void RemoveValue(object _value)
         {
@@ -110,22 +100,28 @@ namespace CorpusDraftCSharp
 
         public void MakeSingle()
         {
-            try
-            {
-                if (this.values.Count > 1)
-                {
-                    throw new Exception("Сначала необходимо оставить только одно значение!");
-                }
-                else
-                {
-                    this.isMultiple = false;
-                }
-            }
-            catch
-            {
-                this.isMultiple = false;
-            }
+            this.isMultiple = false;
                         
+        }
+
+        public void MakeMWE()
+        {
+            this.isMWE = true;
+        }
+
+        public void MakeSingleWorded()
+        {
+            this.isMWE = true;
+        }
+
+        public void Letterize()
+        {
+            this.isByLetter = true;
+        }
+
+        public void Deletterize()
+        {
+            this.isByLetter = false;
         }
 
         public string Jsonize()
