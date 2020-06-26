@@ -175,6 +175,8 @@ namespace CroatianProject.Pages.Admin
 
         public void OnPostChange()
         {
+            throw new NotImplementedException();
+            /*
           string pattern = @"\{.*?\}";
           Regex rgx = new Regex(pattern);
           var words = rgx.Matches(currentText);
@@ -387,6 +389,7 @@ namespace CroatianProject.Pages.Admin
                 }
             }
           }
+          */
         }
 
 

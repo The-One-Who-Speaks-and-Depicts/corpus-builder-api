@@ -80,6 +80,8 @@ namespace CroatianProject.Pages
 
         public void OnPostShow()
         {
+            throw new NotImplementedException();
+            /*
             var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
             if ((textName == "Any") && (String.IsNullOrEmpty(feature)) && (wordSearched == null))
             {
@@ -449,7 +451,7 @@ namespace CroatianProject.Pages
                 textList = getTexts();
                 fieldsList = getFields();
             }
-            
+          */  
         }
 
         public DirectoryInfo SearchForText(string textName, string directory)
@@ -461,6 +463,8 @@ namespace CroatianProject.Pages
 
         public void OnPostShowAlphabetically()
         {
+            throw new NotImplementedException();
+            /*
             var directory = Path.Combine(_environment.ContentRootPath, "database", "dictionary");            
             if ((textName == "Any") && (String.IsNullOrEmpty(feature)) && (wordSearched == null))
             {
@@ -874,7 +878,8 @@ namespace CroatianProject.Pages
 
                 textList = getTexts();
                 fieldsList = getFields();
-            }            
+            }
+            */
         }
     }
 }
