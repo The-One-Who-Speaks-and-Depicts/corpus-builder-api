@@ -22,7 +22,26 @@ namespace CroatianProject.Pages.Admin
         public string FieldDesc { get; set; }
         [BindProperty]
         public string FieldVals { get; set; }
+        [BindProperty]
+        public string Multiply { get; set; }
+        [BindProperty]
+        public string[] MultiplyOptions { get; set; } = new[] { "Single", "Multiple"};
+        [BindProperty]
+        public string Type { get; set; }
+        [BindProperty]
+        public string[] ValueTypeOptions { get; set; } = new[] { "Value of single word", " Value of letters in single words", "Value of multiple words", "Value of letters in multiple words" };
         private IHostingEnvironment _environment;
+
+        public string[] SetOptions()
+        {
+            return new[] { "Single", "Multiple" };
+        }
+
+        public string[] SetValues()
+        {
+            return new[] { "Value of single word", " Value of letters in single words", "Value of multiple words", "Value of letters in multiple words" };
+        }
+
 
         public List<string> getFields()
         {
@@ -50,6 +69,8 @@ namespace CroatianProject.Pages.Admin
             try
             {
                 FieldList = getFields();
+                MultiplyOptions = SetOptions();
+                ValueTypeOptions = SetValues();
             }
             catch
             {
@@ -64,7 +85,7 @@ namespace CroatianProject.Pages.Admin
                 Field field = new Field(FieldName, FieldDesc);                
                 field.Activate();
                 string[] values = FieldVals.Split('\n');
-                if (values.Length > 1)
+                if (Multiply == "Multiple")
                 {
                     field.Multiply();
                 }
@@ -89,6 +110,7 @@ namespace CroatianProject.Pages.Admin
                     w.Write(fieldInJSON);
                 }
                 FieldList = getFields();
+                MultiplyOptions = SetOptions();
             }
             catch (Exception e)
             {

@@ -11,8 +11,22 @@
                 <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="1" cols="20" asp-for="FieldName"></textarea><br />
                 Описание признака: <br />
                 <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="3" cols="20" asp-for="FieldDesc"></textarea><br />
-                Значения признака: <br/>
+                Значения признака: <br />
                 <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="5" cols="20" asp-for="FieldVals"></textarea><br />
+                Может ли одна единица обладать несколькими значениями признака?<br />
+                @foreach (var option in Model.MultiplyOptions)
+                {
+                    <input type="radio" asp-for="Multiply" value="@option" />@option<br />
+                }
+                Признак принадлежит: <br />
+                    токену? <br />
+                    графеме/комплексу графем? <br />
+                    нескольким токенам одновременно? <br />
+                    комплексу графем, распределённому по нескольким токенам? <br />
+                @foreach (var option in Model.ValueTypeOptions)
+                {
+                    <input type="radio" asp-for="Type" value="@option" />@option<br />
+                }
                 <button asp-page-handler="add">Добавить признак</button>
             </form>
         </div>
