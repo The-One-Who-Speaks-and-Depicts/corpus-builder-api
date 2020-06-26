@@ -111,7 +111,7 @@ namespace CorpusDraftCSharp
 
         public void MakeSingleWorded()
         {
-            this.isMWE = true;
+            this.isMWE = false;
         }
 
         public void Letterize()

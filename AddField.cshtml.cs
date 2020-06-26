@@ -29,7 +29,7 @@ namespace CroatianProject.Pages.Admin
         [BindProperty]
         public string Type { get; set; }
         [BindProperty]
-        public string[] ValueTypeOptions { get; set; } = new[] { "Value of single word", " Value of letters in single words", "Value of multiple words", "Value of letters in multiple words" };
+        public string[] ValueTypeOptions { get; set; } = new[] { "Value of single word", "Value of letters in a single word", "Value of multiple words", "Value of letters in multiple words" };
         private IHostingEnvironment _environment;
 
         public string[] SetOptions()
@@ -92,7 +92,18 @@ namespace CroatianProject.Pages.Admin
                 else
                 {
                     field.MakeSingle();
-                }               
+                }
+                field.Deletterize();
+                field.MakeSingleWorded();
+                if (Type == SetValues()[1] || Type == SetValues()[3])
+                {
+                    field.Letterize();
+                }
+                if (Type == SetValues()[2] || Type == SetValues()[3])
+                {
+                    field.MakeMWE();
+                }
+
                 foreach (var value in values)
                 {
                     field.AddValue(Regex.Replace(value, @"\r", ""));
@@ -111,6 +122,7 @@ namespace CroatianProject.Pages.Admin
                 }
                 FieldList = getFields();
                 MultiplyOptions = SetOptions();
+                ValueTypeOptions = SetValues();
             }
             catch (Exception e)
             {
