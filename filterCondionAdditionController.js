@@ -115,8 +115,7 @@ window.onload = function () {
                     for (var k = 0; k < extantList.length; k++) {
                         extantList[k] = extantList[k].split(":");
                     }
-                    var wordAttributes = words[i].getAttribute("data-content");
-                    //if (wordAttributes.length > 0) {
+                    var wordAttributes = words[i].getAttribute("data-content");                    
                     wordAttributes = wordAttributes.split(";<br />");
                         var extantAttributes = [];
                         for (var k = 0; k < wordAttributes.length; k++) {
