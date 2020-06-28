@@ -144,14 +144,58 @@ namespace CroatianProject.Pages.Admin
                             string hoverFields = "";
                             foreach (var field in foundWord.realizationFields)
                             {
-                                fieldsOfWord += field.Key;
-                                hoverFields += field.Key;
+                                fieldsOfWord += field.Key;                                
                                 fieldsOfWord += ":";
+                                hoverFields += field.Key;
                                 hoverFields += ":";
                                 foreach (var fieldValue in field.Value)
                                 {
-                                    fieldsOfWord += fieldValue;
-                                    hoverFields += fieldValue;
+                                    fieldsOfWord += fieldValue.name;
+                                    hoverFields += fieldValue.name;
+                                    if (fieldValue.letters != null)
+                                    {
+                                        fieldsOfWord += "(";
+                                        hoverFields += "(";
+                                        for (int i = 0; i < fieldValue.letters.Count; i++)
+                                        {
+                                            fieldsOfWord += fieldValue.letters[i];
+                                            hoverFields += fieldValue.letters[i];
+                                            if (i < (fieldValue.letters.Count - 1))
+                                            {
+                                                fieldsOfWord += "_";
+                                                hoverFields += "_";
+                                            }
+                                        }
+                                        fieldsOfWord += ")";
+                                        hoverFields += ")";
+                                    }
+                                    if (fieldValue.connectedRealizations != null)
+                                    {
+                                        fieldsOfWord += "[";
+                                        hoverFields += "[";
+                                        for (int i = 0; i < fieldValue.connectedRealizations.Count; i++)
+                                        {
+                                            fieldsOfWord += fieldValue.connectedRealizations[i].documentID;
+                                            fieldsOfWord += "/";
+                                            fieldsOfWord += fieldValue.connectedRealizations[i].clauseID;
+                                            fieldsOfWord += "/";
+                                            fieldsOfWord += fieldValue.connectedRealizations[i].realizationID;
+                                            fieldsOfWord += "/";
+                                            hoverFields += fieldValue.connectedRealizations[i].documentID;
+                                            hoverFields += "/";
+                                            hoverFields += fieldValue.connectedRealizations[i].clauseID;
+                                            hoverFields += "/";
+                                            hoverFields += fieldValue.connectedRealizations[i].realizationID;
+                                            hoverFields += "/";
+                                            if (i < (fieldValue.letters.Count - 1))
+                                            {
+                                                fieldsOfWord += "_";
+                                                hoverFields += "_";
+                                            }
+                                        }
+                                        fieldsOfWord += "]";
+                                        hoverFields += "]";
+                                    }
                                     fieldsOfWord += ";";
                                     hoverFields += ";";
                                 }
