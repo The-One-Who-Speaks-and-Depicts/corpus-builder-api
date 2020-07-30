@@ -13,26 +13,22 @@ public class Text
 	#region objectValues
     [JsonProperty]
     public string documentID;
-    [JsonIgnore]
-    protected Dictionary<string, DataTable> spreadsheets;
     [JsonProperty]
     public string filePath;
     [JsonProperty]
     public string textID;
-    [JsonIgnore]
-	protected List<string> clauseIDs;
-    [JsonIgnore]
-	protected Dictionary<string, string> textFields;
-    [JsonIgnore]
-    public readonly List<Clause> clauses;
+    [JsonProperty]
+	public Dictionary<string, List<IValue>> textMetaData = new Dictionary<string, List<IValue>>();
+    [JsonProperty]
+    public List<Clause> clauses;
 	#endregion	
 	
 	#region Constructors
     
     [JsonConstructor]
-    public Text (string textNumber, string _textID, string _filepath)
+    public Text (string _documentID, string _textID, string _filepath)
     {
-            this.documentID = textNumber;
+            this.documentID = _documentID;
             this.textID = _textID;
             this.filePath = _filepath;
     }
