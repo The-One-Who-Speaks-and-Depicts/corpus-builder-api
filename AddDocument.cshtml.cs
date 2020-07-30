@@ -19,13 +19,15 @@ namespace CroatianProject.Pages.Admin
         [BindProperty]
         public string filePath { get; set; } = "";
         [BindProperty]
-        public string textName { get; set; }
+        public string textName { get; set; } = "";
 
         public AddDocumentModel(IHostingEnvironment environment)
         {
             _environment = environment;
+            filePath = "";
+            textName = "";
         }
-        public async Task OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
             var dirUploads = Path.Combine(_environment.ContentRootPath, "uploads");
             Directory.CreateDirectory(dirUploads);
@@ -37,9 +39,9 @@ namespace CroatianProject.Pages.Admin
                 var dirTexts = Path.Combine(dirData, "documents");
                 Directory.CreateDirectory(dirTexts);
                 DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirTexts);
-                Document document = new Document(directoryTextsInfo.GetDirectories().Length.ToString(), textName, file, filePath);
+                Document document = new Document(directoryTextsInfo.GetFiles().Length.ToString(), textName, file, filePath);
                 string documentInJSON = document.Jsonize();
-                var documentDBFile = Path.Combine(dirTexts, textName + ".json");
+                var documentDBFile = Path.Combine(dirTexts, directoryTextsInfo.GetFiles().Length.ToString() + "_" + textName + ".json");
                 FileStream fs = new FileStream(documentDBFile, FileMode.Create);
                 using (StreamWriter w = new StreamWriter(fs))
                 {
@@ -59,6 +61,7 @@ namespace CroatianProject.Pages.Admin
                     w.Write(e.Message);
                 }
             }
+            return RedirectToPage();
 
         }
     }
