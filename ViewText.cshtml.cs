@@ -85,6 +85,8 @@ namespace CroatianProject.Pages
 
         public void OnPostShow()
         {
+            // TBD after DB restructuring
+            /*
             var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
             List<DirectoryInfo> searchedTexts = new List<DirectoryInfo>();
             if (textName != "Any")
@@ -157,6 +159,7 @@ namespace CroatianProject.Pages
             }
             textList = getTexts();
             fieldsList = getFields();
+            */
         }
     }
 }

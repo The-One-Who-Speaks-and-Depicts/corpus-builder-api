@@ -21,6 +21,8 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string googleDocPath;
         [JsonProperty]
+        public Dictionary<string, List<IValue>> documentMetaData = new Dictionary<string, List<IValue>>();
+        [JsonProperty]
         public List<Text> texts = new List<Text>();
         #endregion
 

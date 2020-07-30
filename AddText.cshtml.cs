@@ -44,6 +44,8 @@ namespace CroatianProject.Pages
 
         public IActionResult OnPostProcess()
         {
+            // TBD: issue of first priority
+            /*
             try
             {                
                 ScriptEngine engine = Python.CreateEngine();
@@ -204,11 +206,11 @@ namespace CroatianProject.Pages
                     w.Write(e.Message);
                 }
             }
-
+            */
             return RedirectToPage();
             
         }
-
+        
 
 
     }

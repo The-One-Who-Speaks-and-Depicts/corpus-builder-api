@@ -40,7 +40,7 @@ namespace CroatianProject.Pages
                     };
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-                    return RedirectToPage("/admin/addtext");
+                    return RedirectToPage("/admin/adddocument");
                 }
             }
             Message = "Invalid attempt";

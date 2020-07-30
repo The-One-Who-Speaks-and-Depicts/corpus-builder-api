@@ -60,7 +60,7 @@ namespace CorpusDraftCSharp
         {
             string regexQuery = "^" + String.Join(".{1,}", query.Split('*')) + "$";
             Debug.WriteLine(regexQuery);
-            if (Regex.IsMatch(realization.lexeme, regexQuery))
+            if (Regex.IsMatch(realization.lexemeTwo, regexQuery))
             {
                 return true;
             }

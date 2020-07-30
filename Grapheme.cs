@@ -27,7 +27,7 @@ namespace CorpusDraftCSharp
 
 
         [JsonConstructor]
-        public Grapheme(string _documentID, string _filePath, string _textID, string _clauseID, Dictionary<string, List<IValue>> _fields, string _realizationID, string _graphemeID, string _grapheme, List<Grapheme> _letters)
+        public Grapheme(string _documentID, string _filePath, string _textID, string _clauseID, Dictionary<string, List<IValue>> _fields, string _realizationID, string _graphemeID, string _grapheme)
         {
             this.documentID = _documentID;
             this.filePath = _filePath;
