@@ -37,6 +37,11 @@ namespace CorpusDraftCSharp
             googleDocPath = _googleDocPath;
         }
 
+        public Document()
+        {
+
+        }
+
         #endregion
         #region PublicMethods
         public string Jsonize()

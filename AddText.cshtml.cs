@@ -33,7 +33,7 @@ namespace CroatianProject.Pages
         [BindProperty]
         public string googleDocPath { get; set; } = "";
         [BindProperty]
-        public Document analyzedDocument { get; set; }
+        public Document analyzedDocument { get; set; } = new Document();
         [BindProperty]
         public string documentPicked { get; set; }
         [BindProperty]
@@ -64,6 +64,12 @@ namespace CroatianProject.Pages
         }
         [BindProperty]
         public string processedString { get; set; }
+        [BindProperty]
+        public string textName { get; set; }
+        [BindProperty]
+        public string stopSymbols { get; set; }
+        [BindProperty]
+        public bool decapitalisation { get; set; }
 
         [HttpGet]
         public void OnGet(string documentPicked)
@@ -87,8 +93,9 @@ namespace CroatianProject.Pages
         }
        
 
-        public IActionResult OnPostProcess()
+        public void OnPostProcess()
         {
+            
             // TBD: issue of first priority
             /*
             try
@@ -252,7 +259,6 @@ namespace CroatianProject.Pages
                 }
             }
             */
-            return RedirectToPage();
             
         }
         

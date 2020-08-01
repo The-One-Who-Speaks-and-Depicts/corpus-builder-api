@@ -22,17 +22,25 @@
                     }
                 </select>
                 <input type="submit" class="btn btn-default" />
-            </form>            
+            </form>
         </div>
-        <div style="min-height:300px; height:600px; min-width:250px; width:50%; float:left;">            
+        <br />
+        <br />
+        <br />
+        <div style="min-height:300px; height:600px; min-width:250px; width:50%; float:left;">
             <iframe src="@Model.googleDocPath" style="min-height:300px; height:485px; min-width:250px; width:100%;"></iframe>
         </div>
 
         <div style="min-height:300px; height:600px; min-width:250px; width:50%; float:right;" align="center">
             <form asp-page-handler="process" method="post">
                 <div>
+                    <div align="center">Название текста:</div><br />
+                    <textarea cols="@Model.Cols" rows="1" asp-for="textName"></textarea><br />
                     <div align="center">Текст:</div><br />
-                    <textarea cols="@Model.Cols" rows="@Model.Rows" asp-for="processedString">Текст</textarea><br />
+                    <textarea cols="@Model.Cols" rows="@Model.Rows" asp-for="processedString"></textarea><br />
+                    <div align="center">Технические символы:</div><br />
+                    <textarea cols="@Model.Cols" rows="1" asp-for="stopSymbols"></textarea><br />
+                    Перевести ли слова в нижний регистр? <input type="checkbox" asp-for="decapitalisation" /><br />
                     <input type="submit" class="btn btn-default" />
                 </div>
             </form>
