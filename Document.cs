@@ -29,6 +29,16 @@ namespace CorpusDraftCSharp
         #region Constructors
 
         [JsonConstructor]
+        public Document(string _documentID, string _documentName, string _filePath, string _googleDocPath, Dictionary<string, List<IValue>> _documentMetaData, List<Text> _texts)
+        {
+            documentID = _documentID;
+            documentName = _documentName;
+            filePath = _filePath;
+            googleDocPath = _googleDocPath;
+            documentMetaData = _documentMetaData;
+            texts = _texts;
+        }
+
         public Document(string _documentID, string _documentName, string _filePath, string _googleDocPath)
         {
             documentID = _documentID;

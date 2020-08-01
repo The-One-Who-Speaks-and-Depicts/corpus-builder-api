@@ -46,7 +46,7 @@ namespace CorpusDraftCSharp
             this.letters = _letters;
         }
 
-        public Realization(Clause clause, string _realizationID, string _lexemeOne, string _lexemeTwo, List<Grapheme> _letters)
+        public Realization(Clause clause, string _realizationID, string _lexemeOne, string _lexemeTwo)
         {
             this.documentID = clause.documentID;
             this.filePath = clause.filePath;
@@ -55,11 +55,10 @@ namespace CorpusDraftCSharp
             this.realizationID = _realizationID;
             this.lexemeOne = _lexemeOne;
             this.lexemeTwo = _lexemeTwo;
-            this.letters = _letters;
         }
 
 
-        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, string _realizationID, string _lexemeOne, string _lexemeTwo, List<Grapheme> _letters)
+        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, string _realizationID, string _lexemeOne, string _lexemeTwo)
         {
             this.documentID = _documentID;
             this.filePath = _filePath;
@@ -68,7 +67,6 @@ namespace CorpusDraftCSharp
             this.realizationID = _realizationID;
             this.lexemeOne = _lexemeOne;
             this.lexemeTwo = _lexemeTwo;
-            this.letters = _letters;
         }
 
         public Realization()

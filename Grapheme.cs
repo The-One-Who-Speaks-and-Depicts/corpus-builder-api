@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CorpusDraftCSharp
 {
+    [Serializable]
     public class Grapheme
     {
         [JsonProperty]

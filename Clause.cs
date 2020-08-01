@@ -29,6 +29,26 @@ namespace CorpusDraftCSharp
 
 
         #region Constructors
+        [JsonConstructor]
+        public Clause(string _documentID, string _textID, string _filePath, string _clauseID, string _clauseText, Dictionary<string, List<IValue>> _clauseFields, List<Realization> _realizations)
+        {
+            this.documentID = _documentID;
+            this.filePath = _filePath;
+            this.textID = _textID;
+            this.clauseID = _clauseID;
+            this.clauseText = _clauseText;
+            this.clauseFields = _clauseFields;
+            this.realizations = _realizations;
+        }
+        public Clause(string _documentID, string _textID, string _filePath, string _clauseID, string _clauseText)
+        {
+            this.documentID = _documentID;
+            this.filePath = _filePath;
+            this.textID = _textID;
+            this.clauseID = _clauseID;
+            this.clauseText = _clauseText;
+        }
+
         public Clause(Text text, string _clauseID, string _clauseText)
         {
             this.documentID = text.documentID;
@@ -37,7 +57,11 @@ namespace CorpusDraftCSharp
             this.clauseID = _clauseID;
             this.clauseText = _clauseText;
         }
-        
+        public Clause()
+        {
+
+        }
+
         #endregion
 
         #region publicMethods
