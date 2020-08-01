@@ -31,15 +31,42 @@ namespace CroatianProject.Pages
 
 
         [BindProperty]
-        public IFormFile Upload { get; set; }
+        public string googleDocPath { get; set; } = "";
         [BindProperty]
-        public string filePath { get; set; } = "";
+        public string documentChosen { get; set; }
         [BindProperty]
-        public string textName { get; set; }
-        
-
+        public List<Document> documents
+        {
+            get
+            {
+                List<Document> deserializedDocuments = new List<Document>();
+                try
+                {
+                    DirectoryInfo docDirectory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
+                    var jsonedDocuments = docDirectory.GetFiles();
+                    foreach (var doc in jsonedDocuments)
+                    {
+                        using (StreamReader r = new StreamReader(doc.FullName))
+                        {
+                            deserializedDocuments.Add(JsonConvert.DeserializeObject<Document>(r.ReadToEnd()));
+                        }
+                    }
+                    return deserializedDocuments;
+                }
+                catch
+                {
+                    return deserializedDocuments;
+                }
+                
+            }
+        }
         [BindProperty]
         public string processedString { get; set; }
+
+        public void OnGet()
+        {
+
+        }
        
 
         public IActionResult OnPostProcess()

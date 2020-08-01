@@ -12,11 +12,23 @@
 
     <div style="min-width:500px; width:100%;">
 
-        <div style="min-height:300px; height:485px; min-width:250px; width:50%; float:left;">
-            <iframe src="@Model.filePath" style="min-height:300px; height:485px; min-width:250px; width:100%;"></iframe>
+        <div align="center">
+            <form method="get">
+                Выберите документ для добавления текста:<br />
+                <select asp-for="documentChosen">
+                    @foreach (var doc in Model.documents)
+                    {
+                        <option>@(doc.documentID + "_" + @doc.documentName)</option>
+                    }
+                </select>
+                <input type="submit" class="btn btn-default" />
+            </form>            
+        </div>
+        <div style="min-height:300px; height:600px; min-width:250px; width:50%; float:left;">            
+            <iframe src="@Model.googleDocPath" style="min-height:300px; height:485px; min-width:250px; width:100%;"></iframe>
         </div>
 
-        <div style="min-height:300px; height:450px; min-width:250px; width:50%; float:right;" align="center">
+        <div style="min-height:300px; height:600px; min-width:250px; width:50%; float:right;" align="center">
             <form asp-page-handler="process" method="post">
                 <div>
                     <div align="center">Текст:</div><br />
