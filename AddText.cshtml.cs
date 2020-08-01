@@ -33,7 +33,9 @@ namespace CroatianProject.Pages
         [BindProperty]
         public string googleDocPath { get; set; } = "";
         [BindProperty]
-        public string documentChosen { get; set; }
+        public Document analyzedDocument { get; set; }
+        [BindProperty]
+        public string documentPicked { get; set; }
         [BindProperty]
         public List<Document> documents
         {
@@ -63,9 +65,25 @@ namespace CroatianProject.Pages
         [BindProperty]
         public string processedString { get; set; }
 
-        public void OnGet()
+        [HttpGet]
+        public void OnGet(string documentPicked)
         {
+            try
+            {
+                var documentID = documentPicked.Split('_')[0];
+                foreach (var doc in documents)
+                {
+                    if (doc.documentID == documentID)
+                    {
+                        googleDocPath = doc.googleDocPath;
+                        analyzedDocument = doc;
+                    }
+                }
+            }
+            catch
+            {
 
+            }            
         }
        
 
