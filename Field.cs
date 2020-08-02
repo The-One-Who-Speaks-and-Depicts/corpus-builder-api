@@ -16,7 +16,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string description { get; private set;  }
         [JsonProperty]
-        public bool isActive { get; private set; } = true;
+        public bool isUserFilled { get; private set; } = true;
         [JsonProperty]
         public bool isMultiple { get; private set; } = false;
         [JsonProperty]
@@ -25,12 +25,12 @@ namespace CorpusDraftCSharp
         public bool isMWE { get; private set; } = false;
 
         [JsonConstructor]
-        Field(string _name, List<object> _values, string _description,  bool _isActive, bool _isMultiple, bool _isByLetter, bool _isMWE)
+        Field(string _name, List<object> _values, string _description,  bool _isUserFilled, bool _isMultiple, bool _isByLetter, bool _isMWE)
         {
             this.name = _name;
             this.values = _values;
             this.description = _description;
-            this.isActive = _isActive;
+            this.isUserFilled = _isUserFilled;
             this.isMultiple = _isMultiple;
             this.isByLetter = _isByLetter;
             this.isMWE = _isMWE;
@@ -66,31 +66,24 @@ namespace CorpusDraftCSharp
 
         public void RemoveValue(object _value)
         {
-            if (this.isActive)
+            if (this.values.Count > 0)
             {
-                if (this.values.Count > 0)
-                {
-                    this.values.Remove(_value);
-                }
-                else
-                {
-                    throw new Exception("В поле нет значений!");
-                }
+                this.values.Remove(_value);
             }
             else
             {
-                throw new Exception("Попытка удалить значение из неактивного поля!");
+                throw new Exception("В поле нет значений!");
             }
         }
 
-        public void Activate()
+        public void MakeUserFilled()
         {
-            this.isActive = true;
+            this.isUserFilled = true;
         }
         
-        public void Deactivate()
+        public void MakeRestricted()
         {
-            this.isActive = false;
+            this.isUserFilled = false;
         }
 
         public void Multiply()

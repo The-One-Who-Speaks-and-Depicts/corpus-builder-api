@@ -30,6 +30,11 @@ namespace CroatianProject.Pages.Admin
         public string Type { get; set; }
         [BindProperty]
         public string[] ValueTypeOptions { get; set; } = new[] { "Value of single word", "Value of letters in a single word", "Value of multiple words", "Value of letters in multiple words" };
+        [BindProperty]
+        public string[] UserFilledOptions { get; set; } = new[] { "User-restricted", "User-filled" };
+        [BindProperty]
+        public string Filled { get; set; }
+
         private IHostingEnvironment _environment;
 
         public string[] SetOptions()
@@ -40,6 +45,11 @@ namespace CroatianProject.Pages.Admin
         public string[] SetValues()
         {
             return new[] { "Value of single word", " Value of letters in single words", "Value of multiple words", "Value of letters in multiple words" };
+        }
+
+        public string[] SetFullfillment()
+        {
+            return new[] { "User-restricted", "User-filled" };
         }
 
 
@@ -71,6 +81,7 @@ namespace CroatianProject.Pages.Admin
                 FieldList = getFields();
                 MultiplyOptions = SetOptions();
                 ValueTypeOptions = SetValues();
+                UserFilledOptions = SetFullfillment();
             }
             catch
             {
@@ -83,8 +94,6 @@ namespace CroatianProject.Pages.Admin
             try
             {
                 Field field = new Field(FieldName, FieldDesc);                
-                field.Activate();
-                string[] values = FieldVals.Split('\n');
                 if (Multiply == "Multiple")
                 {
                     field.Multiply();
@@ -103,12 +112,16 @@ namespace CroatianProject.Pages.Admin
                 {
                     field.MakeMWE();
                 }
-
-                foreach (var value in values)
+                field.MakeUserFilled();
+                if (Filled == SetFullfillment()[0])
                 {
-                    field.AddValue(Regex.Replace(value, @"\r", ""));
+                    field.MakeRestricted();
+                    string[] values = FieldVals.Split('\n');
+                    foreach (var value in values)
+                    {
+                        field.AddValue(Regex.Replace(value, @"\r", ""));
+                    }
                 }
-                
                 var dirData = Path.Combine(_environment.ContentRootPath, "wwwroot", "database");
                 Directory.CreateDirectory(dirData);
                 var dirFields = Path.Combine(dirData, "fields");
@@ -123,13 +136,14 @@ namespace CroatianProject.Pages.Admin
                 FieldList = getFields();
                 MultiplyOptions = SetOptions();
                 ValueTypeOptions = SetValues();
+                UserFilledOptions = SetFullfillment();
             }
             catch (Exception e)
             {
                 FileStream fs = new FileStream("result1.txt", FileMode.Create);
                 using (StreamWriter w = new StreamWriter(fs))
                 {
-                    w.Write(e.Message + FieldVals.Split('\n').Length);
+                    w.Write(e.Message);
                 }
             }
             
