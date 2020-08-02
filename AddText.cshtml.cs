@@ -18,22 +18,22 @@ namespace CroatianProject.Pages
 {
     public class AddTextModel : PageModel
     {
-       
+
         public int Rows { get; set; } = 20;
         public int Cols { get; set; } = 50;
-        
+
 
         private IHostingEnvironment _environment;
         public AddTextModel(IHostingEnvironment environment)
         {
-        _environment = environment;
+            _environment = environment;
         }
 
 
         [BindProperty]
         public string googleDocPath { get; set; } = "";
         [BindProperty]
-        public Document analyzedDocument { get; set; } = new Document();
+        public static Document analyzedDocument { get; set; } = new Document();
         [BindProperty]
         public string documentPicked { get; set; }
         [BindProperty]
@@ -59,7 +59,7 @@ namespace CroatianProject.Pages
                 {
                     return deserializedDocuments;
                 }
-                
+
             }
         }
         [BindProperty]
@@ -89,13 +89,12 @@ namespace CroatianProject.Pages
             catch
             {
 
-            }            
+            }
         }
-       
+
 
         public void OnPostProcess()
-        {
-            
+        {            
             // TBD: issue of first priority
             /*
             try
@@ -259,11 +258,10 @@ namespace CroatianProject.Pages
                 }
             }
             */
-            
+
         }
-        
+
 
 
     }
 }
-
