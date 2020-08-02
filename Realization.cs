@@ -27,7 +27,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string lexemeTwo;
         [JsonProperty]
-        public List<Grapheme> letters;
+        public List<Grapheme> letters = new List<Grapheme>();
         #endregion
 
         #region Constructors

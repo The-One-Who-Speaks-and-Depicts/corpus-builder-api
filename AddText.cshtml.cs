@@ -93,10 +93,8 @@ namespace CroatianProject.Pages
         }
 
 
-        public void OnPostProcess()
+        public IActionResult OnPostProcess()
         {            
-            // TBD: issue of first priority
-            
             try
             {                
                 ScriptEngine engine = Python.CreateEngine();
@@ -109,147 +107,30 @@ namespace CroatianProject.Pages
                 engine.ExecuteFile(pythonFilePath, scope);
                 dynamic function = scope.GetVariable("analysis");
                 IList<object> result = function(processedString, stopSymbols, decapitalization.ToString());
-                Debug.WriteLine(result.Count.ToString());
-                /*
-                IList<object> paragraphs = (IList<object>)result[0]; // параграфы
-                IList<object> tagged_by_paragraphs = (IList<object>)result[1]; // параграфы по словах по параграфам
-                IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном                
-                var dirTexts = Path.Combine(_environment.ContentRootPath, "database", "texts");
-                DirectoryInfo textDirectoryInfo = new DirectoryInfo(dirTexts);
-                if (!textDirectoryInfo.Exists)
+                Text addedText = new Text(analyzedDocument, analyzedDocument.texts.Count.ToString());
+                for (int i = 0; i < result.Count; i++)
                 {
-                    throw new Exception("Не существует директории с текстами!");
-                }
-                var directoriesInfo = textDirectoryInfo.GetDirectories();
-                List<Text> texts = new List<Text>();
-                foreach (var directory in directoriesInfo)
-                {
-                    var textsInfo = directory.GetFiles();
-                    foreach (var text in textsInfo)
-                    {
-                        FileStream fs = new FileStream(text.FullName, FileMode.Open);
-                        using (StreamReader r = new StreamReader(fs))
+                    var clauseFullData = (IList<object>)result[i];
+                    Clause addedClause = new Clause(addedText, i.ToString(), (string)clauseFullData[0]);
+                    var realizations = (IList<object>) clauseFullData[1];
+                    for (int j = 0; j < realizations.Count; j++)
+                    {                        
+                        var realizationFullData = (IList<object>) realizations[j];
+                        Realization addedRealization = new Realization(addedClause, j.ToString(), (string)realizationFullData[0], (string)realizationFullData[1]);
+                        var graphemes = (IList<object>) realizationFullData[2];
+                        for (int k = 0; k < graphemes.Count; k++)
                         {
-                            string jsonizedText = r.ReadLine();
-                            texts.Add(JsonConvert.DeserializeObject<Text>(jsonizedText));
+                            addedRealization.letters.Add(new Grapheme(addedRealization, k.ToString(), (string) graphemes[k]));
                         }
-                    }                    
-                }                
-                if (texts.Count < 1)
-                {
-                    Exception e = new Exception("В базе данных нет текстов!");
-                    throw e;
-                }
-                List<int> textIDs = new List<int>();
-                foreach(Text text in texts)
-                {
-                    if (MyExtensions.isNum(text.documentID))
-                    {
-                        textIDs.Add(int.Parse(text.documentID)); 
+                        addedClause.realizations.Add(addedRealization);
                     }
-                    else
-                    {
-                        Exception e = new Exception(new string("Cannot parse " + text.documentID));
-                        throw e;
-                    }
-                    
+                    addedText.clauses.Add(addedClause);
                 }
-                textIDs.Sort();
-                var currentText = texts.Where(text => text.documentID == textIDs[textIDs.Count - 1].ToString()).First();
-                var sections = new List<Clause>();
-                int currentParagraphID = 0; 
-                foreach (var paragraph in paragraphs)
+                analyzedDocument.texts.Add(addedText);
+                using (StreamWriter w = new StreamWriter(Path.Combine(_environment.ContentRootPath, "database", "documents", analyzedDocument.documentID + "_" + analyzedDocument.documentName + ".json")))
                 {
-                    var section = new Clause(currentText, currentParagraphID.ToString(), paragraph.ToString());
-                    var dirTextData = Path.Combine(dirTexts, currentText.textID);
-                    Directory.CreateDirectory(dirTextData);
-                    var dirParagraphData = Path.Combine(dirTextData, "paragraphs");
-                    Directory.CreateDirectory(dirParagraphData);
-                    string paragraphInJSON = section.Jsonize(); 
-                    var ClauseDBfile = Path.Combine(dirParagraphData, "paragraph" + currentParagraphID.ToString() + ".json");
-                    FileStream fs = new FileStream(ClauseDBfile, FileMode.Create);
-                    using (StreamWriter w = new StreamWriter(fs))
-                    {
-                        w.Write(paragraphInJSON);
-                    }
-                    currentParagraphID += 1;
-                    sections.Add(section);
+                    w.Write(analyzedDocument.Jsonize());
                 }
-                List<Realization> realizations = new List<Realization>();
-                int currentParagraph = 0;
-                foreach (var paragraph in tagged_by_paragraphs)
-                {
-                    IList<object> words = (IList<object>)paragraph; // слова в параграфах
-                    int currentWord = 0;
-                    foreach (var word in words)
-                    {
-                        //IList<object> tuple = (IList<object>)word; // кортеж для каждого слова
-                        string lexeme = (string)word;
-                        lexeme = lexeme.Trim();
-                        var token = new Realization(sections[currentParagraph], currentWord.ToString(), lexeme);
-                        var dirTextData = Path.Combine(dirTexts, currentText.textID);
-                        Directory.CreateDirectory(dirTextData);
-                        var dirParagraphData = Path.Combine(dirTextData, "paragraphs");
-                        Directory.CreateDirectory(dirParagraphData);
-                        string tokenInJSON = token.Jsonize();
-                        var dirWordData = Path.Combine(dirParagraphData, "words[" + sections[currentParagraph].clauseID + "]");
-                        Directory.CreateDirectory(dirWordData);
-                        var wordDBfile = Path.Combine(dirWordData, "word" + currentWord.ToString() + ".json");
-                        FileStream fs = new FileStream(wordDBfile, FileMode.Create);
-                        using (StreamWriter w = new StreamWriter(fs))
-                        {
-                            w.Write(tokenInJSON);
-                        }
-                        currentWord += 1;
-                        realizations.Add(token);
-                    }
-                    currentParagraph += 1;
-                }
-                SortedSet<string> dictionaryUnits_realizations = new SortedSet<string>();
-                foreach (Realization realization in realizations)
-                {
-                    dictionaryUnits_realizations.Add(realization.lexeme);
-                }
-                List<string> dictionary = new List<string>();
-                foreach (var word in tagged_alphabetically)
-                {
-                    string new_word = (string)word;
-                    new_word = new_word.Trim();
-                    dictionary.Add(new_word);
-                }
-                List<DictionaryUnit> alphabeticalDictionary = new List<DictionaryUnit>();
-                foreach (string unit_realization in dictionaryUnits_realizations)
-                {
-                    var units = dictionary.Where((unit) => unit == unit_realization.ToLower());
-                    foreach (var unit in units)
-                    {
-                        var dictionaryUnits = realizations.Where((realization) => realization.lexeme.ToLower() == unit);
-                        List<Realization> dictionaryUnitsConverted = new List<Realization>();
-                        foreach (var dictionaryunit in dictionaryUnits)
-                        {
-                            dictionaryUnitsConverted.Add(dictionaryunit);
-                        }
-                        alphabeticalDictionary.Add(new DictionaryUnit(unit_realization, dictionaryUnitsConverted));
-                    }                    
-                }
-                var dirData = Path.Combine(_environment.ContentRootPath, "database");
-                Directory.CreateDirectory(dirData);
-                var dirDictionary = Path.Combine(dirData, "dictionary");
-                Directory.CreateDirectory(dirDictionary);
-                var dirTextDictionary = Path.Combine(dirDictionary, currentText.textID);
-                Directory.CreateDirectory(dirTextDictionary);
-                var unitNumber = 0;
-                foreach (var wordInOrder in alphabeticalDictionary)
-                {
-                    var wordInDictfile = Path.Combine(dirTextDictionary, "dictionaryUnit[" + unitNumber + "]" + ".json");
-                    FileStream fs = new FileStream(wordInDictfile, FileMode.Create);
-                    using (StreamWriter w = new StreamWriter(fs))
-                    {
-                        w.Write(wordInOrder.Jsonize());
-                    }
-                    unitNumber++;
-                }
-                */
             }
             catch (Exception e)
             {
@@ -259,7 +140,8 @@ namespace CroatianProject.Pages
                 {
                     w.Write(e.Message);
                 }
-            }           
+            }
+            return RedirectToPage();
 
         }
 

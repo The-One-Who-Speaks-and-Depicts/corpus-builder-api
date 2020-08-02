@@ -20,7 +20,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
 	    public Dictionary<string, List<IValue>> textMetaData = new Dictionary<string, List<IValue>>();
         [JsonProperty]
-        public List<Clause> clauses;
+        public List<Clause> clauses = new List<Clause>();
 	    #endregion	
 	
 	    #region Constructors

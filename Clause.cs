@@ -24,7 +24,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string clauseText;
         [JsonProperty]
-        public List<Realization> realizations;
+        public List<Realization> realizations = new List<Realization>();
         #endregion
 
 
