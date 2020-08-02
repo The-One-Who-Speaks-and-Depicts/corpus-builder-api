@@ -3,6 +3,11 @@
 @{
     ViewData["Title"] = "Добавление полей для разметки";
 }
+<html>
+<head>
+    <script src="~/js/fieldConnectionController.js"></script>
+</head>
+<body>
     <div>
         <div style="float:left;">
             <h3>Добавить поле</h3>
@@ -36,29 +41,55 @@
             </form>
         </div>
         <div style="float:right;">
-            <h3>Редактировать поле</h3>
-            <form method="post">
-                <select>
-                    @try
+            <h3>Связать поля</h3>
+            <div id="values" style="display:none">
+                @foreach (var field in Model.FieldList)
+                {
+                    @if (field != "Any")
                     {
-                        if (Model.FieldList.Count > 0)
-                        {
-                        @foreach (var field in Model.FieldList)
-                        {
-                            <option>@field</option>
-                        }
-                        }
+                        @(field + "|")
                     }
-                    catch {
+                }
+            </div>
+            Исходное поле/значение:
+            <select id="fieldMother">
+                <option>Any</option>
+            </select>
+            <select id="valueMother">
+                <option>Any</option>
+            </select>
+            <br />
+            @try
+            {
+                if (Model.FieldList.Count > 0)
+                {
 
+                    @foreach (var field in Model.FieldList)
+                    {
+                        @if (field != "Any")
+                        {
+                            <input type="checkbox" class="fieldChildren" id="@field" />@field<br />
+                        }
                     }
-                </select>
-                <br />
+                }
+            }
+            catch
+            {
+
+            }
+            <br />
+            <button id="submit">Зафиксировать изменения</button>
+            <form method="post">
+                <textarea style="display:none" asp-for="connections"></textarea><br />
+                <button asp-page-handler="connect">Внести изменения</button>
             </form>
         </div>
     </div>
 
     <div style="clear:both;"></div>
+</body>
+</html>
+    
     
 
 

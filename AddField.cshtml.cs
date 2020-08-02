@@ -34,6 +34,8 @@ namespace CroatianProject.Pages.Admin
         public string[] UserFilledOptions { get; set; } = new[] { "User-restricted", "User-filled" };
         [BindProperty]
         public string Filled { get; set; }
+        [BindProperty]
+        public string connections { get; set; }
 
         private IHostingEnvironment _environment;
 
@@ -147,6 +149,11 @@ namespace CroatianProject.Pages.Admin
                 }
             }
             
+        }
+
+        public void OnPostConnect()
+        {
+
         }
 
 

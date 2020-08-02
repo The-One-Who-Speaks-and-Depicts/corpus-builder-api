@@ -23,9 +23,11 @@ namespace CorpusDraftCSharp
         public bool isByLetter { get; private set; } = false;       
         [JsonProperty]
         public bool isMWE { get; private set; } = false;
+        [JsonProperty]
+        public Dictionary<string, List<string>> connectedFields { get; set; } = new Dictionary<string, List<string>>();
 
         [JsonConstructor]
-        Field(string _name, List<object> _values, string _description,  bool _isUserFilled, bool _isMultiple, bool _isByLetter, bool _isMWE)
+        Field(string _name, List<object> _values, string _description,  bool _isUserFilled, bool _isMultiple, bool _isByLetter, bool _isMWE, Dictionary<string, List<string>> _connectedFields)
         {
             this.name = _name;
             this.values = _values;
@@ -34,6 +36,7 @@ namespace CorpusDraftCSharp
             this.isMultiple = _isMultiple;
             this.isByLetter = _isByLetter;
             this.isMWE = _isMWE;
+            this.connectedFields = _connectedFields;
         }
 
         protected Field()
