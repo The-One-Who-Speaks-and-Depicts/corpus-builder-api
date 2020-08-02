@@ -69,7 +69,7 @@ namespace CroatianProject.Pages
         [BindProperty]
         public string stopSymbols { get; set; }
         [BindProperty]
-        public bool decapitalisation { get; set; }
+        public bool decapitalization { get; set; }
 
         [HttpGet]
         public void OnGet(string documentPicked)
@@ -96,7 +96,7 @@ namespace CroatianProject.Pages
         public void OnPostProcess()
         {            
             // TBD: issue of first priority
-            /*
+            
             try
             {                
                 ScriptEngine engine = Python.CreateEngine();
@@ -108,10 +108,12 @@ namespace CroatianProject.Pages
                 var pythonFilePath = Path.Combine(_environment.ContentRootPath, "Scripts", "analysis.py");
                 engine.ExecuteFile(pythonFilePath, scope);
                 dynamic function = scope.GetVariable("analysis");
-                IList<object> result = function(processedString);
+                IList<object> result = function(processedString, stopSymbols, decapitalization.ToString());
+                Debug.WriteLine(result.Count.ToString());
+                /*
                 IList<object> paragraphs = (IList<object>)result[0]; // параграфы
                 IList<object> tagged_by_paragraphs = (IList<object>)result[1]; // параграфы по словах по параграфам
-                IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном
+                IList<object> tagged_alphabetically = (IList<object>)result[2]; // слова в алфавитном                
                 var dirTexts = Path.Combine(_environment.ContentRootPath, "database", "texts");
                 DirectoryInfo textDirectoryInfo = new DirectoryInfo(dirTexts);
                 if (!textDirectoryInfo.Exists)
@@ -247,6 +249,7 @@ namespace CroatianProject.Pages
                     }
                     unitNumber++;
                 }
+                */
             }
             catch (Exception e)
             {
@@ -256,8 +259,7 @@ namespace CroatianProject.Pages
                 {
                     w.Write(e.Message);
                 }
-            }
-            */
+            }           
 
         }
 
