@@ -34,7 +34,7 @@ window.onload = function () {
         if (selectedField != "Any" && selectedField != "" && selectedValue != "Any" && selectedValue != "") {
             var childrenFields = document.getElementsByClassName("fieldChildren");
             for (var i = 0; i < childrenFields.length; i++) {
-                if (childrenFields[i].checked) {
+                if (childrenFields[i].checked && childrenFields[i].id != selectedField) {
                     var connection = selectedField + ":" + selectedValue + "->" + childrenFields[i].id;
                     if ($("#connections").val() != "") {
                         var addedFields = $("#connections").val().split('\n');
@@ -67,8 +67,24 @@ window.onload = function () {
     });
 
     $("#valueMother").change(function () {
-        //чекнуть все чекбоксы, которые законнекчены
-        // добавить после реализации первого коннекта
+        var childrenFields = document.getElementsByClassName("fieldChildren");
+        for (var j = 0; j < childrenFields.length; j++) {
+            $('#' + childrenFields[j].id).prop('checked', false);
+        }
+        for (var i = 0; i < jsons.length; i++) {
+            if (jsons[i].name == $("#fieldMother option:selected").text() && Object.keys(jsons[i].connectedFields).includes($("#valueMother option:selected").text())) {
+                var childrenFields = document.getElementsByClassName("fieldChildren");
+                for (var j = 0; j < childrenFields.length; j++) {
+                    if (jsons[i].connectedFields[$("#valueMother option:selected").text()].includes(childrenFields[j].id)) {
+                        $('#' + childrenFields[j].id).prop('checked', true);
+                    }
+                }
+            }
+        }
+    });
+
+    $('#clear').click(function () {
+        $('#connections').val("");
     });
         
 }

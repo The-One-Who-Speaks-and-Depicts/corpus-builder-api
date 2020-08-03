@@ -156,6 +156,58 @@ namespace CroatianProject.Pages.Admin
         {
             var addedConnections = from connection in connections.Split('\n')
                                    select connection.Trim();
+            var fieldFiles = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields")).GetFiles();
+            List<Field> fields = new List<Field>();
+            foreach (var fieldFile in fieldFiles)
+            {
+                using (StreamReader r = new StreamReader(fieldFile.FullName))
+                {
+                    fields.Add(JsonConvert.DeserializeObject<Field>(r.ReadToEnd()));
+                }
+            }
+            foreach (var connection in addedConnections)
+            {
+                string mother = connection.Split("->")[0];
+                string[] children = connection.Split("->")[1].Split(',');
+                string name = mother.Split(':')[0];
+                string value = mother.Split(':')[1];
+                foreach (var field in fields)
+                {
+                    if (field.name == name)
+                    {
+                        if (field.connectedFields != null)
+                        {
+                            if (field.connectedFields.Keys.Contains(value))
+                            {
+                                foreach (var child in children)
+                                {
+                                    if (!field.connectedFields[value].Contains(child))
+                                    {
+                                        field.connectedFields[value].Add(child);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                field.connectedFields[value] = children.ToList();
+                            }
+                        }
+                        else
+                        {
+                            field.connectedFields = new Dictionary<string, List<string>>();
+                            field.connectedFields[value] = children.ToList();
+                        }
+                    }
+                }
+            }
+            foreach (var field in fields)
+            {
+                using (StreamWriter w = new StreamWriter(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields", field.name + ".json")))
+                {
+                    w.Write(field.Jsonize());
+                }
+            }
+            FieldList = getFields();
             MultiplyOptions = SetOptions();
             ValueTypeOptions = SetValues();
             UserFilledOptions = SetFullfillment();
