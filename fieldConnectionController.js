@@ -16,6 +16,7 @@ window.onload = function () {
     $("#fieldMother").change(function () {
         $("#valueMother").text("");
         var selectedOption = $("#fieldMother option:selected").text();
+        $("#valueMother").append("<option>Any</option>");
 
         for (var i = 0; i < jsons.length; i++) {
                 if (jsons[i].name == selectedOption) {
@@ -25,6 +26,49 @@ window.onload = function () {
                     }
                 }            
         }
+    });
+
+    $("#submit").click(function () {
+        var selectedField = $("#fieldMother option:selected").text();
+        var selectedValue = $("#valueMother option:selected").text();
+        if (selectedField != "Any" && selectedField != "" && selectedValue != "Any" && selectedValue != "") {
+            var childrenFields = document.getElementsByClassName("fieldChildren");
+            for (var i = 0; i < childrenFields.length; i++) {
+                if (childrenFields[i].checked) {
+                    var connection = selectedField + ":" + selectedValue + "->" + childrenFields[i].id + "\n";
+                    if ($("#connections").val() != "") {
+                        var addedFields = $("#connections").val().split('\n');
+                        var foundCoincidence = false;
+                        for (var j = 0; j < addedFields.length; j++) {
+                            if (addedFields[j].split("->")[0] == connection.split("->")[0]) {
+                                if (addedFields[j].split("->")[1].includes(connection.split("->")[1].trim())) {
+                                    foundCoincidence = true;
+                                    break;
+                                }
+                                else {
+                                    addedFields[j] = addedFields[j].split("->")[0] + "->" + addedFields[j].split("->")[1] + "," + childrenFields[i].id;
+                                    foundCoincidence = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!foundCoincidence) {
+                            addedFields.push(connection);
+                        }
+                        $("#connections").val(addedFields.join('\n'));
+                    }
+                    else {
+                        $('#connections').val(connection);
+                    }
+                }
+            }
+        }
+        
+    });
+
+    $("#valueMother").change(function () {
+        //чекнуть все чекбоксы, которые законнекчены
+        // добавить после реализации первого коннекта
     });
         
 }

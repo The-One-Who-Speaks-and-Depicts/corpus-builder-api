@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using CorpusDraftCSharp;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace CroatianProject.Pages.Admin
 {
@@ -153,7 +154,7 @@ namespace CroatianProject.Pages.Admin
 
         public void OnPostConnect()
         {
-
+            Debug.WriteLine(connections);
         }
 
 

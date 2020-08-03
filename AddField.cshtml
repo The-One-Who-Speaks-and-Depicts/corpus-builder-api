@@ -43,12 +43,19 @@
         <div style="float:right;">
             <h3>Связать поля</h3>
             <div id="values" style="display:none">
-                @foreach (var field in Model.FieldList)
+                @try
                 {
-                    @if (field != "Any")
+                    foreach (var field in Model.FieldList)
                     {
-                        @(field + "|")
+                        @if (field != "Any")
+                        {
+                            @(field + "|")
+                        }
                     }
+                }
+                catch
+                {
+
                 }
             </div>
             Исходное поле/значение:
@@ -77,10 +84,10 @@
             {
 
             }
-            <br />
-            <button id="submit">Зафиксировать изменения</button>
+            <br />            
+            <button id="submit">Связать поля</button>
             <form method="post">
-                <textarea style="display:none" asp-for="connections"></textarea><br />
+                <textarea rows="20" cols="50" id="connections" asp-for="connections" readonly></textarea><br />
                 <button asp-page-handler="connect">Внести изменения</button>
             </form>
         </div>
