@@ -154,7 +154,11 @@ namespace CroatianProject.Pages.Admin
 
         public void OnPostConnect()
         {
-            Debug.WriteLine(connections);
+            var addedConnections = from connection in connections.Split('\n')
+                                   select connection.Trim();
+            MultiplyOptions = SetOptions();
+            ValueTypeOptions = SetValues();
+            UserFilledOptions = SetFullfillment();
         }
 
 

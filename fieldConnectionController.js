@@ -35,7 +35,7 @@ window.onload = function () {
             var childrenFields = document.getElementsByClassName("fieldChildren");
             for (var i = 0; i < childrenFields.length; i++) {
                 if (childrenFields[i].checked) {
-                    var connection = selectedField + ":" + selectedValue + "->" + childrenFields[i].id + "\n";
+                    var connection = selectedField + ":" + selectedValue + "->" + childrenFields[i].id;
                     if ($("#connections").val() != "") {
                         var addedFields = $("#connections").val().split('\n');
                         var foundCoincidence = false;
