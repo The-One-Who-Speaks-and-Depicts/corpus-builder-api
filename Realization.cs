@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace CorpusDraftCSharp
 {
@@ -83,6 +84,35 @@ namespace CorpusDraftCSharp
         {
             string realizationToJson = JsonConvert.SerializeObject(this);
             return realizationToJson;
+        }
+
+        public string Output()
+        {
+            Func<string> graphemes = () =>
+            {
+                string collected = "";
+                foreach (var l in letters)
+                {
+                    collected += l.Output();
+                }
+                return collected;
+            };
+            try
+            {
+                Func<List<Dictionary<string, List<IValue>>>, string> fieldsInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    return "";
+                };
+                Func<List<Dictionary<string, List<IValue>>>, string> fieldsInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    return "";
+                };
+                return "<span title=\"" + fieldsInRawText.Invoke(realizationFields) + "\" data-content=\"" + fieldsInHTML.Invoke(realizationFields) + "\" class=\"word\" id=\"" + this.documentID + "|" + this.clauseID + "|" + this.realizationID + "\"> " + graphemes.Invoke() + "</span>";
+            }
+            catch
+            {
+                return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.clauseID + "|" + this.realizationID + "\"> " + graphemes.Invoke() + "</span>";
+            }
         }
 
         #endregion

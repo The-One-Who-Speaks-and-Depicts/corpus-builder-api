@@ -73,5 +73,10 @@ namespace CorpusDraftCSharp
             string realizationToJson = JsonConvert.SerializeObject(this);
             return realizationToJson;
         }
+
+        public string Output()
+        {
+            return grapheme;
+        }
     }
 }
