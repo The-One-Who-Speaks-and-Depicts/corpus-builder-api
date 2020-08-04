@@ -18,7 +18,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string textID;
         [JsonProperty]
-        protected Dictionary<string, List<IValue>> clauseFields = new Dictionary<string, List<IValue>>();
+        protected List<Dictionary<string, List<IValue>>> clauseFields = new List<Dictionary<string, List<IValue>>>();
         [JsonProperty]
         public string clauseID;
         [JsonProperty]
@@ -30,7 +30,7 @@ namespace CorpusDraftCSharp
 
         #region Constructors
         [JsonConstructor]
-        public Clause(string _documentID, string _textID, string _filePath, string _clauseID, string _clauseText, Dictionary<string, List<IValue>> _clauseFields, List<Realization> _realizations)
+        public Clause(string _documentID, string _textID, string _filePath, string _clauseID, string _clauseText, List<Dictionary<string, List<IValue>>> _clauseFields, List<Realization> _realizations)
         {
             this.documentID = _documentID;
             this.filePath = _filePath;

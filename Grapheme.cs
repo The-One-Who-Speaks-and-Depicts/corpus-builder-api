@@ -18,7 +18,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string clauseID;
         [JsonProperty]
-        public Dictionary<string, List<IValue>> graphemeFields;
+        public List<Dictionary<string, List<IValue>>> graphemeFields;
         [JsonProperty]
         public string realizationID;
         [JsonProperty]
@@ -28,7 +28,7 @@ namespace CorpusDraftCSharp
 
 
         [JsonConstructor]
-        public Grapheme(string _documentID, string _filePath, string _textID, string _clauseID, Dictionary<string, List<IValue>> _fields, string _realizationID, string _graphemeID, string _grapheme)
+        public Grapheme(string _documentID, string _filePath, string _textID, string _clauseID, List<Dictionary<string, List<IValue>>> _fields, string _realizationID, string _graphemeID, string _grapheme)
         {
             this.documentID = _documentID;
             this.filePath = _filePath;
@@ -36,7 +36,6 @@ namespace CorpusDraftCSharp
             this.clauseID = _clauseID;
             this.graphemeFields = _fields;
             this.realizationID = _realizationID;
-            this.graphemeFields = _fields;
             this.graphemeID = _graphemeID;
             this.grapheme = _grapheme;
         }

@@ -21,7 +21,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string googleDocPath;
         [JsonProperty]
-        public Dictionary<string, List<IValue>> documentMetaData = new Dictionary<string, List<IValue>>();
+        public List<Dictionary<string, List<IValue>>> documentMetaData = new List<Dictionary<string, List<IValue>>>();
         [JsonProperty]
         public List<Text> texts = new List<Text>();
         #endregion
@@ -29,7 +29,7 @@ namespace CorpusDraftCSharp
         #region Constructors
 
         [JsonConstructor]
-        public Document(string _documentID, string _documentName, string _filePath, string _googleDocPath, Dictionary<string, List<IValue>> _documentMetaData, List<Text> _texts)
+        public Document(string _documentID, string _documentName, string _filePath, string _googleDocPath, List<Dictionary<string, List<IValue>>> _documentMetaData, List<Text> _texts)
         {
             documentID = _documentID;
             documentName = _documentName;

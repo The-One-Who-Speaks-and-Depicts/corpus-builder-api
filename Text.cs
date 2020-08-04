@@ -18,7 +18,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string textID;
         [JsonProperty]
-	    public Dictionary<string, List<IValue>> textMetaData = new Dictionary<string, List<IValue>>();
+	    public List<Dictionary<string, List<IValue>>> textMetaData = new List<Dictionary<string, List<IValue>>>();
         [JsonProperty]
         public List<Clause> clauses = new List<Clause>();
 	    #endregion	
@@ -26,7 +26,7 @@ namespace CorpusDraftCSharp
 	    #region Constructors
     
         [JsonConstructor]
-        public Text (string _documentID, string _textID, string _filePath, Dictionary<string, List<IValue>> _textMetaData, List<Clause> _clauses)
+        public Text (string _documentID, string _textID, string _filePath, List<Dictionary<string, List<IValue>>> _textMetaData, List<Clause> _clauses)
         {
             this.documentID = _documentID;
             this.textID = _textID;
