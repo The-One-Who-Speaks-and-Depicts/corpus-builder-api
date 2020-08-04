@@ -100,8 +100,6 @@ namespace CroatianProject.Pages
                 ScriptEngine engine = Python.CreateEngine();
                 ScriptScope scope = engine.CreateScope();
                 var paths = engine.GetSearchPaths();
-                var packagePath = Path.Combine(_environment.ContentRootPath, "Packages");
-                paths.Add(packagePath);
                 engine.SetSearchPaths(paths);
                 var pythonFilePath = Path.Combine(_environment.ContentRootPath, "Scripts", "analysis.py");
                 engine.ExecuteFile(pythonFilePath, scope);
