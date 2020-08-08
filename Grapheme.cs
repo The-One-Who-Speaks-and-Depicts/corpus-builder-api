@@ -75,7 +75,56 @@ namespace CorpusDraftCSharp
 
         public string Output()
         {
-            return grapheme;
+            try
+            {
+                Func<List<Dictionary<string, List<IValue>>>, string> fieldsInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    string result = "";
+                    foreach (var optional_tagging in fields)
+                    {
+                        foreach (var field in optional_tagging)
+                        {
+                            result += field.Key;
+                            result += ":";
+                            foreach (var fieldValue in field.Value)
+                            {
+                                result += fieldValue.name;
+                                if (fieldValue.connectedRealizations != null)
+                                {
+                                    result += "[";
+                                    for (int i = 0; i < fieldValue.connectedRealizations.Count; i++)
+                                    {
+                                        result += fieldValue.connectedRealizations[i].documentID;
+                                        result += "/";
+                                        result += fieldValue.connectedRealizations[i].clauseID;
+                                        result += "/";
+                                        result += fieldValue.connectedRealizations[i].realizationID;
+                                        result += "/";
+                                        if (i < (fieldValue.letters.Count - 1))
+                                        {
+                                            result += "_";
+                                        }
+                                    }
+                                    result += "]";
+                                }
+                                result += ";";
+                            }
+                            result += "||";
+                        }
+                        result += "\n";
+                    }
+                    return result;
+                };
+                Func<List<Dictionary<string, List<IValue>>>, string> fieldsInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    return fieldsInRawText.Invoke(fields).Replace("\n", "<br />");
+                };
+                return "<span title=\"" + fieldsInRawText.Invoke(graphemeFields) + "\" data-content=\"" + fieldsInHTML.Invoke(graphemeFields) + "\" class=\"grapheme\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "|" + this.graphemeID + "\"> " + grapheme + "</span>";
+            }
+            catch
+            {
+                return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "|" + this.graphemeID + "\"> " + grapheme + "</span>";
+            }
         }
     }
 }
