@@ -71,7 +71,7 @@ namespace CorpusDraftCSharp
             Func<string> tokens = () =>
             {
                 string collected = "";
-                foreach (var r in realizations.OrderBy(realization => Convert.ToInt32(realization.documentID)).ThenBy(realization => Convert.ToInt32(realization.textID)).ThenBy(realization => Convert.ToInt32(realization.realizationID)))
+                foreach (var r in realizations.OrderBy(realization => Convert.ToInt32(realization.documentID)).ThenBy(realization => Convert.ToInt32(realization.textID)).ThenBy(realization => Convert.ToInt32(realization.clauseID)).ThenBy(realization => Convert.ToInt32(realization.realizationID)))
                 {
                     collected += r.Output();
                 }
@@ -103,11 +103,11 @@ namespace CorpusDraftCSharp
                 {
                     return clauseInRawText.Invoke(fields).Replace("\n", "<br />");
                 };
-                return "<span title=\"" + clauseInRawText.Invoke(clauseFields) + "\" data-content=\"" + clauseInHTML.Invoke(clauseFields) + "\" class=\"clause\" id=\"" + this.documentID + "|" + this.clauseID + "\"> " + tokens.Invoke() + "</span>";
+                return "<span title=\"" + clauseInRawText.Invoke(clauseFields) + "\" data-content=\"" + clauseInHTML.Invoke(clauseFields) + "\" class=\"clause\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "\"> " + tokens.Invoke() + "</span><br />";
             }
             catch
             {
-                return "<span title= \"\" data-content=\"\" class=\"clause\" id=\"" + this.documentID + "|" + this.clauseID  + "\"> " + tokens.Invoke() + "</span>";
+                return "<span title= \"\" data-content=\"\" class=\"clause\" id=\"" + this.documentID + "|" + this.clauseID  + "\"> " + tokens.Invoke() + "</span><br />";
             }
         }
         public string Jsonize()

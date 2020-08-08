@@ -59,6 +59,51 @@ namespace CorpusDraftCSharp
             string json = JsonConvert.SerializeObject(this);
             return json;
         }
+
+        public string Output()
+        {
+            Func<string> parts = () =>
+            {
+                string collected = "";
+                foreach (var t in texts.OrderBy(text => Convert.ToInt32(text.documentID)).ThenBy(text => Convert.ToInt32(text.textID)))
+                {
+                    collected += t.Output();
+                }
+                return collected;
+            };
+            try
+            {
+                Func<List<Dictionary<string, List<IValue>>>, string> documentInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    string result = "";
+                    foreach (var optional_tagging in fields)
+                    {
+                        foreach (var field in optional_tagging)
+                        {
+                            result += field.Key;
+                            result += ":";
+                            foreach (var fieldValue in field.Value)
+                            {
+                                result += fieldValue.name;
+                                result += ";";
+                            }
+                            result += "||";
+                        }
+                        result += "\n";
+                    }
+                    return result;
+                };
+                Func<List<Dictionary<string, List<IValue>>>, string> documentInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    return documentInRawText.Invoke(fields).Replace("\n", "<br />");
+                };
+                return "<span title=\"" + documentInRawText.Invoke(documentMetaData) + "\" data-content=\"" + documentInHTML.Invoke(documentMetaData) + "\" class=\"text\" id=\"" + this.documentID + "\"> " + parts.Invoke() + "</span><br />";
+            }
+            catch
+            {
+                return "<span title= \"\" data-content=\"\" class=\"text\" id=\"" + this.documentID + "\"> " + parts.Invoke() + "</span><br />";
+            }
+        }
         #endregion
 
 

@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace CorpusDraftCSharp
 { 
@@ -60,11 +61,59 @@ namespace CorpusDraftCSharp
 	
 
     #region PublicMethods
-    public string Jsonize()
-    {
-        string json = JsonConvert.SerializeObject(this);
-        return json;
-    }
-    #endregion
+        public string Jsonize()
+        {
+            string json = JsonConvert.SerializeObject(this);
+            return json;
+        }
+
+        public string Output()
+        {
+            Func<string> sentences = () =>
+            {
+                string collected = "";
+                foreach (var c in clauses.OrderBy(clause => Convert.ToInt32(clause.documentID)).ThenBy(clause => Convert.ToInt32(clause.textID)).ThenBy(clause => Convert.ToInt32(clause.clauseID)))
+                {
+                    collected += c.Output();
+                }
+                return collected;
+            };
+            try
+            {
+                Func<List<Dictionary<string, List<IValue>>>, string> textInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    string result = "";
+                    foreach (var optional_tagging in fields)
+                    {
+                        foreach (var field in optional_tagging)
+                        {
+                            result += field.Key;
+                            result += ":";
+                            foreach (var fieldValue in field.Value)
+                            {
+                                result += fieldValue.name;
+                                result += ";";
+                            }
+                            result += "||";
+                        }
+                        result += "\n";
+                    }
+                    return result;
+                };
+                Func<List<Dictionary<string, List<IValue>>>, string> textInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    return textInRawText.Invoke(fields).Replace("\n", "<br />");
+                };
+                return "<span title=\"" + textInRawText.Invoke(textMetaData) + "\" data-content=\"" + textInHTML.Invoke(textMetaData) + "\" class=\"text\" id=\"" + this.documentID + "|" + this.textID + "\"> " + sentences.Invoke() + "</span><br />";
+            }
+            catch
+            {
+                return "<span title= \"\" data-content=\"\" class=\"text\" id=\"" + this.documentID + "|" + this.textID + "\"> " + sentences.Invoke() + "</span><br />";
+            }
+        }
+
+
+
+        #endregion
     }
 }

@@ -91,7 +91,7 @@ namespace CorpusDraftCSharp
             Func<string> graphemes = () =>
             {
                 string collected = "";
-                foreach (var l in letters.OrderBy(graheme => Convert.ToInt32(graheme.documentID)).ThenBy(graheme => Convert.ToInt32(graheme.textID)).ThenBy(graheme => Convert.ToInt32(graheme.realizationID)).ThenBy(graheme => Convert.ToInt32(graheme.graphemeID)))
+                foreach (var l in letters.OrderBy(graheme => Convert.ToInt32(graheme.documentID)).ThenBy(graheme => Convert.ToInt32(graheme.textID)).ThenBy(grapheme => Convert.ToInt32(grapheme.clauseID)).ThenBy(graheme => Convert.ToInt32(graheme.realizationID)).ThenBy(graheme => Convert.ToInt32(graheme.graphemeID)))
                 {
                     collected += l.Output();
                 }
@@ -141,11 +141,11 @@ namespace CorpusDraftCSharp
                 {
                     return fieldsInRawText.Invoke(fields).Replace("\n", "<br />");
                 };
-                return "<span title=\"" + fieldsInRawText.Invoke(realizationFields) + "\" data-content=\"" + fieldsInHTML.Invoke(realizationFields) + "\" class=\"word\" id=\"" + this.documentID + "|" + this.clauseID + "|" + this.realizationID + "\"> " + graphemes.Invoke() + "</span>";
+                return "<span title=\"" + fieldsInRawText.Invoke(realizationFields) + "\" data-content=\"" + fieldsInHTML.Invoke(realizationFields) + "\" class=\"word\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "\"> " + graphemes.Invoke() + "</span>";
             }
             catch
             {
-                return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.clauseID + "|" + this.realizationID + "\"> " + graphemes.Invoke() + "</span>";
+                return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.textID +  "|" + this.clauseID + "|" + this.realizationID + "\"> " + graphemes.Invoke() + "</span>";
             }
         }
 
