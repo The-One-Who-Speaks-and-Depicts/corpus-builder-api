@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace CorpusDraftCSharp
@@ -65,6 +66,50 @@ namespace CorpusDraftCSharp
         #endregion
 
         #region publicMethods
+        public string Output()
+        {
+            Func<string> tokens = () =>
+            {
+                string collected = "";
+                foreach (var r in realizations.OrderBy(realization => Convert.ToInt32(realization.documentID)).ThenBy(realization => Convert.ToInt32(realization.textID)).ThenBy(realization => Convert.ToInt32(realization.realizationID)))
+                {
+                    collected += r.Output();
+                }
+                return collected;
+            };
+            try
+            {
+                Func<List<Dictionary<string, List<IValue>>>, string> clauseInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    string result = "";
+                    foreach (var optional_tagging in fields)
+                    {
+                        foreach (var field in optional_tagging)
+                        {
+                            result += field.Key;
+                            result += ":";
+                            foreach (var fieldValue in field.Value)
+                            {
+                                result += fieldValue.name;
+                                result += ";";
+                            }
+                            result += "||";
+                        }
+                        result += "\n";
+                    }
+                    return result;
+                };
+                Func<List<Dictionary<string, List<IValue>>>, string> clauseInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                {
+                    return clauseInRawText.Invoke(fields).Replace("\n", "<br />");
+                };
+                return "<span title=\"" + clauseInRawText.Invoke(clauseFields) + "\" data-content=\"" + clauseInHTML.Invoke(clauseFields) + "\" class=\"clause\" id=\"" + this.documentID + "|" + this.clauseID + "\"> " + tokens.Invoke() + "</span>";
+            }
+            catch
+            {
+                return "<span title= \"\" data-content=\"\" class=\"clause\" id=\"" + this.documentID + "|" + this.clauseID  + "\"> " + tokens.Invoke() + "</span>";
+            }
+        }
         public string Jsonize()
         {
             string jsonedClause = JsonConvert.SerializeObject(this);
