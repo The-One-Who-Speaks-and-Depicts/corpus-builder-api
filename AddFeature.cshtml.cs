@@ -72,22 +72,24 @@ namespace CroatianProject.Pages.Admin
                 var docs = directory.GetFiles();
                 foreach (var doc in docs)
                 {
+                    string document = "";
                     using (StreamReader r = new StreamReader(doc.FullName))
                     {
                         var deserialized = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
-                        existingTexts.Add(deserialized.documentID + "_" + deserialized.documentName + ":");
+                        document += deserialized.documentID + "_" + deserialized.documentName + ":";
                         for (int i = 0; i < deserialized.texts.Count; i++)
                         {
                             if (i < (deserialized.texts.Count - 1))
                             {
-                                existingTexts.Add(deserialized.texts[i].textName + "|");
+                               document += deserialized.texts[i].textName + "|";
                             }
                             else
                             {
-                                existingTexts.Add(deserialized.texts[i].textName);
+                                document += deserialized.texts[i].textName;
                             }
                         }
                     }
+                    existingTexts.Add(document);
                 }
             }
             catch
