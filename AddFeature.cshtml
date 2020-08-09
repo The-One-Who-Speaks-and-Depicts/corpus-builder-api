@@ -6,19 +6,26 @@
 <html>
 <head>    
     <script src="~/js/filterCondionAdditionController.js"></script>
+    <script src="~/js/documentTextAdditionController.js"></script>
 </head>
 <body>
     <div id="values" style="display:none;">
         @foreach (var field in Model.fieldsList)
         {@(field + "|")}
-</div>
+    </div>
+    <div id="doctexts" style="display:none;">
+        @foreach (var doc in Model.docList)
+        {
+           @(doc)
+        }
+    </div>
 <h2>Добавление признаков в текст</h2>
 <form align="center" method="post">
-    <select asp-for="textName">
-        @foreach (var text in Model.textList)
-        {
-            <option>@text</option>
-        }
+    <select id="docs" asp-for="docName">
+        <option>Any</option>
+    </select>
+    <select id="texts" asp-for="textName">
+        <option>Any</option>
     </select>
     <button>Показать текст</button><br />
 </form><br /><br /><br />
