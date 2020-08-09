@@ -156,9 +156,8 @@ namespace CroatianProject.Pages.Admin
             fieldsList = getFields();
         }
 
-        public void OnPut(string currentText)
-        {
-            Debug.WriteLine(currentText);
+        public void OnPost()
+        {            
             /*
           string pattern = @"\{.*?\}";
           Regex rgx = new Regex(pattern);

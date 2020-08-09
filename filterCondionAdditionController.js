@@ -233,20 +233,6 @@ $(document).ready(function () {
         }
     });
 
-    $('#SaveChanges').click(function () {
-        $('changedText').text();
-        var words = document.getElementsByClassName('word');
-        for (let i = 0; i < words.length; i++) {
-            if (words[i].dataset.content == "") {
-                $('#changedText').append('{' + words[i].id + '}');
-            }
-            else {
-                $('#changedText').append('{' + words[i].id + ' => ' + words[i].dataset.content + '}');
-            }
-
-        }
-    });
-
     function isMatch(pattern, word) {
         if (pattern.includes('*')) {
             pattern = pattern.split('*').join("\.*");
@@ -286,10 +272,23 @@ $(document).ready(function () {
                 }
             }
         }
-
-
-
-
-
     };
+
+    $('#SaveChanges').bind('click', save_changes);
+
+    function save_changes(event) {
+        event.preventDefault();
+        $('changedText').text();
+        var words = document.getElementsByClassName('word');
+        for (let i = 0; i < words.length; i++) {
+            if (words[i].dataset.content == "") {
+                $('#changedText').append('{' + words[i].id + '}');
+            }
+            else {
+                $('#changedText').append('{' + words[i].id + ' => ' + words[i].dataset.content + '}');
+            }
+
+        }
+        alert('Изменения сохранены');
+    }
 });

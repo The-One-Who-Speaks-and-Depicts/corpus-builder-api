@@ -45,15 +45,15 @@
 </div><br /><br /><br />
 
 <div>
-    <div align="center" style="float:left; width:50%;">
-    <button id="SaveChanges">Сохранить изменения</button>
-        <form method="put">
-            <textarea id="changedText" style="display:none;"></textarea>        
+    <div align="center" style="float:left; width:50%;">    
+        <form method="post">
+            <textarea id="changedText" style="display:none;" asp-for="currentText"></textarea>
             <div id="currText">
-                @Html.Raw(Model.textByWords)    
+                @Html.Raw(Model.textByWords)
             </div>
+            <button id="SaveChanges">Сохранить изменения</button><br />
             <button>Внести изменения</button>
-         </form>
+        </form>
 
     </div>
 
