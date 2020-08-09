@@ -17,7 +17,9 @@ namespace CroatianProject.Pages.Admin
     public class AddFeatureModel : PageModel
     {
         [BindProperty]
-        public List<string> textList { get; set; }
+        public List<string> docList { get; set; }
+        [BindProperty]
+        public string docName { get; set; }
         [BindProperty]
         public string textName { get; set; }
         public List<string> textByWords = new List<string>();
@@ -61,17 +63,37 @@ namespace CroatianProject.Pages.Admin
             }
             return existingFields;
         }
-        public List<string> getTexts()
+        public List<string> getDocs()
         {
-            var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
-            DirectoryInfo textsDirectory = new DirectoryInfo(directory);
-            var texts = textsDirectory.GetDirectories();
             List<string> existingTexts = new List<string>();
-            existingTexts.Add("Any");
-            foreach (var text in texts)
+            try
             {
-                existingTexts.Add(text.Name);
+                var directory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
+                var docs = directory.GetFiles();
+                foreach (var doc in docs)
+                {
+                    using (StreamReader r = new StreamReader(doc.FullName))
+                    {
+                        var deserialized = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
+                        existingTexts.Add(deserialized.documentID + "_" + deserialized.documentName + ":");
+                        for (int i = 0; i < deserialized.texts.Count; i++)
+                        {
+                            if (i < (deserialized.texts.Count - 1))
+                            {
+                                existingTexts.Add(deserialized.texts[i].textName + "|");
+                            }
+                            else
+                            {
+                                existingTexts.Add(deserialized.texts[i].textName);
+                            }
+                        }
+                    }
+                }
             }
+            catch
+            {
+
+            }            
             return existingTexts;
         }
 
@@ -88,7 +110,7 @@ namespace CroatianProject.Pages.Admin
             _environment = environment;
             try
             {
-                textList = getTexts();
+                docList = getDocs();
                 fieldsList = getFields();
             }
             catch
