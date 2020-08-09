@@ -81,11 +81,11 @@ namespace CroatianProject.Pages.Admin
                         {
                             if (i < (deserialized.texts.Count - 1))
                             {
-                               document += deserialized.texts[i].textName + "|";
+                               document += deserialized.texts[i].textID + "_" + deserialized.texts[i].textName + "|";
                             }
                             else
                             {
-                                document += deserialized.texts[i].textName;
+                                document += deserialized.texts[i].textID + "_" + deserialized.texts[i].textName;
                             }
                         }
                     }
