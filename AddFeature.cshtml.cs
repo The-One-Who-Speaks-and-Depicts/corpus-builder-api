@@ -22,7 +22,7 @@ namespace CroatianProject.Pages.Admin
         public string docName { get; set; }
         [BindProperty]
         public string textName { get; set; }
-        public List<string> textByWords = new List<string>();
+        public string textByWords { get; set; }
         [BindProperty]
         public List<string> fieldsList { get; set; } = new List<string>();
         [BindProperty]
@@ -146,7 +146,7 @@ namespace CroatianProject.Pages.Admin
                         }
                     }
                 }
-                textByWords.Add(text.Output());
+                textByWords = text.Output();
             }
             catch
             {
@@ -156,9 +156,9 @@ namespace CroatianProject.Pages.Admin
             fieldsList = getFields();
         }
 
-        public void OnPostChange()
+        public void OnPut(string currentText)
         {
-            throw new NotImplementedException();
+            Debug.WriteLine(currentText);
             /*
           string pattern = @"\{.*?\}";
           Regex rgx = new Regex(pattern);

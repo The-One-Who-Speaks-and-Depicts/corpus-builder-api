@@ -4,7 +4,8 @@
     ViewData["Title"] = "Анализ";
 }
 <html>
-<head>    
+<head>
+    <script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
     <script src="~/js/filterCondionAdditionController.js"></script>
     <script src="~/js/documentTextAdditionController.js"></script>
 </head>
@@ -46,16 +47,13 @@
 <div>
     <div align="center" style="float:left; width:50%;">
     <button id="SaveChanges">Сохранить изменения</button>
-    <form method="post">
-    <textarea id="changedText" asp-for="currentText" style="display:none;"></textarea>
-			<div id="currText">
-			@foreach (var word in Model.textByWords)
-        		{
-            		@Html.Raw(word)
-        		}
-			</div>
-      <button asp-page-handler="change">Внести изменения</button>
-      </form>
+        <form method="put">
+            <textarea id="changedText" style="display:none;"></textarea>        
+            <div id="currText">
+                @Html.Raw(Model.textByWords)    
+            </div>
+            <button>Внести изменения</button>
+         </form>
 
     </div>
 

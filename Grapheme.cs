@@ -123,7 +123,7 @@ namespace CorpusDraftCSharp
             }
             catch
             {
-                return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "|" + this.graphemeID + "\">" + grapheme + "</span>";
+                return "<span title= \"\" data-content=\"\" class=\"grapheme\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "|" + this.graphemeID + "\">" + grapheme + "</span>";
             }
         }
     }

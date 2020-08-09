@@ -1,8 +1,6 @@
 ﻿jsons = [];
 
-window.onload = function () {
-
-
+$(document).ready(function () {
     $(".word").dblclick(function () {
         $('#info').text("");
         $('#info').append("Lexeme:");
@@ -13,6 +11,7 @@ window.onload = function () {
         $("#identificator").text("");
         $("#identificator").append($(this).attr('id'));
     });
+    
 
 
     var values = document.getElementById('values');
@@ -28,7 +27,7 @@ window.onload = function () {
 
     $("#keys").change(function () {
         $("#thisFieldValues").text("");
-		$("#fieldInfo").text("");
+        $("#fieldInfo").text("");
         var selectedOption = $("#keys option:selected").text();
         for (var i = 0; i < jsons.length; i++) {
             if (jsons[i].name == selectedOption) {
@@ -74,9 +73,8 @@ window.onload = function () {
     $("#featureAdditionButton").click(function () {
         var selectedOption = $("#keysFilter option:selected").text();
         isNegative = "";
-        if ($("#isNegative").is(':checked'))
-        {
-          isNegative = "!";
+        if ($("#isNegative").is(':checked')) {
+            isNegative = "!";
         }
         $("#featureFilter").append(isNegative + selectedOption + ":");
         for (var i = 0; i < jsons.length; i++) {
@@ -115,64 +113,64 @@ window.onload = function () {
                     for (var k = 0; k < extantList.length; k++) {
                         extantList[k] = extantList[k].split(":");
                     }
-                    var wordAttributes = words[i].getAttribute("data-content");                    
+                    var wordAttributes = words[i].getAttribute("data-content");
                     wordAttributes = wordAttributes.split(";<br />");
-                        var extantAttributes = [];
-                        for (var k = 0; k < wordAttributes.length; k++) {
-                            if (wordAttributes[k].length > 0) {
-                                extantAttributes.push(wordAttributes[k]);
+                    var extantAttributes = [];
+                    for (var k = 0; k < wordAttributes.length; k++) {
+                        if (wordAttributes[k].length > 0) {
+                            extantAttributes.push(wordAttributes[k]);
+                        }
+                    }
+                    for (var k = 0; k < extantAttributes.length; k++) {
+                        extantAttributes[k] = extantAttributes[k].split(":");
+                    }
+                    coincidingAttributes = 0;
+                    for (var j = 0; j < extantList.length; j++) {
+                        coincidenceFound = false;
+                        if (extantList[j][0][0] == '!') {
+                            if (extantAttributes.length < 1) {
+                                coincidenceFound = true;
                             }
                         }
-                        for (var k = 0; k < extantAttributes.length; k++) {
-                            extantAttributes[k] = extantAttributes[k].split(":");
-                        }
-                        coincidingAttributes = 0;
-                        for (var j = 0; j < extantList.length; j++) {
-                            coincidenceFound = false;
-                            if (extantList[j][0][0] == '!') {
-                                if (extantAttributes.length < 1) {
-                                    coincidenceFound = true;
-                                }
-                            }
-                            exact = false;
-                            for (var m = 0; m < extantAttributes.length; m++) {
+                        exact = false;
+                        for (var m = 0; m < extantAttributes.length; m++) {
 
-                                if (extantList[j][0][0] != '!') {
-                                    if (extantList[j][0] == extantAttributes[m][0]) {
-                                        if (extantAttributes[m][1].match(extantList[j][1])) {
-                                            coincidenceFound = true;
-                                        }
+                            if (extantList[j][0][0] != '!') {
+                                if (extantList[j][0] == extantAttributes[m][0]) {
+                                    if (extantAttributes[m][1].match(extantList[j][1])) {
+                                        coincidenceFound = true;
                                     }
                                 }
-                                else {
-                                    var positive = extantList[j][0].slice(1);
-                                    if (positive == extantAttributes[m][0]) {
-                                        if (extantAttributes[m][1].match(extantList[j][1])) {
-                                            exact = true;
-                                        }
-                                        else {
-                                            coincidenceFound = true;
-                                        }
+                            }
+                            else {
+                                var positive = extantList[j][0].slice(1);
+                                if (positive == extantAttributes[m][0]) {
+                                    if (extantAttributes[m][1].match(extantList[j][1])) {
+                                        exact = true;
                                     }
                                     else {
                                         coincidenceFound = true;
                                     }
                                 }
+                                else {
+                                    coincidenceFound = true;
+                                }
+                            }
 
-                            }
-                            if (exact) {
-                                coincidenceFound = false;
-                            }
-                            if (coincidenceFound) {
-                                coincidingAttributes++;
-                            }
                         }
+                        if (exact) {
+                            coincidenceFound = false;
+                        }
+                        if (coincidenceFound) {
+                            coincidingAttributes++;
+                        }
+                    }
                     if (coincidingAttributes == extantList.length) {
                         console.log("ok");
-                        }
-                        else {
-                            words[i].setAttribute("style", "display:none;");
-                        }
+                    }
+                    else {
+                        words[i].setAttribute("style", "display:none;");
+                    }
                 }
 
             }
@@ -182,118 +180,116 @@ window.onload = function () {
         }
     });
 
-	$("#changeButton").click(function() {
+    $("#changeButton").click(function () {
         var currentFeatures = document.getElementById($("#identificator").val()).getAttribute("data-content").split(';<br />');
         var addedFeature = $("#keys option:selected").text();
-		var addedValue = $("#thisFieldValues option:selected").text();
-    if (addedFeature != "Any" && addedValue != "Any")
-    {
+        var addedValue = $("#thisFieldValues option:selected").text();
+        if (addedFeature != "Any" && addedValue != "Any") {
 
-		var isFeatureMultiple = $("#fieldInfo").text();
-		var coincidenceFound = false;
-		for (let i = 0; i < currentFeatures.length; i++) {
-			if (currentFeatures[i] != "") {
-				var feature = currentFeatures[i].split(':');
-				if (feature[0] == addedFeature) {
-					var valuesOfFeature = feature[1].split(';');
-					for (let j = 0; j < valuesOfFeature.length; j++){
-						if (valuesOfFeature[j] != "") {
-							if (valuesOfFeature[j] == addedValue) {
-								coincidenceFound = true;
-								alert('У слова есть этот признак и это значение!');
-								break;
-							}
-						}
-					}
-					if (coincidenceFound) break;
-					if (isFeatureMultiple != "true") {
-						coincidenceFound = true;
-						alert('Этому признаку может соответствовать только одно значение!');
-						break;
-					}
-					else {
-                        currentFeatures[i] += ";";
-                        currentFeatures[i] += addedValue;
-                        var new_features = "";
-                        for (let feature in currentFeatures) {
-                            if (feature != "") {
-                                new_features += feature;
-                                new_features += ";<br />";
+            var isFeatureMultiple = $("#fieldInfo").text();
+            var coincidenceFound = false;
+            for (let i = 0; i < currentFeatures.length; i++) {
+                if (currentFeatures[i] != "") {
+                    var feature = currentFeatures[i].split(':');
+                    if (feature[0] == addedFeature) {
+                        var valuesOfFeature = feature[1].split(';');
+                        for (let j = 0; j < valuesOfFeature.length; j++) {
+                            if (valuesOfFeature[j] != "") {
+                                if (valuesOfFeature[j] == addedValue) {
+                                    coincidenceFound = true;
+                                    alert('У слова есть этот признак и это значение!');
+                                    break;
+                                }
                             }
                         }
-                        document.getElementById($("#identificator").val()).setAttribute("data-content", currentFeatures);
-                        coincidenceFound = true;
-                        alert('Добавлено значение');
-						break;
-					}
-				}
-			}
-		}
-		if (!coincidenceFound) {
-            alert('Добавлен признак и присвоено значение.');
-            document.getElementById($("#identificator").val()).setAttribute("data-content", document.getElementById($("#identificator").val()).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />");
-		}
+                        if (coincidenceFound) break;
+                        if (isFeatureMultiple != "true") {
+                            coincidenceFound = true;
+                            alert('Этому признаку может соответствовать только одно значение!');
+                            break;
+                        }
+                        else {
+                            currentFeatures[i] += ";";
+                            currentFeatures[i] += addedValue;
+                            var new_features = "";
+                            for (let feature in currentFeatures) {
+                                if (feature != "") {
+                                    new_features += feature;
+                                    new_features += ";<br />";
+                                }
+                            }
+                            document.getElementById($("#identificator").val()).setAttribute("data-content", currentFeatures);
+                            coincidenceFound = true;
+                            alert('Добавлено значение');
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!coincidenceFound) {
+                alert('Добавлен признак и присвоено значение.');
+                document.getElementById($("#identificator").val()).setAttribute("data-content", document.getElementById($("#identificator").val()).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />");
+            }
+        }
+    });
+
+    $('#SaveChanges').click(function () {
+        $('changedText').text();
+        var words = document.getElementsByClassName('word');
+        for (let i = 0; i < words.length; i++) {
+            if (words[i].dataset.content == "") {
+                $('#changedText').append('{' + words[i].id + '}');
+            }
+            else {
+                $('#changedText').append('{' + words[i].id + ' => ' + words[i].dataset.content + '}');
+            }
+
+        }
+    });
+
+    function isMatch(pattern, word) {
+        if (pattern.includes('*')) {
+            pattern = pattern.split('*').join("\.*");
+        }
+        pattern = "\^" + pattern + "\$";
+        pattern = new RegExp(pattern);
+        if (word.match(pattern)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
     }
-	});
 
-  $('#SaveChanges').click(function() {
-    $('changedText').text();
-    var words = document.getElementsByClassName('word');
-    for (let i = 0; i < words.length; i++) {
-      if (words[i].dataset.content == "") {
-        $('#changedText').append('{' + words[i].id + '}');
-      }
-      else {
-        $('#changedText').append('{' + words[i].id + ' => ' + words[i].dataset.content + '}');
-      }
-
-    }
-  });
-
-};
-
-function isMatch(pattern, word) {
-    if (pattern.includes('*')) {
-        pattern = pattern.split('*').join("\.*");
-    }
-    pattern = "\^" + pattern + "\$";
-    pattern = new RegExp(pattern);
-    if (word.match(pattern)) {
-        return true;
-    }
-    else {
-        return false;
-    }
-
-}
-
-function Depict(selectedOption) {
-    var words = document.getElementsByClassName('word');
-    var contents = "";
-    for (var i = 0; i < words.length; i++) {
-        contents = $(words[i]).attr('data-content');
-        contents = contents.split(':');
-        if (contents[0] == selectedOption) {
-            wordFeatures = contents[1].split(";");
-            for (var j = 0; j < wordFeatures.length; j++) {
-                if (wordFeatures[j] != "<br />") {
-                    var features = document.getElementsByTagName("input");
-                    console.log(features.length);
-                    for (var k = 1; k < features.length; k++) {
-                        console.log($(features[k]).attr('name').split('_')[1]);
-                        console.log(wordFeatures[j]);
-                        if ($(features[k]).attr('name').split('_')[1] == wordFeatures[j]) {
-                            var color = $(features[k]).val();
-                            words[i].style.backgroundColor = color;
+    function Depict(selectedOption) {
+        var words = document.getElementsByClassName('word');
+        var contents = "";
+        for (var i = 0; i < words.length; i++) {
+            contents = $(words[i]).attr('data-content');
+            contents = contents.split(':');
+            if (contents[0] == selectedOption) {
+                wordFeatures = contents[1].split(";");
+                for (var j = 0; j < wordFeatures.length; j++) {
+                    if (wordFeatures[j] != "<br />") {
+                        var features = document.getElementsByTagName("input");
+                        console.log(features.length);
+                        for (var k = 1; k < features.length; k++) {
+                            console.log($(features[k]).attr('name').split('_')[1]);
+                            console.log(wordFeatures[j]);
+                            if ($(features[k]).attr('name').split('_')[1] == wordFeatures[j]) {
+                                var color = $(features[k]).val();
+                                words[i].style.backgroundColor = color;
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
 
 
 
 
-};
+    };
+});
