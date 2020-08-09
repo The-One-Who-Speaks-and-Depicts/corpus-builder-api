@@ -3,7 +3,7 @@
     let docsAndTextsSplit = docsAndTexts.split('\n');
     for (let i = 0; i < docsAndTextsSplit.length; i++) {
         if (docsAndTextsSplit[i].includes(':')) {
-            let document = "<option>" + docsAndTextsSplit[i].split(':')[0].split('_')[1] + "</option>";
+            let document = "<option>" + docsAndTextsSplit[i].split(':')[0] + "</option>";
             $(document).appendTo('#docs');
         }
     }
