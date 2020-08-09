@@ -121,127 +121,39 @@ namespace CroatianProject.Pages.Admin
             }
         }
         public void OnGet(string docName, string textName)
-        {            
-            // TBD after DB restructuring
-            /*
-            var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
-            List<DirectoryInfo> searchedTexts = new List<DirectoryInfo>();
-            if (textName != "Any")
+        {
+            try
             {
-                searchedTexts.Add(SearchForText(textName, directory));
-            List<Realization> acquiredForms = new List<Realization>();
-            foreach (var text in searchedTexts)
-            {
-                DirectoryInfo dirWords = new DirectoryInfo(Path.Combine(directory, text.Name, "paragraphs"));
-                var dirResults = dirWords.GetDirectories();
-		dirResults = dirResults.OrderBy(dirResult => dirResult.FullName).ToArray();
-                foreach (var wordDirectory in dirResults)
+                docName = docName.Split('_', 2)[0];
+                textName = textName.Split('_', 2)[0];
+                var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents")).GetFiles();
+                Text text = new Text();
+                foreach (var file in files)
                 {
-                    var words = wordDirectory.GetFiles();
-                    string s;
-                    foreach (var word in words)
+                    using (StreamReader r = new StreamReader(file.FullName))
                     {
-
-                        using (var f = new StreamReader(word.FullName))
+                        Document analyzedDocument = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
+                        if (analyzedDocument.documentID == docName)
                         {
-                            while ((s = f.ReadLine()) != null)
+                            foreach (var t in analyzedDocument.texts)
                             {
-                                acquiredForms.Add(JsonConvert.DeserializeObject<Realization>(s));
-                            }
-                        }
-                    }
-                        acquiredForms.Add(new Realization());
-                }
-            }
-	           acquiredForms = acquiredForms.OrderBy(realization => Convert.ToInt32(realization.documentID)).ThenBy(realization => Convert.ToInt32(realization.clauseID)).ThenBy(realization => Convert.ToInt32(realization.realizationID)).ToList();
-             int currClause = 0;
-            foreach (var foundWord in acquiredForms)
-            {
-              if (Convert.ToInt32(foundWord.clauseID) > currClause)
-              {
-                currClause++;
-                textByWords.Add("<br />");
-              }
-                    try
-                    {
-                        if (!String.IsNullOrEmpty(foundWord.documentID))
-                        {
-                            string fieldsOfWord = "";
-                            string hoverFields = "";
-                            foreach (var field in foundWord.realizationFields)
-                            {
-                                fieldsOfWord += field.Key;                                
-                                fieldsOfWord += ":";
-                                hoverFields += field.Key;
-                                hoverFields += ":";
-                                foreach (var fieldValue in field.Value)
+                                if (t.textID == textName)
                                 {
-                                    fieldsOfWord += fieldValue.name;
-                                    hoverFields += fieldValue.name;
-                                    if (fieldValue.letters != null)
-                                    {
-                                        fieldsOfWord += "(";
-                                        hoverFields += "(";
-                                        for (int i = 0; i < fieldValue.letters.Count; i++)
-                                        {
-                                            fieldsOfWord += fieldValue.letters[i];
-                                            hoverFields += fieldValue.letters[i];
-                                            if (i < (fieldValue.letters.Count - 1))
-                                            {
-                                                fieldsOfWord += "_";
-                                                hoverFields += "_";
-                                            }
-                                        }
-                                        fieldsOfWord += ")";
-                                        hoverFields += ")";
-                                    }
-                                    if (fieldValue.connectedRealizations != null)
-                                    {
-                                        fieldsOfWord += "[";
-                                        hoverFields += "[";
-                                        for (int i = 0; i < fieldValue.connectedRealizations.Count; i++)
-                                        {
-                                            fieldsOfWord += fieldValue.connectedRealizations[i].documentID;
-                                            fieldsOfWord += "/";
-                                            fieldsOfWord += fieldValue.connectedRealizations[i].clauseID;
-                                            fieldsOfWord += "/";
-                                            fieldsOfWord += fieldValue.connectedRealizations[i].realizationID;
-                                            fieldsOfWord += "/";
-                                            hoverFields += fieldValue.connectedRealizations[i].documentID;
-                                            hoverFields += "/";
-                                            hoverFields += fieldValue.connectedRealizations[i].clauseID;
-                                            hoverFields += "/";
-                                            hoverFields += fieldValue.connectedRealizations[i].realizationID;
-                                            hoverFields += "/";
-                                            if (i < (fieldValue.letters.Count - 1))
-                                            {
-                                                fieldsOfWord += "_";
-                                                hoverFields += "_";
-                                            }
-                                        }
-                                        fieldsOfWord += "]";
-                                        hoverFields += "]";
-                                    }
-                                    fieldsOfWord += ";";
-                                    hoverFields += ";";
+                                    text = t;
+                                    break;
                                 }
-                                fieldsOfWord += "<br />";
-                                hoverFields += "\n";
                             }
-                            textByWords.Add("<span title=\"" + hoverFields + "\" data-content=\"" + fieldsOfWord + "\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
-
                         }
                     }
-                    catch
-                    {
-                        textByWords.Add("<span title= \"\" data-content=\"\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
-                    }
-
+                }
+                textByWords.Add(text.Output());
             }
+            catch
+            {
+                
             }
-            textList = getTexts();
+            docList = getDocs();
             fieldsList = getFields();
-            */
         }
 
         public void OnPostChange()

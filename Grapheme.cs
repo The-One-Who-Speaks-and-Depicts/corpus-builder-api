@@ -119,11 +119,11 @@ namespace CorpusDraftCSharp
                 {
                     return fieldsInRawText.Invoke(fields).Replace("\n", "<br />");
                 };
-                return "<span title=\"" + fieldsInRawText.Invoke(graphemeFields) + "\" data-content=\"" + fieldsInHTML.Invoke(graphemeFields) + "\" class=\"grapheme\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "|" + this.graphemeID + "\"> " + grapheme + "</span>";
+                return "<span title=\"" + fieldsInRawText.Invoke(graphemeFields) + "\" data-content=\"" + fieldsInHTML.Invoke(graphemeFields) + "\" class=\"grapheme\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "|" + this.graphemeID + "\">" + grapheme + "</span>";
             }
             catch
             {
-                return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "|" + this.graphemeID + "\"> " + grapheme + "</span>";
+                return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "|" + this.graphemeID + "\">" + grapheme + "</span>";
             }
         }
     }
