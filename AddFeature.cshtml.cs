@@ -120,8 +120,8 @@ namespace CroatianProject.Pages.Admin
                 Redirect("./Error");
             }
         }
-        public void OnPost()
-        {
+        public void OnGet(string docName, string textName)
+        {            
             // TBD after DB restructuring
             /*
             var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
