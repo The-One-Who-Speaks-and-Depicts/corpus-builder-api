@@ -28,12 +28,14 @@ $(document).ready(function () {
         $("#thisFieldValues").text("");
         $("#userValue").text("");
         $("#fieldInfo").text("");
+        $("#connected").text("");
         var selectedOption = $("#keys option:selected").text();
         for (var i = 0; i < jsons.length; i++) {            
             if (jsons[i].name == selectedOption) {
                 $("#userValue").css('opacity', '0.0');
                 $("#thisFieldValues").css('opacity', '1.0');
                 if (jsons[i].isUserFilled == false) {
+                    $("#thisFieldValues").append("<option>Any</option>");
                     for (var j = 0; j < jsons[i].values.length; j++) {
                         var currValue = jsons[i].values[j];
                         $("#thisFieldValues").append("<option>" + currValue + "</option>");
@@ -68,6 +70,13 @@ $(document).ready(function () {
             }  
     });
 
+    $("#thisFieldValues").change(function () {
+        var selectedField = $("#keys option:selected").text();
+        var selectedValue = $("#thisFieldValues option:selected").text();
+        if (selectedValue != "Any") {
+            $("#connected").append(selectedField + " " + selectedValue);
+        }
+    });
 
     $("#showFeature").click(function () {
         var selectedOption = $("#keys option:selected").text();
