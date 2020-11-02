@@ -53,9 +53,27 @@ $(document).ready(function () {
     $("#thisFieldValues").change(function () {
         var selectedField = $("#keys option:selected").text();
         var selectedValue = $("#thisFieldValues option:selected").text();
-        $("#connected").text("");
+        $("#connected").text("");        
         if (selectedValue != "Any") {
-            $("#connected").append(selectedField + " " + selectedValue); // ВОТ ТУТ ДОБАВИТЬ ПОЛЯ ВМЕСТО ВОТ ЭТОЙ СТРОЧКИ
+            for (var i = 0; i < jsons.length; i++) {
+                if (jsons[i].name == selectedField) {
+                    for (var j = 0; j < jsons[i].values.length; j++) {
+                        if (jsons[i].values[j] == selectedValue) {
+                            if (Object.keys(jsons[i].connectedFields).length > 0 && selectedValue in jsons[i].connectedFields) { 
+                                $('#connected').append("<select id=\"connectedFields\"><option>Any</option></select><br><br>")
+                                for (var k = 0; k < Object.keys(jsons[i].connectedFields).length; k++) {
+                                    if (Object.keys(jsons[i].connectedFields)[k] == selectedValue) {
+                                        for (var l = 0; l < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[k]].length; l++) {
+                                            $("#connectedFields").append("<option>" + jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[k]][l] + "</option>");
+                                        }
+                                    }
+                                }
+                            }                            
+                        }
+                    }
+                }
+            }
+             // ВОТ ТУТ ДОБАВИТЬ ПОЛЯ ВМЕСТО ВОТ ЭТОЙ СТРОЧКИ
            
         }
         //ВОТ ЭТО НУЖНО ИЗМЕНИТЬ И ВЫНЕСТИ В ПОЛЯ
