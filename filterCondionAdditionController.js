@@ -45,37 +45,38 @@ $(document).ready(function () {
                 else {
                     $("#thisFieldValues").css('opacity', '0.0');
                     $("#userValue").css('opacity', '1.0');
-                }                   
-                    
-                    //ВОТ ЭТО НУЖНО УНЕСТИ В ВЫБОР!
-                    /*if (Object.keys(jsons[i].connectedFields).length == 0) { 
-                        $("#fieldInfo").append(jsons[i].isMultiple + " " + jsons[i].isByLetter + " " + jsons[i].isMWE);
-                    }
-                    else {
-                        var connectedFields = "";
-                        for (var j = 0; j < Object.keys(jsons[i].connectedFields).length; j++) {
-                            connectedFields += Object.keys(jsons[i].connectedFields)[j];
-                            connectedFields += "=>";
-                            for (var k = 0; k < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]].length; k++) {
-                                connectedFields += jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]][k];
-                                if (k < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]].length - 1) {
-                                    connectedFields += ",";
-                                }
-                            }
-                            connectedFields += "|";
-                        }
-                        $("#fieldInfo").append(jsons[i].isMultiple + " [" + connectedFields + "] " + jsons[i].isByLetter + " " + jsons[i].isMWE);
-                    }*/
                 }
+            }
             }  
     });
 
     $("#thisFieldValues").change(function () {
         var selectedField = $("#keys option:selected").text();
         var selectedValue = $("#thisFieldValues option:selected").text();
+        $("#connected").text("");
         if (selectedValue != "Any") {
-            $("#connected").append(selectedField + " " + selectedValue);
+            $("#connected").append(selectedField + " " + selectedValue); // ВОТ ТУТ ДОБАВИТЬ ПОЛЯ ВМЕСТО ВОТ ЭТОЙ СТРОЧКИ
+           
         }
+        //ВОТ ЭТО НУЖНО ИЗМЕНИТЬ И ВЫНЕСТИ В ПОЛЯ
+    /*if (Object.keys(jsons[i].connectedFields).length == 0) {
+        $("#fieldInfo").append(jsons[i].isMultiple + " " + jsons[i].isByLetter + " " + jsons[i].isMWE);
+    }
+    else {
+        var connectedFields = "";
+        for (var j = 0; j < Object.keys(jsons[i].connectedFields).length; j++) {
+            connectedFields += Object.keys(jsons[i].connectedFields)[j];
+            connectedFields += "=>";
+            for (var k = 0; k < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]].length; k++) {
+                connectedFields += jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]][k];
+                if (k < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]].length - 1) {
+                    connectedFields += ",";
+                }
+            }
+            connectedFields += "|";
+        }
+        $("#fieldInfo").append(jsons[i].isMultiple + " [" + connectedFields + "] " + jsons[i].isByLetter + " " + jsons[i].isMWE);
+    }*/
     });
 
     $("#showFeature").click(function () {
