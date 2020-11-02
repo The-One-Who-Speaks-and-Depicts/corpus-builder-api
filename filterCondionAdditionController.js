@@ -11,7 +11,6 @@ $(document).ready(function () {
         $("#identificator").text("");
         $("#identificator").append($(this).attr('id'));
     });
-    
 
 
     var values = document.getElementById('values');
@@ -27,18 +26,49 @@ $(document).ready(function () {
 
     $("#keys").change(function () {
         $("#thisFieldValues").text("");
+        $("#userValue").text("");
         $("#fieldInfo").text("");
         var selectedOption = $("#keys option:selected").text();
-        for (var i = 0; i < jsons.length; i++) {
+        for (var i = 0; i < jsons.length; i++) {            
             if (jsons[i].name == selectedOption) {
-                for (var j = 0; j < jsons[i].values.length; j++) {
-                    var currValue = jsons[i].values[j];
-                    $("#thisFieldValues").append("<option>" + currValue + "</option>");
+                $("#userValue").css('opacity', '0.0');
+                $("#thisFieldValues").css('opacity', '1.0');
+                if (jsons[i].isUserFilled == false) {
+                    for (var j = 0; j < jsons[i].values.length; j++) {
+                        var currValue = jsons[i].values[j];
+                        $("#thisFieldValues").append("<option>" + currValue + "</option>");
+                    }
+                    $("#fieldInfo").append(jsons[i].isMultiple + " " + jsons[i].isByLetter + " " + jsons[i].isMWE);
                 }
-                $("#fieldInfo").append(jsons[i].isMultiple);
-            }
-        }
+                else {
+                    $("#thisFieldValues").css('opacity', '0.0');
+                    $("#userValue").css('opacity', '1.0');
+                }                   
+                    
+                    //ВОТ ЭТО НУЖНО УНЕСТИ В ВЫБОР!
+                    /*if (Object.keys(jsons[i].connectedFields).length == 0) { 
+                        $("#fieldInfo").append(jsons[i].isMultiple + " " + jsons[i].isByLetter + " " + jsons[i].isMWE);
+                    }
+                    else {
+                        var connectedFields = "";
+                        for (var j = 0; j < Object.keys(jsons[i].connectedFields).length; j++) {
+                            connectedFields += Object.keys(jsons[i].connectedFields)[j];
+                            connectedFields += "=>";
+                            for (var k = 0; k < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]].length; k++) {
+                                connectedFields += jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]][k];
+                                if (k < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]].length - 1) {
+                                    connectedFields += ",";
+                                }
+                            }
+                            connectedFields += "|";
+                        }
+                        $("#fieldInfo").append(jsons[i].isMultiple + " [" + connectedFields + "] " + jsons[i].isByLetter + " " + jsons[i].isMWE);
+                    }*/
+                }
+            }  
     });
+
+
     $("#showFeature").click(function () {
         var selectedOption = $("#keys option:selected").text();
         $("#features").append("<div id=\"" + selectedOption + "\">");

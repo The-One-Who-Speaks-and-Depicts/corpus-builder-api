@@ -6,7 +6,7 @@
 <html>
 <head>
     <script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
-    <script src="~/js/filterCondionAdditionController.js"></script>
+    <script src="~/js/filterCondionAdditionController.js"> </script>
     <script src="~/js/documentTextAdditionController.js"></script>
 </head>
 <body>
@@ -59,14 +59,15 @@
 
     <div align="center" style="float:right;width:50%;">
         <textarea id="identificator" style="display:none;"></textarea>
-        <div id="info"></div>
         <textarea id="fieldInfo" style="display:none;"></textarea>
         <select id="keys">
-          <option>Any</option>
-        </select>
-        <select id="thisFieldValues">
-          <option>Any</option>
-        </select>
+            <option>Any</option>
+        </select> <br> <br />
+        <select id="thisFieldValues" style="opacity:0.0">
+            <option>Any</option>
+        </select> <br /> <br />
+        <textarea id="userValue" style="opacity:0.0" rows="1" cols="25"></textarea> <br /> <br />
+        <div id="info"></div>
         <button id="changeButton">Добавить признак</button>
     </div>
 </div>
