@@ -105,7 +105,7 @@ namespace CroatianProject.Pages
                 engine.ExecuteFile(pythonFilePath, scope);
                 dynamic function = scope.GetVariable("analysis");
                 IList<object> result = function(processedString, stopSymbols, decapitalization.ToString());
-                Text addedText = new Text(analyzedDocument, analyzedDocument.texts.Count.ToString());
+                Text addedText = new Text(analyzedDocument, analyzedDocument.texts.Count.ToString(), textName);
                 for (int i = 0; i < result.Count; i++)
                 {
                     var clauseFullData = (IList<object>)result[i];

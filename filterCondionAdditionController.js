@@ -27,7 +27,6 @@ $(document).ready(function () {
     $("#keys").change(function () {
         $("#thisFieldValues").text("");
         $("#userValue").text("");
-        $("#fieldInfo").text("");
         $("#connected").text("");
         var selectedOption = $("#keys option:selected").text();
         for (var i = 0; i < jsons.length; i++) {            
@@ -40,7 +39,6 @@ $(document).ready(function () {
                         var currValue = jsons[i].values[j];
                         $("#thisFieldValues").append("<option>" + currValue + "</option>");
                     }
-                    $("#fieldInfo").append(jsons[i].isMultiple + " " + jsons[i].isByLetter + " " + jsons[i].isMWE);
                 }
                 else {
                     $("#thisFieldValues").css('opacity', '0.0');
@@ -65,37 +63,45 @@ $(document).ready(function () {
                                     if (Object.keys(jsons[i].connectedFields)[k] == selectedValue) {
                                         for (var l = 0; l < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[k]].length; l++) {
                                             $("#connectedFields").append("<option>" + jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[k]][l] + "</option>");
+                                            $("#connected").append("<select id=\"connectedRestrictedValue\" style=\"opacity:0.0\"><option>Any</option></select><br><br>");
+                                            $("#connected").append("<textarea id=\"connectedUserValue\" style=\"opacity:0.0\"></textarea><br><br>");
+                                            $('#connected').append("<button id=\"additionalFeatureButton\">Добавить связанный признак в разметку</button> <br /> <br />")
                                         }
                                     }
                                 }
+                                $("#connectedFields").change(function () {
+                                    $("#connectedRestrictedValue").text("");
+                                    $("#connectedUserValue").text("");
+                                    $("#connectedRestrictedValue").css('opacity', '0.0');
+                                    $("#connectedUserValue").css('opacity', '0.0');
+                                    var selectedOption = $("#connectedFields option:selected").text();
+                                    for (var i = 0; i < jsons.length; i++) {
+                                        if (jsons[i].name == selectedOption) {
+                                            $("#connectedUserValue").css('opacity', '0.0');
+                                            $("#connectedRestrictedValue").css('opacity', '1.0');
+                                            if (jsons[i].isUserFilled == false) {
+                                                $("#connectedRestrictedValue").append("<option>Any</option>");
+                                                for (var j = 0; j < jsons[i].values.length; j++) {
+                                                    var currValue = jsons[i].values[j];
+                                                    $("#connectedRestrictedValue").append("<option>" + currValue + "</option>");
+                                                }
+                                            }
+                                            else {
+                                                $("#connectedRestrictedValue").css('opacity', '0.0');
+                                                $("#connectedUserValue").css('opacity', '1.0');
+                                            }
+                                        }
+                                    }
+                                });
                             }                            
                         }
                     }
                 }
             }
-             // ВОТ ТУТ ДОБАВИТЬ ПОЛЯ ВМЕСТО ВОТ ЭТОЙ СТРОЧКИ
-           
         }
-        //ВОТ ЭТО НУЖНО ИЗМЕНИТЬ И ВЫНЕСТИ В ПОЛЯ
-    /*if (Object.keys(jsons[i].connectedFields).length == 0) {
-        $("#fieldInfo").append(jsons[i].isMultiple + " " + jsons[i].isByLetter + " " + jsons[i].isMWE);
-    }
-    else {
-        var connectedFields = "";
-        for (var j = 0; j < Object.keys(jsons[i].connectedFields).length; j++) {
-            connectedFields += Object.keys(jsons[i].connectedFields)[j];
-            connectedFields += "=>";
-            for (var k = 0; k < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]].length; k++) {
-                connectedFields += jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]][k];
-                if (k < jsons[i].connectedFields[Object.keys(jsons[i].connectedFields)[j]].length - 1) {
-                    connectedFields += ",";
-                }
-            }
-            connectedFields += "|";
-        }
-        $("#fieldInfo").append(jsons[i].isMultiple + " [" + connectedFields + "] " + jsons[i].isByLetter + " " + jsons[i].isMWE);
-    }*/
     });
+
+    
 
     $("#showFeature").click(function () {
         var selectedOption = $("#keys option:selected").text();
@@ -239,6 +245,7 @@ $(document).ready(function () {
     });
 
     $("#changeButton").click(function () {
+        // спросить, новая ли это разметка, или можно добавлять к старой?
         var currentFeatures = document.getElementById($("#identificator").val()).getAttribute("data-content").split(';<br />');
         var addedFeature = $("#keys option:selected").text();
         var addedValue = $("#thisFieldValues option:selected").text();

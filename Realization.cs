@@ -20,7 +20,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string clauseID;
         [JsonProperty]
-        public List<Dictionary<string, List<IValue>>> realizationFields;
+        public List<Dictionary<string, List<Value>>> realizationFields;
         [JsonProperty]
         public string realizationID;
         [JsonProperty]
@@ -34,7 +34,7 @@ namespace CorpusDraftCSharp
         #region Constructors
 
         [JsonConstructor]
-        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, List<Dictionary<string, List<IValue>>> _fields, string _realizationID, string _lexemeOne, string _lexemeTwo, List<Grapheme> _letters)
+        public Realization(string _documentID, string _filePath, string _textID, string _clauseID, List<Dictionary<string, List<Value>>> _fields, string _realizationID, string _lexemeOne, string _lexemeTwo, List<Grapheme> _letters)
         {
             this.documentID = _documentID;
             this.filePath = _filePath;
@@ -99,7 +99,7 @@ namespace CorpusDraftCSharp
             };
             try
             {
-                Func<List<Dictionary<string, List<IValue>>>, string> fieldsInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                Func<List<Dictionary<string, List<Value>>>, string> fieldsInRawText = (List<Dictionary<string, List<Value>>> fields) =>
                 {
                     string result = "";
                     foreach (var optional_tagging in fields)
@@ -110,25 +110,7 @@ namespace CorpusDraftCSharp
                             result += ":";
                             foreach (var fieldValue in field.Value)
                             {
-                                result += fieldValue.name;
-                                if (fieldValue.connectedRealizations != null)
-                                {
-                                    result += "[";
-                                    for (int i = 0; i < fieldValue.connectedRealizations.Count; i++)
-                                    {
-                                        result += fieldValue.connectedRealizations[i].documentID;
-                                        result += "/";
-                                        result += fieldValue.connectedRealizations[i].clauseID;
-                                        result += "/";
-                                        result += fieldValue.connectedRealizations[i].realizationID;
-                                        result += "/";
-                                        if (i < (fieldValue.letters.Count - 1))
-                                        {
-                                            result += "_";
-                                        }
-                                    }
-                                    result += "]";
-                                }
+                                result += fieldValue.name;                                
                                 result += ";";
                             }
                             result += "||";
@@ -137,7 +119,7 @@ namespace CorpusDraftCSharp
                     }
                     return result;
                 };
-                Func<List<Dictionary<string, List<IValue>>>, string> fieldsInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                Func<List<Dictionary<string, List<Value>>>, string> fieldsInHTML = (List<Dictionary<string, List<Value>>> fields) =>
                 {
                     return fieldsInRawText.Invoke(fields).Replace("\n", "<br />");
                 };

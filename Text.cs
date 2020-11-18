@@ -19,34 +19,39 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string textID;
         [JsonProperty]
-	    public List<Dictionary<string, List<IValue>>> textMetaData = new List<Dictionary<string, List<IValue>>>();
+        public string textName;
+        [JsonProperty]
+	    public List<Dictionary<string, List<Value>>> textMetaData = new List<Dictionary<string, List<Value>>>();
         [JsonProperty]
         public List<Clause> clauses = new List<Clause>();
-	    #endregion	
-	
-	    #region Constructors
-    
+        #endregion
+
+        #region Constructors
+
         [JsonConstructor]
-        public Text (string _documentID, string _textID, string _filePath, List<Dictionary<string, List<IValue>>> _textMetaData, List<Clause> _clauses)
+        public Text(string _documentID, string _textID, string _textName, string _filePath, List<Dictionary<string, List<Value>>> _textMetaData, List<Clause> _clauses)
         {
             this.documentID = _documentID;
             this.textID = _textID;
             this.filePath = _filePath;
+            this.textName = _textName;
             this.textMetaData = _textMetaData;
             this.clauses = _clauses;
         }
 
-        public Text(string _documentID, string _textID, string _filePath)
+        public Text(string _documentID, string _textID, string _textName, string _filePath)
         {
             this.documentID = _documentID;
             this.textID = _textID;
+            this.textName = _textName;
             this.filePath = _filePath;
         }
 
-        public Text(Document document, string _textID)
+        public Text(Document document, string _textID, string _textName)
         {
             this.documentID = document.documentID;
             this.textID = _textID;
+            this.textName = _textName;
             this.filePath = document.filePath;
         }
 
@@ -80,7 +85,7 @@ namespace CorpusDraftCSharp
             };
             try
             {
-                Func<List<Dictionary<string, List<IValue>>>, string> textInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                Func<List<Dictionary<string, List<Value>>>, string> textInRawText = (List<Dictionary<string, List<Value>>> fields) =>
                 {
                     string result = "";
                     foreach (var optional_tagging in fields)
@@ -100,7 +105,7 @@ namespace CorpusDraftCSharp
                     }
                     return result;
                 };
-                Func<List<Dictionary<string, List<IValue>>>, string> textInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                Func<List<Dictionary<string, List<Value>>>, string> textInHTML = (List<Dictionary<string, List<Value>>> fields) =>
                 {
                     return textInRawText.Invoke(fields).Replace("\n", "<br />");
                 };

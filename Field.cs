@@ -20,22 +20,19 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public bool isMultiple { get; private set; } = false;
         [JsonProperty]
-        public bool isByLetter { get; private set; } = false;       
-        [JsonProperty]
-        public bool isMWE { get; private set; } = false;
+        public string type { get; private set; }
         [JsonProperty]
         public Dictionary<string, List<string>> connectedFields { get; set; } = new Dictionary<string, List<string>>();
 
         [JsonConstructor]
-        Field(string _name, List<object> _values, string _description,  bool _isUserFilled, bool _isMultiple, bool _isByLetter, bool _isMWE, Dictionary<string, List<string>> _connectedFields)
+        Field(string _name, List<object> _values, string _description,  bool _isUserFilled, bool _isMultiple, string _type, Dictionary<string, List<string>> _connectedFields)
         {
             this.name = _name;
             this.values = _values;
             this.description = _description;
             this.isUserFilled = _isUserFilled;
             this.isMultiple = _isMultiple;
-            this.isByLetter = _isByLetter;
-            this.isMWE = _isMWE;
+            this.type = _type;
             this.connectedFields = _connectedFields;
         }
 
@@ -100,24 +97,9 @@ namespace CorpusDraftCSharp
                         
         }
 
-        public void MakeMWE()
+        public void changeType(string _type)
         {
-            this.isMWE = true;
-        }
-
-        public void MakeSingleWorded()
-        {
-            this.isMWE = false;
-        }
-
-        public void Letterize()
-        {
-            this.isByLetter = true;
-        }
-
-        public void Deletterize()
-        {
-            this.isByLetter = false;
+            this.type = _type;
         }
 
         public string Jsonize()

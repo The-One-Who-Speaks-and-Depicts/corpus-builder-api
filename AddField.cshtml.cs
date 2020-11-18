@@ -30,7 +30,7 @@ namespace CroatianProject.Pages.Admin
         [BindProperty]
         public string Type { get; set; }
         [BindProperty]
-        public string[] ValueTypeOptions { get; set; } = new[] { "Value of single word", "Value of letters in a single word", "Value of multiple words", "Value of letters in multiple words" };
+        public string[] ValueTypeOptions { get; set; } = new[] { "Value of document", "Value of text", "Value of text unit", "Value of single word", "Value of letter" };
         [BindProperty]
         public string[] UserFilledOptions { get; set; } = new[] { "User-restricted", "User-filled" };
         [BindProperty]
@@ -47,7 +47,7 @@ namespace CroatianProject.Pages.Admin
 
         public string[] SetValues()
         {
-            return new[] { "Value of single word", " Value of letters in single words", "Value of multiple words", "Value of letters in multiple words" };
+            return new[] { "Value of document", "Value of text", "Value of text unit", "Value of single token", "Value of letter" };
         }
 
         public string[] SetFullfillment()
@@ -105,15 +105,25 @@ namespace CroatianProject.Pages.Admin
                 {
                     field.MakeSingle();
                 }
-                field.Deletterize();
-                field.MakeSingleWorded();
-                if (Type == SetValues()[1] || Type == SetValues()[3])
+                if (Type == SetValues()[0])
                 {
-                    field.Letterize();
+                    field.changeType("Document");
                 }
-                if (Type == SetValues()[2] || Type == SetValues()[3])
+                else if (Type == SetValues()[1])
                 {
-                    field.MakeMWE();
+                    field.changeType("Text");
+                }
+                else if (Type == SetValues()[2])
+                {
+                    field.changeType("Clause");
+                }
+                else if (Type == SetValues()[3])
+                {
+                    field.changeType("Realization");
+                }
+                else if (Type == SetValues()[4])
+                {
+                    field.changeType("Grapheme");
                 }
                 field.MakeUserFilled();
                 if (Filled == SetFullfillment()[0])
@@ -183,19 +193,48 @@ namespace CroatianProject.Pages.Admin
                                 {
                                     if (!field.connectedFields[value].Contains(child))
                                     {
-                                        field.connectedFields[value].Add(child);
+                                        var motherType = field.type;
+                                        foreach (var potentialChild in fields)
+                                        {
+                                            if (potentialChild.name == child && potentialChild.type == motherType)
+                                            {
+                                                field.connectedFields[value].Add(child);
+                                            }
+                                        }                                        
                                     }
                                 }
                             }
                             else
                             {
-                                field.connectedFields[value] = children.ToList();
+                                field.connectedFields[value] = new List<string>();
+                                foreach (var child in children)
+                                {
+                                    var motherType = field.type;
+                                    foreach (var potentialChild in fields)
+                                    {
+                                        if (potentialChild.name == child && potentialChild.type == motherType)
+                                        {
+                                            field.connectedFields[value].Add(child);
+                                        }
+                                    }
+                                }
                             }
                         }
                         else
                         {
                             field.connectedFields = new Dictionary<string, List<string>>();
-                            field.connectedFields[value] = children.ToList();
+                            field.connectedFields[value] = new List<string>();
+                            foreach (var child in children)
+                            {
+                                var motherType = field.type;
+                                foreach (var potentialChild in fields)
+                                {
+                                    if (potentialChild.name == child && potentialChild.type == motherType)
+                                    {
+                                        field.connectedFields[value].Add(child);
+                                    }
+                                }
+                            }
                         }
                     }
                 }

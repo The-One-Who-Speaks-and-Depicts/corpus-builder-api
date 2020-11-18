@@ -19,7 +19,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string textID;
         [JsonProperty]
-        protected List<Dictionary<string, List<IValue>>> clauseFields = new List<Dictionary<string, List<IValue>>>();
+        protected List<Dictionary<string, List<Value>>> clauseFields = new List<Dictionary<string, List<Value>>>();
         [JsonProperty]
         public string clauseID;
         [JsonProperty]
@@ -31,7 +31,7 @@ namespace CorpusDraftCSharp
 
         #region Constructors
         [JsonConstructor]
-        public Clause(string _documentID, string _textID, string _filePath, string _clauseID, string _clauseText, List<Dictionary<string, List<IValue>>> _clauseFields, List<Realization> _realizations)
+        public Clause(string _documentID, string _textID, string _filePath, string _clauseID, string _clauseText, List<Dictionary<string, List<Value>>> _clauseFields, List<Realization> _realizations)
         {
             this.documentID = _documentID;
             this.filePath = _filePath;
@@ -79,7 +79,7 @@ namespace CorpusDraftCSharp
             };
             try
             {
-                Func<List<Dictionary<string, List<IValue>>>, string> clauseInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                Func<List<Dictionary<string, List<Value>>>, string> clauseInRawText = (List<Dictionary<string, List<Value>>> fields) =>
                 {
                     string result = "";
                     foreach (var optional_tagging in fields)
@@ -99,7 +99,7 @@ namespace CorpusDraftCSharp
                     }
                     return result;
                 };
-                Func<List<Dictionary<string, List<IValue>>>, string> clauseInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                Func<List<Dictionary<string, List<Value>>>, string> clauseInHTML = (List<Dictionary<string, List<Value>>> fields) =>
                 {
                     return clauseInRawText.Invoke(fields).Replace("\n", "<br />");
                 };

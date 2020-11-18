@@ -21,7 +21,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string googleDocPath;
         [JsonProperty]
-        public List<Dictionary<string, List<IValue>>> documentMetaData = new List<Dictionary<string, List<IValue>>>();
+        public List<Dictionary<string, List<Value>>> documentMetaData = new List<Dictionary<string, List<Value>>>();
         [JsonProperty]
         public List<Text> texts = new List<Text>();
         #endregion
@@ -29,7 +29,7 @@ namespace CorpusDraftCSharp
         #region Constructors
 
         [JsonConstructor]
-        public Document(string _documentID, string _documentName, string _filePath, string _googleDocPath, List<Dictionary<string, List<IValue>>> _documentMetaData, List<Text> _texts)
+        public Document(string _documentID, string _documentName, string _filePath, string _googleDocPath, List<Dictionary<string, List<Value>>> _documentMetaData, List<Text> _texts)
         {
             documentID = _documentID;
             documentName = _documentName;
@@ -73,7 +73,7 @@ namespace CorpusDraftCSharp
             };
             try
             {
-                Func<List<Dictionary<string, List<IValue>>>, string> documentInRawText = (List<Dictionary<string, List<IValue>>> fields) =>
+                Func<List<Dictionary<string, List<Value>>>, string> documentInRawText = (List<Dictionary<string, List<Value>>> fields) =>
                 {
                     string result = "";
                     foreach (var optional_tagging in fields)
@@ -93,7 +93,7 @@ namespace CorpusDraftCSharp
                     }
                     return result;
                 };
-                Func<List<Dictionary<string, List<IValue>>>, string> documentInHTML = (List<Dictionary<string, List<IValue>>> fields) =>
+                Func<List<Dictionary<string, List<Value>>>, string> documentInHTML = (List<Dictionary<string, List<Value>>> fields) =>
                 {
                     return documentInRawText.Invoke(fields).Replace("\n", "<br />");
                 };
