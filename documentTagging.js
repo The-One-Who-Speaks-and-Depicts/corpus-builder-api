@@ -21,6 +21,14 @@ $(document).ready(function () {
         $("#userValue").text("");
         $("#connected").text("");
         var selectedOption = $("#keys option:selected").text();
+        if (selectedOption == "Any") {
+            if ($("#thisFieldValues").css('opacity') == 1) {
+                $("#thisFieldValues").css('opacity', '0.0');
+            }
+            if ($("#userValue").css('opacity') == 1) {
+                $("#userValue").css('opacity', '0.0');
+            }
+        }
         for (var i = 0; i < jsons.length; i++) {
             if (jsons[i].name == selectedOption) {
                 $("#userValue").css('opacity', '0.0');
