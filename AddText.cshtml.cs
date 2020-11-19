@@ -27,6 +27,14 @@ namespace CroatianProject.Pages
         public AddTextModel(IHostingEnvironment environment)
         {
             _environment = environment;
+            try
+            {
+                FieldList = getFields();
+            }
+            catch
+            {
+                Redirect("./Error");
+            }
         }
 
 
@@ -70,6 +78,31 @@ namespace CroatianProject.Pages
         public string stopSymbols { get; set; }
         [BindProperty]
         public bool decapitalization { get; set; }
+        [BindProperty]
+        public string connections { get; set; }
+        [BindProperty]
+        public List<string> FieldList { get; set; } 
+
+        public List<string> getFields()
+        {
+            List<string> existingFields = new List<string>();
+            try
+            {
+                var directory = Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields");
+                DirectoryInfo fieldsDirectory = new DirectoryInfo(directory);
+                var fields = fieldsDirectory.GetFiles();
+                existingFields.Add("Any");
+                foreach (var field in fields)
+                {
+                    existingFields.Add(field.Name.Split(".json")[0]);
+                }
+            }
+            catch
+            {
+
+            }
+            return existingFields;
+        }
 
         [HttpGet]
         public void OnGet(string documentPicked)
@@ -106,6 +139,29 @@ namespace CroatianProject.Pages
                 dynamic function = scope.GetVariable("analysis");
                 IList<object> result = function(processedString, stopSymbols, decapitalization.ToString());
                 Text addedText = new Text(analyzedDocument, analyzedDocument.texts.Count.ToString(), textName);
+                addedText.textMetaData = new List<Dictionary<string, List<Value>>>();
+                addedText.textMetaData.Add(new Dictionary<string, List<Value>>());
+                if (!String.IsNullOrEmpty(connections) && !String.IsNullOrWhiteSpace(connections))
+                {
+                    string[] tags = connections.Split("\n");
+                    foreach (string tag in tags)
+                    {
+                        if (!String.IsNullOrWhiteSpace(tag) && !String.IsNullOrEmpty(tag))
+                        {
+                            string key = tag.Split("=>")[0];
+                            string[] stringValues = tag.Split("=>")[1].Split(';');
+                            List<Value> typedValues = new List<Value>();
+                            foreach (string stringValue in stringValues)
+                            {
+                                if (!String.IsNullOrEmpty(stringValue) && !String.IsNullOrWhiteSpace(stringValue))
+                                {
+                                    typedValues.Add(new Value(stringValue));
+                                }
+                            }
+                            addedText.textMetaData[0].Add(key, typedValues);
+                        }
+                    }
+                }
                 for (int i = 0; i < result.Count; i++)
                 {
                     var clauseFullData = (IList<object>)result[i];
