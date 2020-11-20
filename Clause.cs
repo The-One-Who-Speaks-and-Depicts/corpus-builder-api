@@ -103,11 +103,11 @@ namespace CorpusDraftCSharp
                 {
                     return clauseInRawText.Invoke(fields).Replace("\n", "<br />");
                 };
-                return "<span title=\"" + clauseInRawText.Invoke(clauseFields) + "\" data-content=\"" + clauseInHTML.Invoke(clauseFields) + "\" class=\"clause\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "\"> " + tokens.Invoke() + "</span><br />";
+                return "<span title=\"" + clauseInRawText.Invoke(clauseFields) + "\" data-content=\"" + clauseInHTML.Invoke(clauseFields) + "\" class=\"clause\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "\"> " + tokens.Invoke() + "\t<button class=\"clauseInfoButton\" type=\"button\">Show sentence fields</button>\t<button class=\"clauseButton\" type=\"button\">Add to sentence</button></span><br />";
             }
             catch
             {
-                return "<span title= \"\" data-content=\"\" class=\"clause\" id=\"" + this.documentID + "|" + this.clauseID  + "\"> " + tokens.Invoke() + "</span><br />";
+                return "<span title= \"\" data-content=\"\" class=\"clause\" id=\"" + this.documentID + "|" + this.clauseID  + "\"> " + tokens.Invoke() + "\t<button class=\"clauseInfoButton\" type=\"button\">Show sentence fields</button>\t<button class=\"clauseButton\" type=\"button\">Add to sentence</button></span><br />";
             }
         }
         public string Jsonize()

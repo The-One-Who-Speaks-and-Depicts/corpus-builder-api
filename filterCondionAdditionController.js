@@ -17,12 +17,14 @@ $(document).ready(function () {
     splitValues = values.innerText.split('|');
     for (var i = 0; i < splitValues.length; i++) {
         $.getJSON("/database/fields/" + splitValues[i], function (data) {
-            jsons.push(data);
-            $("#keys").append("<option>" + data.name + "</option>");
-            $("#keysFilter").append("<option>" + data.name + "</option>");
-
+            if (data.type != "Document" && data.type != "Text") {
+                jsons.push(data);
+                $("#keys").append("<option>" + data.name + "</option>");
+                $("#keysFilter").append("<option>" + data.name + "</option>");
+            }            
         });
     }
+    
 
     $("#keys").change(function () {
         $("#thisFieldValues").text("");
@@ -356,4 +358,20 @@ $(document).ready(function () {
         }
         alert('Изменения сохранены');
     }
+
+    $(".clauseButton").click(function () {
+        var tokens = $(this).parent().children();
+        $('#info').text("");
+        $('#info').append("Clause:");
+        for (let i = 0; i < tokens.length; i++) {
+            if ($(tokens[i]).hasClass('word')) {
+                $('#info').append($(tokens[i]).text());                
+            }
+        }
+        $('#info').append("<br /><br /> Features:<br />");
+        $('#info').append($(this).parent('data-content'));
+        $('#info').append("<br /><br /><br />");
+        $("#identificator").text("");
+        $("#identificator").append($(this).parent().attr('id'));
+    });
 });
