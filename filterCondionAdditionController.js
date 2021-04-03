@@ -11,8 +11,8 @@ $(document).ready(function () {
         for (let i = 0; i < features.length; i++) {
             if (features[i] != "") {
                 $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
-            }            
-        }        
+            }
+        }
         $('#info').append("<br /><br /><br />");
         $("#identificator").text("");
         $("#identificator").append($(this).attr('id'));
@@ -97,19 +97,19 @@ $(document).ready(function () {
                 jsons.push(data);
                 if (data.type == "Realization") {
                     $("#keysFilter").append("<option>" + data.name + "</option>");
-                }                
-            }            
+                }
+            }
         });
     }
     jsons.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
-    
+
 
     $("#keys").change(function () {
         $("#thisFieldValues").text("");
         $("#userValue").text("");
         $("#connected").text("");
         var selectedOption = $("#keys option:selected").text();
-        for (var i = 0; i < jsons.length; i++) {            
+        for (var i = 0; i < jsons.length; i++) {
             if (jsons[i].name == selectedOption) {
                 $("#userValue").css('opacity', '0.0');
                 $("#thisFieldValues").css('opacity', '1.0');
@@ -125,19 +125,19 @@ $(document).ready(function () {
                     $("#userValue").css('opacity', '1.0');
                 }
             }
-            }  
+        }
     });
 
     $("#thisFieldValues").change(function () {
         var selectedField = $("#keys option:selected").text();
         var selectedValue = $("#thisFieldValues option:selected").text();
-        $("#connected").text("");        
+        $("#connected").text("");
         if (selectedValue != "Any") {
             for (var i = 0; i < jsons.length; i++) {
                 if (jsons[i].name == selectedField) {
                     for (var j = 0; j < jsons[i].values.length; j++) {
                         if (jsons[i].values[j] == selectedValue) {
-                            if (Object.keys(jsons[i].connectedFields).length > 0 && selectedValue in jsons[i].connectedFields) { 
+                            if (Object.keys(jsons[i].connectedFields).length > 0 && selectedValue in jsons[i].connectedFields) {
                                 $('#connected').append("<select id=\"connectedFields\"><option>Any</option></select><br><br>")
                                 for (var k = 0; k < Object.keys(jsons[i].connectedFields).length; k++) {
                                     if (Object.keys(jsons[i].connectedFields)[k] == selectedValue) {
@@ -173,7 +173,7 @@ $(document).ready(function () {
                                         }
                                     }
                                     $("#additionalFeatureButton").click(function () {
-                                        
+
                                         var category = $("#connectedFields option:selected").text();
                                         if (category != "Any") {
                                             if ($("#connectedUserValue").css("opacity") == 1) {
@@ -191,20 +191,20 @@ $(document).ready(function () {
                                             $(".deleteTaggingButton").click(function () {
                                                 $(this).parent().remove();
                                             });
-                                        }                                        
+                                        }
                                     });
                                 });
-                            }                            
+                            }
                         }
                     }
                 }
             }
         }
 
-        
+
     });
 
-    
+
 
     $("#showFeature").click(function () {
         var selectedOption = $("#keys option:selected").text();
@@ -352,7 +352,7 @@ $(document).ready(function () {
         }
     });
 
-    function changing(id) {        
+    function changing(id) {
         var newFeatures = document.getElementsByClassName("tag");
         for (let i = 0; i < newFeatures.length; i++) {
             var currentFeatures = document.getElementById(id).getAttribute("data-content").split(';<br />');
@@ -374,20 +374,25 @@ $(document).ready(function () {
                         var valuesOfFeature = feature[1].split(';');
                         for (let j = 0; j < valuesOfFeature.length; j++) {
                             if (valuesOfFeature[j] != "") {
-                                if (valuesOfFeature[j] == addedValue) {
-                                    coincidenceFound = true;
-                                    alert('У клаузы есть один из признаков и одно из значений!');
-                                    break;
+                                var multipleFeatures = valuesOfFeature[j].split(' ,');
+                                for (let m = 0; m < multipleFeatures.length; m++) {
+                                    if (multipleFeatures[m].trim() == addedValue.trim()) {
+                                        coincidenceFound = true;
+                                        alert('У клаузы есть один из признаков и одно из значений!');
+                                        break;
+                                    }
                                 }
+                                if (coincidenceFound) break;
+                                
                             }
                         }
-                        if (coincidenceFound) continue;
+                        if (coincidenceFound) break;
                         if (isFeatureMultiple == false) {
                             coincidenceFound = true;
                             alert('Одному из признаков может соответствовать только одно значение!');
-                            continue;
+                            break;
                         }
-                        else {                            
+                        else {
                             currentFeatures[i] += "," + addedValue;
                             let new_features = "";
                             for (let j = 0; j < currentFeatures.length; j++) {
@@ -398,15 +403,15 @@ $(document).ready(function () {
                                     else {
                                         new_features += currentFeatures[j] + ";<br />";
                                     }
-                                }                              
-                               
+                                }
+
                             }
                             document.getElementById(id).setAttribute("data-content", new_features);
                             coincidenceFound = true;
                             break;
                         }
                     }
-                }                
+                }
             }
             if (!coincidenceFound) {
                 document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />");
@@ -421,8 +426,7 @@ $(document).ready(function () {
         if (id_origin.split('|')[2] < id_transfer.split('|')[2]) {
             return true;
         }
-        else if (id_origin.split('|')[2] > id_transfer.split('|')[2])
-        {
+        else if (id_origin.split('|')[2] > id_transfer.split('|')[2]) {
             return false;
         }
         else {
@@ -431,7 +435,7 @@ $(document).ready(function () {
             }
             else {
                 return true;
-            }            
+            }
         }
     }
 
@@ -445,9 +449,9 @@ $(document).ready(function () {
                 for (let i = 0; i < words.length; i++) {
                     if (words[i].id == id) {
                         wordText = words[i].innerText;
-                    } 
+                    }
                 }
-                for (let i = 0; i < words.length; i++) {                    
+                for (let i = 0; i < words.length; i++) {
                     if (words[i].innerText.trim() == wordText.trim() && check_ids(id, words[i].id)) {
                         changing(words[i].id);
                     }
@@ -465,10 +469,10 @@ $(document).ready(function () {
         else if ($("#thisFieldValues").css("opacity") == 1) {
             $("#thisFieldValues").css("opacity", 0.0);
             $('#thisFieldValues option:first').prop('selected', true);
-        }      
+        }
         $("#connected").text("");
-        alert('Внесение завершено!');        
-        
+        alert('Внесение завершено!');
+
     });
 
     function isMatch(pattern, word) {
@@ -557,7 +561,7 @@ $(document).ready(function () {
         $('#info').append("Clause:");
         for (let i = 0; i < tokens.length; i++) {
             if ($(tokens[i]).hasClass('word')) {
-                $('#info').append($(tokens[i]).text());                
+                $('#info').append($(tokens[i]).text());
             }
         }
         $('#info').append("<br /><br /> Features:<br />");
@@ -600,7 +604,7 @@ $(document).ready(function () {
     });
 
     $("#mainFeatureButton").click(function () {
-        
+
         var category = $("#keys option:selected").text();
         if (category != "Any") {
             if ($("#userValue").css("opacity") == 1) {
@@ -614,14 +618,14 @@ $(document).ready(function () {
                     $("#tagging").append("<span class=\"tag\">" + category + ":" + $("#thisFieldValues option:selected").text() + " <button class=\"deleteTaggingButton\" type=\"button\">Удалить</button></span><br />");
                 }
             }
-        }       
+        }
 
         $(".deleteTaggingButton").click(function () {
             $(this).parent().remove();
         });
     });
 
-    
 
-    
+
+
 });
