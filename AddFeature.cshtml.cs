@@ -150,7 +150,7 @@ namespace CroatianProject.Pages.Admin
             }
             catch
             {
-                
+
             }
             docList = getDocs();
             fieldsList = getFields();
@@ -158,7 +158,131 @@ namespace CroatianProject.Pages.Admin
 
         public void OnPost()
         {
-            Console.WriteLine(currentText);
+            MatchCollection units = Regex.Matches(currentText, @"\{(\d*\|){2}.*?\}");
+            string document_edited = units[0].Value.Split('|')[0].Replace("{", "");
+            string text_edited = units[0].Value.Split('|')[1];
+            var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents")).GetFiles();
+            Text text = new Text();
+            foreach (var file in files)
+            {
+                using (StreamReader r = new StreamReader(file.FullName))
+                {
+                    Document analyzedDocument = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
+                    if (analyzedDocument.documentID == document_edited)
+                    {
+                        foreach (var t in analyzedDocument.texts)
+                        {
+                            if (t.textID == text_edited)
+                            {
+                                text = t;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (Clause clause in text.clauses)
+            {
+                List<string> forEditing = units.Select(c => c.Value).Where(v => v.Split('|')[2] == clause.clauseID).ToList();
+                for (int i  = 0; i < forEditing.Count; i++)
+                {
+                    if (Regex.IsMatch(forEditing[i], @"\{(\d*\|){2}(\d*)(\s.*?\}|\})"))
+                    {
+                        try
+                        {
+                            List<string> addedFields = forEditing[i].Split(" => ")[1].Replace("{", "").Split(";<br />").ToList();
+                            List<Dictionary<string, List<Value>>> newFields = new List<Dictionary<string, List<Value>>>();
+                            Dictionary<string, List<Value>> addedField = new Dictionary<string, List<Value>>();
+                            for (int j = 0; j < addedFields.Count; j++)
+                            {
+                                if (addedFields[j] != "")
+                                {
+                                    string field = addedFields[j].Split(':')[0];
+                                    string values = addedFields[j].Split(':')[1];
+                                    List<Value> addedValues = new List<Value>();
+                                    if (values.Contains(','))
+                                    {
+                                        List<string> splitValues = values.Split(" ,").ToList();
+                                        for (int k = 0; k < splitValues.Count; k++)
+                                        {
+                                            addedValues.Add(new Value(splitValues[k].Trim()));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        addedValues.Add(new Value(values.Trim()));
+                                    }
+                                    addedField[field] = addedValues;
+                                }
+                            }
+                            newFields.Add(addedField);
+                            clause.clauseFields = newFields;
+                            
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            if (clause.clauseFields.Count < 1)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                clause.clauseFields.Clear();
+                            }
+                        }
+                    }
+                    else if (Regex.IsMatch(forEditing[i], @"\{(\d*\|){4}(\d*)(\s.*?\}|\})"))
+                    {
+                        string realizationID = forEditing[i].Split('|')[3];
+                        string graphemeID = forEditing[i].Split('|')[4];
+                        Grapheme grapheme = clause.realizations.Where(r => r.realizationID == realizationID).Select(r => r.letters).ToList()[0].Where(g => g.graphemeID == graphemeID).ToList()[0];
+                        try
+                        {
+                            List<string> addedFields = forEditing[i].Split(" => ")[1].Replace("{", "").Split(";<br />").ToList();
+                            List<Dictionary<string, List<Value>>> newFields = new List<Dictionary<string, List<Value>>>();
+                            Dictionary<string, List<Value>> addedField = new Dictionary<string, List<Value>>();
+                            for (int j = 0; j < addedFields.Count; j++)
+                            {
+                                if (addedFields[j] != "")
+                                {
+                                    string field = addedFields[j].Split(':')[0];
+                                    string values = addedFields[j].Split(':')[1];
+                                    List<Value> addedValues = new List<Value>();
+                                    if (values.Contains(','))
+                                    {
+                                        List<string> splitValues = values.Split(" ,").ToList();
+                                        for (int k = 0; k < splitValues.Count; k++)
+                                        {
+                                            addedValues.Add(new Value(splitValues[k].Trim()));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        addedValues.Add(new Value(values.Trim()));
+                                    }
+                                    addedField[field] = addedValues;
+                                }
+                            }
+                            newFields.Add(addedField);
+                            grapheme.graphemeFields = newFields;
+
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            if (grapheme.graphemeFields.Count < 1)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                grapheme.graphemeFields.Clear();
+                            }
+                        }
+                    }
+                }
+            }
+            docList = getDocs();
+            fieldsList = getFields();
         }
 
 
