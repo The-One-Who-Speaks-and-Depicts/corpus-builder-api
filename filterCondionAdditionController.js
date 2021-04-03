@@ -2,15 +2,91 @@
 
 $(document).ready(function () {
     $(".word").dblclick(function () {
+        $('#tagging').text("");
         $('#info').text("");
         $('#info').append("Lexeme:");
         $('#info').append(this.innerHTML);
         $('#info').append("<br /><br /> Features:<br />");
-        $('#info').append($(this).attr('data-content'));
+        var features = $(this).attr('data-content').split('<br />');
+        for (let i = 0; i < features.length; i++) {
+            if (features[i] != "") {
+                $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
+            }            
+        }        
         $('#info').append("<br /><br /><br />");
         $("#identificator").text("");
         $("#identificator").append($(this).attr('id'));
+        $("#keys").text("");
+        $("#keys").append("<option>Any</option>");
+        for (var i = 0; i < jsons.length; i++) {
+            if (jsons[i].type == "Realization") {
+                $("#keys").append("<option>" + jsons[i].name + "</option>");
+            }
+        }
+        $("#similarTagging").css("opacity", 1.0);
+        $("#similarTaggingLabel").css("opacity", 1.0);
+
+        $(".deleteTaggedButton").click(function () {
+
+            var words = $(".word");
+            for (let i = 0; i < words.length; i++) {
+                if (words[i].id == $("#identificator").val()) {
+                    var features = $(words[i]).attr('data-content').split('<br />');
+                    for (let j = 0; j < features.length; j++) {
+                        if ((features[j] != "") && (features[j] == $(this).parent().children()[0].innerText)) {
+                            words[i].setAttribute('data-content', words[i].getAttribute('data-content').replace(features[j] + "<br />", ""));
+                        }
+                    }
+                }
+            }
+            $(this).parent().remove();
+        })
     });
+
+    $('.grapheme').bind('contextmenu', show_graphemes);
+
+    function show_graphemes(event) {
+        event.preventDefault();
+        $('#tagging').text("");
+        $('#info').text("");
+        $('#info').append("Grapheme:");
+        $('#info').append(this.innerHTML);
+        $('#info').append("<br /><br /> Features:<br />");
+        var features = $(this).attr('data-content').split('<br />');
+        for (let i = 0; i < features.length; i++) {
+            if (features[i] != "") {
+                $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
+            }
+        }
+        $('#info').append("<br /><br /><br />");
+        $("#identificator").text("");
+        $("#identificator").append($(this).attr('id'));
+        $("#keys").text("");
+        $("#keys").append("<option>Any</option>");
+        for (var i = 0; i < jsons.length; i++) {
+            if (jsons[i].type == "Grapheme") {
+                $("#keys").append("<option>" + jsons[i].name + "</option>");
+            }
+        }
+        if ($("#similarTagging").css("opacity") == 1) {
+            $("#similarTagging").css("opacity", 0.0);
+            $("#similarTaggingLabel").css("opacity", 0.0);
+        }
+        $(".deleteTaggedButton").click(function () {
+            var graphemes = $(".grapheme");
+            for (let i = 0; i < graphemes.length; i++) {
+                if (graphemes[i].id == $("#identificator").val()) {
+                    var features = $(graphemes[i]).attr('data-content').split('<br />');
+                    for (let j = 0; j < features.length; j++) {
+                        if ((features[j] != "") && (features[j] == $(this).parent().children()[0].innerText)) {
+                            graphemes[i].setAttribute('data-content', graphemes[i].getAttribute('data-content').replace(features[j] + "<br />", ""));
+                        }
+                    }
+                }
+            }
+            $(this).parent().remove();
+        })
+    }
 
 
     var values = document.getElementById('values');
@@ -19,11 +95,13 @@ $(document).ready(function () {
         $.getJSON("/database/fields/" + splitValues[i], function (data) {
             if (data.type != "Document" && data.type != "Text") {
                 jsons.push(data);
-                $("#keys").append("<option>" + data.name + "</option>");
-                $("#keysFilter").append("<option>" + data.name + "</option>");
+                if (data.type == "Realization") {
+                    $("#keysFilter").append("<option>" + data.name + "</option>");
+                }                
             }            
         });
     }
+    jsons.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
     
 
     $("#keys").change(function () {
@@ -94,6 +172,27 @@ $(document).ready(function () {
                                             }
                                         }
                                     }
+                                    $("#additionalFeatureButton").click(function () {
+                                        
+                                        var category = $("#connectedFields option:selected").text();
+                                        if (category != "Any") {
+                                            if ($("#connectedUserValue").css("opacity") == 1) {
+                                                if ($("#connectedUserValue").text() != "") {
+                                                    $("#tagging").append("<span class=\"tag\">" + category + ":" + $("#connectedUserValue").text() + " <button class=\"deleteTaggingButton\" type=\"button\">Удалить</button></span><br />");
+                                                }
+
+                                            }
+                                            else if ($("#connectedRestrictedValue").css("opacity") == 1) {
+                                                if ($("#connectedRestrictedValue option:selected").text() != "Any") {
+                                                    $("#tagging").append("<span class=\"tag\">" + category + ":" + $("#connectedRestrictedValue option:selected").text() + " <button class=\"deleteTaggingButton\" type=\"button\">Удалить</button></span><br />");
+                                                }
+                                            }
+
+                                            $(".deleteTaggingButton").click(function () {
+                                                $(this).parent().remove();
+                                            });
+                                        }                                        
+                                    });
                                 });
                             }                            
                         }
@@ -101,6 +200,8 @@ $(document).ready(function () {
                 }
             }
         }
+
+        
     });
 
     
@@ -162,10 +263,9 @@ $(document).ready(function () {
         if (selectedWord.length > 0 | selectedOptions.length > 0) {
             var words = document.getElementsByClassName('word');
             for (var i = 0; i < words.length; i++) {
-                console.log('nw');
                 if (selectedWord.length > 0) {
                     if (!isMatch(selectedWord, words[i].innerText)) {
-                        words[i].setAttribute("style", "display:none;");
+                        words[i].setAttribute("style", "opacity:0.25;");
                     }
                 }
                 if (selectedOptions.length > 0) {
@@ -235,7 +335,7 @@ $(document).ready(function () {
                         console.log("ok");
                     }
                     else {
-                        words[i].setAttribute("style", "display:none;");
+                        words[i].setAttribute("style", "opacity:0.25;");
                     }
                 }
 
@@ -245,15 +345,27 @@ $(document).ready(function () {
             alert("Empty filters!");
         }
     });
+    $("#buttonFilterDeletion").click(function () {
+        var words = document.getElementsByClassName('word');
+        for (let i = 0; i < words.length; i++) {
+            words[i].setAttribute("style", "opacity:1.0;");
+        }
+    });
 
-    $("#changeButton").click(function () {
-        // спросить, новая ли это разметка, или можно добавлять к старой?
-        var currentFeatures = document.getElementById($("#identificator").val()).getAttribute("data-content").split(';<br />');
-        var addedFeature = $("#keys option:selected").text();
-        var addedValue = $("#thisFieldValues option:selected").text();
-        if (addedFeature != "Any" && addedValue != "Any") {
-
-            var isFeatureMultiple = $("#fieldInfo").text();
+    function changing(id) {        
+        var newFeatures = document.getElementsByClassName("tag");
+        for (let i = 0; i < newFeatures.length; i++) {
+            var currentFeatures = document.getElementById(id).getAttribute("data-content").split(';<br />');
+            var feature = newFeatures[i].textContent.match(/.*\s/g)[0];
+            var addedFeature = feature.split(":")[0];
+            var addedValue = feature.split(":")[1];
+            var isFeatureMultiple = false;
+            for (let i = 0; i < jsons.length; i++) {
+                if (jsons[i].name == addedFeature) {
+                    isFeatureMultiple = jsons[i].isMultiple;
+                    break;
+                }
+            }
             var coincidenceFound = false;
             for (let i = 0; i < currentFeatures.length; i++) {
                 if (currentFeatures[i] != "") {
@@ -264,18 +376,18 @@ $(document).ready(function () {
                             if (valuesOfFeature[j] != "") {
                                 if (valuesOfFeature[j] == addedValue) {
                                     coincidenceFound = true;
-                                    alert('У слова есть этот признак и это значение!');
+                                    alert('У клаузы есть один из признаков и одно из значений!');
                                     break;
                                 }
                             }
                         }
-                        if (coincidenceFound) break;
-                        if (isFeatureMultiple != "true") {
+                        if (coincidenceFound) continue;
+                        if (isFeatureMultiple == false) {
                             coincidenceFound = true;
-                            alert('Этому признаку может соответствовать только одно значение!');
-                            break;
+                            alert('Одному из признаков может соответствовать только одно значение!');
+                            continue;
                         }
-                        else {
+                        else {                            
                             currentFeatures[i] += ";";
                             currentFeatures[i] += addedValue;
                             var new_features = "";
@@ -285,19 +397,74 @@ $(document).ready(function () {
                                     new_features += ";<br />";
                                 }
                             }
-                            document.getElementById($("#identificator").val()).setAttribute("data-content", currentFeatures);
+                            document.getElementById(id).setAttribute("data-content", new_features);
                             coincidenceFound = true;
-                            alert('Добавлено значение');
                             break;
                         }
                     }
-                }
+                }                
             }
             if (!coincidenceFound) {
-                alert('Добавлен признак и присвоено значение.');
-                document.getElementById($("#identificator").val()).setAttribute("data-content", document.getElementById($("#identificator").val()).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />");
+                document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />");
             }
         }
+    }
+
+    function check_ids(id_origin, id_transfer) {
+        if (id_origin == id_transfer) {
+            return false;
+        }
+        if (id_origin.split('|')[2] < id_transfer.split('|')[2]) {
+            return true;
+        }
+        else if (id_origin.split('|')[2] > id_transfer.split('|')[2])
+        {
+            return false;
+        }
+        else {
+            if (id_origin.split('|')[3] < id_transfer.split('|')[3]) {
+                return false;
+            }
+            else {
+                return true;
+            }            
+        }
+    }
+
+    $("#changeButton").click(function () {
+        id = $("#identificator").val()
+        changing(id);
+        if ($('#info').text().startsWith("Lexeme")) {
+            if ($('#similarTagging').prop('checked')) {
+                words = $(".word");
+                var wordText = "";
+                for (let i = 0; i < words.length; i++) {
+                    if (words[i].id == id) {
+                        wordText = words[i].innerText;
+                    } 
+                }
+                for (let i = 0; i < words.length; i++) {                    
+                    if (words[i].innerText.trim() == wordText.trim() && check_ids(id, words[i].id)) {
+                        changing(words[i].id);
+                    }
+                }
+            }
+        }
+        $('#info').text("");
+        $('#identificator').text("");
+        $('#tagging').text("");
+        $('#keys option:first').prop('selected', true);
+        if ($("#userValue").css("opacity") == 1) {
+            $("#userValue").css("opacity", 0.0);
+            $("#userValue").val("");
+        }
+        else if ($("#thisFieldValues").css("opacity") == 1) {
+            $("#thisFieldValues").css("opacity", 0.0);
+            $('#thisFieldValues option:first').prop('selected', true);
+        }      
+        $("#connected").text("");
+        alert('Внесение завершено!');        
+        
     });
 
     function isMatch(pattern, word) {
@@ -346,6 +513,16 @@ $(document).ready(function () {
     function save_changes(event) {
         event.preventDefault();
         $('changedText').text();
+        var clauses = document.getElementsByClassName('clause');
+        for (let i = 0; i < clauses.length; i++) {
+            if (clauses[i].dataset.content == "") {
+                $('#changedText').append('{' + clauses[i].id + '}');
+            }
+            else {
+                $('#changedText').append('{' + clauses[i].id + ' => ' + clauses[i].dataset.content + '}');
+            }
+
+        }
         var words = document.getElementsByClassName('word');
         for (let i = 0; i < words.length; i++) {
             if (words[i].dataset.content == "") {
@@ -356,10 +533,21 @@ $(document).ready(function () {
             }
 
         }
+        var graphemes = document.getElementsByClassName('grapheme')
+        for (let i = 0; i < graphemes.length; i++) {
+            if (graphemes[i].dataset.content == "") {
+                $('#changedText').append('{' + graphemes[i].id + '}');
+            }
+            else {
+                $('#changedText').append('{' + graphemes[i].id + ' => ' + graphemes[i].dataset.content + '}');
+            }
+
+        }
         alert('Изменения сохранены');
     }
 
     $(".clauseButton").click(function () {
+        $('#tagging').text("");
         var tokens = $(this).parent().children();
         $('#info').text("");
         $('#info').append("Clause:");
@@ -369,9 +557,67 @@ $(document).ready(function () {
             }
         }
         $('#info').append("<br /><br /> Features:<br />");
-        $('#info').append($(this).parent('data-content'));
+        var features = $(this).parent().attr('data-content').split('<br />');
+        for (let i = 0; i < features.length; i++) {
+            if (features[i] != "") {
+                $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
+            }
+        }
         $('#info').append("<br /><br /><br />");
         $("#identificator").text("");
         $("#identificator").append($(this).parent().attr('id'));
+        $("#keys").text("");
+        $("#keys").append("<option>Any</option>");
+        for (var i = 0; i < jsons.length; i++) {
+            if (jsons[i].type == "Clause") {
+                $("#keys").append("<option>" + jsons[i].name + "</option>");
+            }
+        }
+        if ($("#similarTagging").css("opacity") == 1) {
+            $("#similarTagging").css("opacity", 0.0);
+            $("#similarTaggingLabel").css("opacity", 0.0);
+        }
+
+        $(".deleteTaggedButton").click(function () {
+
+            var clauses = $(".clause");
+            for (let i = 0; i < clauses.length; i++) {
+                if (clauses[i].id == $("#identificator").val()) {
+                    var features = $(clauses[i]).attr('data-content').split('<br />');
+                    for (let j = 0; j < features.length; j++) {
+                        if ((features[j] != "") && (features[j] == $(this).parent().children()[0].innerText)) {
+                            clauses[i].setAttribute('data-content', clauses[i].getAttribute('data-content').replace(features[j] + "<br />", ""));
+                        }
+                    }
+                }
+            }
+            $(this).parent().remove();
+        })
     });
+
+    $("#mainFeatureButton").click(function () {
+        
+        var category = $("#keys option:selected").text();
+        if (category != "Any") {
+            if ($("#userValue").css("opacity") == 1) {
+                if ($("#userValue").val() != "") {
+                    $("#tagging").append("<span class=\"tag\">" + category + ":" + $("#userValue").val() + " <button class=\"deleteTaggingButton\" type=\"button\">Удалить</button></span><br />");
+                }
+
+            }
+            else if ($("#thisFieldValues").css("opacity") == 1) {
+                if ($("#thisFieldValues option:selected").text() != "Any") {
+                    $("#tagging").append("<span class=\"tag\">" + category + ":" + $("#thisFieldValues option:selected").text() + " <button class=\"deleteTaggingButton\" type=\"button\">Удалить</button></span><br />");
+                }
+            }
+        }       
+
+        $(".deleteTaggingButton").click(function () {
+            $(this).parent().remove();
+        });
+    });
+
+    
+
+    
 });
