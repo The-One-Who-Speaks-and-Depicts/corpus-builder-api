@@ -370,10 +370,21 @@ $(document).ready(function () {
         }
     });
 
-    function changing(id, isLexeme, newTagging) {
+    function changing(id, isLexeme, newTagging, oldTagging = -1) {
         var newFeatures = document.getElementsByClassName("tag");
+        var currentFeatures = "";
         for (let i = 0; i < newFeatures.length; i++) {
-            var currentFeatures = document.getElementById(id).getAttribute("data-content").split(';<br />');
+            if (isLexeme == true) {
+                if (newTagging == false) {
+                    currentFeatures = document.getElementById(id).getAttribute("data-content").split('***')[document.getElementById(id).getAttribute("data-content").split('***').length - 1].split(';br />');   
+                }
+                else {
+                    currentFeatures = document.getElementById(id).getAttribute("data-content").split('***')[oldTagging].split(';<br />');
+                }
+            }
+            else {
+                currentFeatures = document.getElementById(id).getAttribute("data-content").split(';<br />');
+            }
             var feature = newFeatures[i].textContent.match(/.*\s/g)[0];
             var addedFeature = feature.split(':')[0];
             var addedValue = feature.split(':')[1];
@@ -396,7 +407,7 @@ $(document).ready(function () {
                                 for (let m = 0; m < multipleFeatures.length; m++) {
                                     if (multipleFeatures[m].trim() == addedValue.trim()) {
                                         coincidenceFound = true;
-                                        alert('У клаузы есть один из признаков и одно из значений!');
+                                        alert('У единицы есть один из признаков и одно из значений!');
                                         break;
                                     }
                                 }
@@ -425,9 +436,32 @@ $(document).ready(function () {
 
                             }
                             if (isLexeme == true) {
-                                newFeatures += "***";
+                                let number = 0;
+                                if (newTagging == false) {
+                                    number = oldTagging;
+                                }
+                                else {
+                                    number = document.getElementById(id).getAttribute("data-content").split('***').length - 1;
+                                }
+                                let taggings = document.getElementById(id).getAttribute("data-content").split('***');
+                                taggings[number] = new_features;
+                                let new_taggings = "";
+                                for (let j = 0; j < taggings.length; j++) {
+                                    if (taggings[j] != "") {
+                                        if (taggings[j].endsWith(";<br />")) {
+                                            new_taggings += taggings[j] + "***";
+                                        }
+                                        else {
+                                            new_taggings += taggings[j] + ";<br />" + "***";
+                                        }
+                                    }
+
+                                }
+                                document.getElementById(id).setAttribute("data-content", new_taggings);
                             }
-                            document.getElementById(id).setAttribute("data-content", new_features);
+                            else {
+                                document.getElementById(id).setAttribute("data-content", new_features);
+                            }                            
                             coincidenceFound = true;
                             break;
                         }
@@ -436,11 +470,38 @@ $(document).ready(function () {
             }
             if (!coincidenceFound) {
                 if (isLexeme == true) {
-                    document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />" + "***");
+                    let number = 0;
+                    if (newTagging == true) {
+                        number = oldTagging;
+                        let taggings = document.getElementById(id).getAttribute("data-content").split('***');
+                        taggings[number] = taggings[number] + addedFeature + ":" + addedValue + ";<br />";
+                        let new_taggings = "";
+                        for (let j = 0; j < taggings.length; j++) {
+                            if (taggings[j] != "") {
+                                if (taggings[j].endsWith(";<br />")) {
+                                    new_taggings += taggings[j] + "***";
+                                }
+                                else {
+                                    new_taggings += taggings[j] + ";<br />" + "***";
+                                }
+                            }
+
+                        }
+                        document.getElementById(id).setAttribute("data-content", new_taggings);
+                    }
+                    else {
+                        document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />")
+                    }
+                    
                 }
                 else {
                     document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />")
                 }
+            }
+        }
+        if (isLexeme == true) {
+            if (newTagging == false) {
+                document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + "***");
             }
         }
     }
@@ -468,24 +529,51 @@ $(document).ready(function () {
     $("#changeButton").click(function () {
         id = $("#identificator").val()
         if (!$('#info').text().startsWith("Lexeme")) {
-            changing(id, false, false);
+            changing(id, false, false, -1);
         }
         else {
-            changing(id, true, true);
-            if ($('#similarTagging').prop('checked')) {
-                words = $(".word");
-                var wordText = "";
-                for (let i = 0; i < words.length; i++) {
-                    if (words[i].id == id) {
-                        wordText = words[i].innerText;
+            if ($('#editTagging').prop('checked')) {
+                if ($('#tagNumber').val() > (document.getElementById(id).getAttribute("data-content").split('***').length - 2)) {
+                    alert('Не существует разметки с этим номером!');
+                }                
+                else {
+                    changing(id, true, true, $('#tagNumber').val());
+                    if ($('#similarTagging').prop('checked')) {
+                        words = $(".word");
+                        var wordText = "";
+                        for (let i = 0; i < words.length; i++) {
+                            if (words[i].id == id) {
+                                wordText = words[i].innerText;
+                            }
+                        }
+                        for (let i = 0; i < words.length; i++) {
+                            if (words[i].innerText.trim() == wordText.trim() && check_ids(id, words[i].id)) {
+                                changing(words[i].id, true, false, -1);
+                            }
+                        }
                     }
                 }
-                for (let i = 0; i < words.length; i++) {
-                    if (words[i].innerText.trim() == wordText.trim() && check_ids(id, words[i].id)) {
-                        changing(words[i].id);
+                
+            }
+            else {
+                changing(id, true, false, - 1);
+                if ($('#similarTagging').prop('checked')) {
+                    words = $(".word");
+                    var wordText = "";
+                    for (let i = 0; i < words.length; i++) {
+                        if (words[i].id == id) {
+                            wordText = words[i].innerText;
+                        }
+                    }
+                    for (let i = 0; i < words.length; i++) {
+                        if (words[i].innerText.trim() == wordText.trim() && check_ids(id, words[i].id)) {
+                            changing(words[i].id, true, false, -1);
+                        }
                     }
                 }
             }
+            
+            
         }
         $('#info').text("");
         $('#identificator').text("");
