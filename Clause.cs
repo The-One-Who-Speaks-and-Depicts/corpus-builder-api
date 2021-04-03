@@ -19,7 +19,7 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string textID;
         [JsonProperty]
-        protected List<Dictionary<string, List<Value>>> clauseFields = new List<Dictionary<string, List<Value>>>();
+        public List<Dictionary<string, List<Value>>> clauseFields = new List<Dictionary<string, List<Value>>>();
         [JsonProperty]
         public string clauseID;
         [JsonProperty]
@@ -88,14 +88,16 @@ namespace CorpusDraftCSharp
                         {
                             result += field.Key;
                             result += ":";
-                            foreach (var fieldValue in field.Value)
+                            for (int i = 0; i < field.Value.Count; i++)
                             {
-                                result += fieldValue.name;
-                                result += ";";
-                            }
-                            result += "||";
-                        }
-                        result += "\n";
+                                result += field.Value[i].name;
+                                if (i < field.Value.Count - 1)
+                                {
+                                    result += ",";
+                                }
+                            }                            
+                            result += ";\n";
+                        }                        
                     }
                     return result;
                 };

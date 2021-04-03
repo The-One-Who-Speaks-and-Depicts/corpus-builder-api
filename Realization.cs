@@ -108,14 +108,17 @@ namespace CorpusDraftCSharp
                         {
                             result += field.Key;
                             result += ":";
-                            foreach (var fieldValue in field.Value)
+                            for (int i = 0; i < field.Value.Count; i++)
                             {
-                                result += fieldValue.name;                                
-                                result += ";";
+                                result += field.Value[i].name;
+                                if (i < field.Value.Count - 1)
+                                {
+                                    result += ",";
+                                }
                             }
-                            result += "||";
+                            result += ";\n";
                         }
-                        result += "\n";
+                        result += "***";
                     }
                     return result;
                 };

@@ -9,7 +9,7 @@ $(document).ready(function () {
         $('#info').append("<br /><br /> Features:<br />");
         var taggings = $(this).attr('data-content').split('***');
         for (let t = 0; t < taggings.length; t++) {
-            if (taggings[t] != "") {
+            if (taggings[t].replace("<br /><br />", "") != "" && taggings[t] != "") {
                 $('#info').append("Tagging " + t + "<br />");
                 var features = taggings[t].split('<br />');
                 for (let i = 0; i < features.length; i++) {
@@ -44,12 +44,20 @@ $(document).ready(function () {
             var words = $(".word");
             for (let i = 0; i < words.length; i++) {
                 if (words[i].id == $("#identificator").val()) {
-                    var features = $(words[i]).attr('data-content').split('<br />');
-                    for (let j = 0; j < features.length; j++) {
-                        if ((features[j] != "") && (features[j] == $(this).parent().children()[0].innerText)) {
-                            words[i].setAttribute('data-content', words[i].getAttribute('data-content').replace(features[j] + "<br />", ""));
+                    var taggings = $(words[i]).attr('data-content').split('***');
+                    for (let t = 0; t < taggings.length; t++) {
+                        var features = taggings[t].split('<br />');
+                        for (let j = 0; j < features.length; j++) {
+                            if ((features[j] != "") && (features[j] == $(this).parent().children()[0].innerText)) {
+                                var newFeatures = words[i].getAttribute('data-content').replace(features[j] + "<br />", "");
+                                while (newFeatures.charAt(0) === '*') {
+                                    newFeatures = newFeatures.substring(1);
+                                }
+                                newFeatures = newFeatures.replace("******", "***");
+                                words[i].setAttribute('data-content', newFeatures);
+                            }
                         }
-                    }
+                    }                    
                 }
             }
             $(this).parent().remove();
@@ -113,7 +121,7 @@ $(document).ready(function () {
         $.getJSON("/database/fields/" + splitValues[i], function (data) {
             if (data.type != "Document" && data.type != "Text") {
                 jsons.push(data);
-                if (data.type == "Realization") {
+                if (data.type == "Realization" && !data.isUserFilled) {
                     $("#keysFilter").append("<option>" + data.name + "</option>");
                 }
             }
