@@ -298,63 +298,68 @@ $(document).ready(function () {
                         extantList[k] = extantList[k].split(":");
                     }
                     var wordAttributes = words[i].getAttribute("data-content");
-                    wordAttributes = wordAttributes.split(";<br />");
-                    var extantAttributes = [];
-                    for (var k = 0; k < wordAttributes.length; k++) {
-                        if (wordAttributes[k].length > 0) {
-                            extantAttributes.push(wordAttributes[k]);
-                        }
-                    }
-                    for (var k = 0; k < extantAttributes.length; k++) {
-                        extantAttributes[k] = extantAttributes[k].split(":");
-                    }
-                    coincidingAttributes = 0;
-                    for (var j = 0; j < extantList.length; j++) {
-                        coincidenceFound = false;
-                        if (extantList[j][0][0] == '!') {
-                            if (extantAttributes.length < 1) {
-                                coincidenceFound = true;
+                    var wordTaggings = wordAttributes.split("***");
+                    for (let t = 0; t < wordTaggings.length; t++) {
+                        wordAttributes = wordTaggings[t].split(';<br />')
+                        var extantAttributes = [];
+                        for (var k = 0; k < wordAttributes.length; k++) {
+                            if (wordAttributes[k].length > 0) {
+                                extantAttributes.push(wordAttributes[k]);
                             }
                         }
-                        exact = false;
-                        for (var m = 0; m < extantAttributes.length; m++) {
-
-                            if (extantList[j][0][0] != '!') {
-                                if (extantList[j][0] == extantAttributes[m][0]) {
-                                    if (extantAttributes[m][1].match(extantList[j][1])) {
-                                        coincidenceFound = true;
-                                    }
+                        for (var k = 0; k < extantAttributes.length; k++) {
+                            extantAttributes[k] = extantAttributes[k].split(":");
+                        }
+                        coincidingAttributes = 0;
+                        for (var j = 0; j < extantList.length; j++) {
+                            coincidenceFound = false;
+                            if (extantList[j][0][0] == '!') {
+                                if (extantAttributes.length < 1) {
+                                    coincidenceFound = true;
                                 }
                             }
-                            else {
-                                var positive = extantList[j][0].slice(1);
-                                if (positive == extantAttributes[m][0]) {
-                                    if (extantAttributes[m][1].match(extantList[j][1])) {
-                                        exact = true;
+                            exact = false;
+                            for (var m = 0; m < extantAttributes.length; m++) {
+
+                                if (extantList[j][0][0] != '!') {
+                                    if (extantList[j][0] == extantAttributes[m][0]) {
+                                        if (extantAttributes[m][1].match(extantList[j][1])) {
+                                            coincidenceFound = true;
+                                        }
+                                    }
+                                }
+                                else {
+                                    var positive = extantList[j][0].slice(1);
+                                    if (positive == extantAttributes[m][0]) {
+                                        if (extantAttributes[m][1].match(extantList[j][1])) {
+                                            exact = true;
+                                        }
+                                        else {
+                                            coincidenceFound = true;
+                                        }
                                     }
                                     else {
                                         coincidenceFound = true;
                                     }
                                 }
-                                else {
-                                    coincidenceFound = true;
-                                }
-                            }
 
+                            }
+                            if (exact) {
+                                coincidenceFound = false;
+                            }
+                            if (coincidenceFound) {
+                                coincidingAttributes++;
+                            }
                         }
-                        if (exact) {
-                            coincidenceFound = false;
+                        if (coincidingAttributes == extantList.length) {
+                            console.log("ok");
+                            words[i].setAttribute("style", "opacity:1.0;");
+                            break;
                         }
-                        if (coincidenceFound) {
-                            coincidingAttributes++;
+                        else {
+                            words[i].setAttribute("style", "opacity:0.25;");
                         }
-                    }
-                    if (coincidingAttributes == extantList.length) {
-                        console.log("ok");
-                    }
-                    else {
-                        words[i].setAttribute("style", "opacity:0.25;");
-                    }
+                    }                    
                 }
 
             }
