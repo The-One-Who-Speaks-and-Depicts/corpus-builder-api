@@ -7,12 +7,19 @@ $(document).ready(function () {
         $('#info').append("Lexeme:");
         $('#info').append(this.innerHTML);
         $('#info').append("<br /><br /> Features:<br />");
-        var features = $(this).attr('data-content').split('<br />');
-        for (let i = 0; i < features.length; i++) {
-            if (features[i] != "") {
-                $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
-            }
+        var taggings = $(this).attr('data-content').split('***');
+        for (let t = 0; t < taggings.length; t++) {
+            if (taggings[t] != "") {
+                $('#info').append("Tagging " + t + "<br />");
+                var features = taggings[t].split('<br />');
+                for (let i = 0; i < features.length; i++) {
+                    if (features[i] != "") {
+                        $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
+                    }
+                }
+            }            
         }
+        
         $('#info').append("<br /><br /><br />");
         $("#identificator").text("");
         $("#identificator").append($(this).attr('id'));
@@ -25,6 +32,12 @@ $(document).ready(function () {
         }
         $("#similarTagging").css("opacity", 1.0);
         $("#similarTaggingLabel").css("opacity", 1.0);
+
+        $("#editTagging").css("opacity", 1.0);
+        $("#editTaggingLabel").css("opacity", 1.0);
+
+        $("#tagNumber").css("opacity", 1.0);
+        $("#tagNumberLabel").css("opacity", 1.0);
 
         $(".deleteTaggedButton").click(function () {
 
@@ -71,6 +84,11 @@ $(document).ready(function () {
         if ($("#similarTagging").css("opacity") == 1) {
             $("#similarTagging").css("opacity", 0.0);
             $("#similarTaggingLabel").css("opacity", 0.0);
+            $("#editTagging").css("opacity", 0.0);
+            $("#editTaggingLabel").css("opacity", 0.0);
+
+            $("#tagNumber").css("opacity", 0.0);
+            $("#tagNumberLabel").css("opacity", 0.0);
         }
         $(".deleteTaggedButton").click(function () {
             var graphemes = $(".grapheme");
@@ -352,7 +370,7 @@ $(document).ready(function () {
         }
     });
 
-    function changing(id) {
+    function changing(id, isLexeme, newTagging) {
         var newFeatures = document.getElementsByClassName("tag");
         for (let i = 0; i < newFeatures.length; i++) {
             var currentFeatures = document.getElementById(id).getAttribute("data-content").split(';<br />');
@@ -406,6 +424,9 @@ $(document).ready(function () {
                                 }
 
                             }
+                            if (isLexeme == true) {
+                                newFeatures += "***";
+                            }
                             document.getElementById(id).setAttribute("data-content", new_features);
                             coincidenceFound = true;
                             break;
@@ -414,7 +435,12 @@ $(document).ready(function () {
                 }
             }
             if (!coincidenceFound) {
-                document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />");
+                if (isLexeme == true) {
+                    document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />" + "***");
+                }
+                else {
+                    document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />")
+                }
             }
         }
     }
@@ -441,8 +467,11 @@ $(document).ready(function () {
 
     $("#changeButton").click(function () {
         id = $("#identificator").val()
-        changing(id);
-        if ($('#info').text().startsWith("Lexeme")) {
+        if (!$('#info').text().startsWith("Lexeme")) {
+            changing(id, false, false);
+        }
+        else {
+            changing(id, true, true);
             if ($('#similarTagging').prop('checked')) {
                 words = $(".word");
                 var wordText = "";
@@ -584,6 +613,12 @@ $(document).ready(function () {
         if ($("#similarTagging").css("opacity") == 1) {
             $("#similarTagging").css("opacity", 0.0);
             $("#similarTaggingLabel").css("opacity", 0.0);
+
+            $("#editTagging").css("opacity", 0.0);
+            $("#editTaggingLabel").css("opacity", 0.0);
+
+            $("#tagNumber").css("opacity", 0.0);
+            $("#tagNumberLabel").css("opacity", 0.0);
         }
 
         $(".deleteTaggedButton").click(function () {
