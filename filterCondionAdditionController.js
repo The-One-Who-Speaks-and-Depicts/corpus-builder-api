@@ -357,8 +357,8 @@ $(document).ready(function () {
         for (let i = 0; i < newFeatures.length; i++) {
             var currentFeatures = document.getElementById(id).getAttribute("data-content").split(';<br />');
             var feature = newFeatures[i].textContent.match(/.*\s/g)[0];
-            var addedFeature = feature.split(":")[0];
-            var addedValue = feature.split(":")[1];
+            var addedFeature = feature.split(':')[0];
+            var addedValue = feature.split(':')[1];
             var isFeatureMultiple = false;
             for (let i = 0; i < jsons.length; i++) {
                 if (jsons[i].name == addedFeature) {
@@ -388,14 +388,18 @@ $(document).ready(function () {
                             continue;
                         }
                         else {                            
-                            currentFeatures[i] += ";";
-                            currentFeatures[i] += addedValue;
-                            var new_features = "";
-                            for (let feature in currentFeatures) {
-                                if (feature != "") {
-                                    new_features += feature;
-                                    new_features += ";<br />";
-                                }
+                            currentFeatures[i] += "," + addedValue;
+                            let new_features = "";
+                            for (let j = 0; j < currentFeatures.length; j++) {
+                                if (currentFeatures[j] != "") {
+                                    if (currentFeatures[j].endsWith(";<br />")) {
+                                        new_features += currentFeatures[j];
+                                    }
+                                    else {
+                                        new_features += currentFeatures[j] + ";<br />";
+                                    }
+                                }                              
+                               
                             }
                             document.getElementById(id).setAttribute("data-content", new_features);
                             coincidenceFound = true;
