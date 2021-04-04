@@ -110,6 +110,9 @@ $(document).ready(function () {
                     if (contents.includes("***")) {
                         lexemeContents = contents.split("***");
                         for (let c = 0; c < lexemeContents.length; c++) {
+                            if (lexemeContents[c] == "") {
+                                continue;
+                            }
                             contents = lexemeContents[c].split(";<br />");
                             for (var j = 0; j < contents.length; j++) {
                                 contents[j] = contents[j].split(':');
@@ -118,6 +121,9 @@ $(document).ready(function () {
                             for (var j = 0; j < selectedOption.length; j++) {
                                 coincides = false;
                                 for (var k = 0; k < contents.length; k++) {
+                                    if (contents[k] == "") {
+                                        continue;
+                                    }
                                     if (selectedOption[j][0][0] == '!') {
                                         var positive = selectedOption[j][0];
                                         positive = positive.slice(1);
