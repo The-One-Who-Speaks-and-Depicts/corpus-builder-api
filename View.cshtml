@@ -3,19 +3,20 @@
 @{
     ViewData["Title"] = "Просмотр корпуса";
 }
+<script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
 <script src="~/js/featureAdditionController.js"></script>
+
 
 <div style="margin-top:25px;">
     <select id="keys">
-        @foreach (var part in Model.fieldsList)
-        {
-            <option>@part</option>
-        }
-    </select>
-    <select id="thisFieldValues">
         <option>Any</option>
-    </select>
-    <input id="isNegative" type="checkbox" value="Искать слова без этого признака" />
+    </select><br />
+    <select id="thisFieldValues" style="opacity:0;">
+        <option>Any</option>
+    </select><br />
+    <textarea id="userValue" cols="15" style="opacity:0;"></textarea><br />
+    <input id="isNegative" type="checkbox" value="Искать без этого признака" />
+    <label id="isNegativeLabel" for="isNegative">Искать единицы без этого признака</label><br/>
     <button id="addFeature">Добавить признак</button><br />
     <form method="post">
         <div id="values" style="display:none;">
@@ -23,13 +24,14 @@
             {@field}
     </div>
     <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="1" cols="20" asp-for="wordSearched"></textarea><br />
-    <select asp-for="textName">
-        @foreach (var text in Model.textList)
+    <select asp-for="docName">
+        <option>Any</option>
+        @foreach (var doc in Model.docList)
         {
-            <option>@text</option>
+            <option>@doc.documentName</option>
         }
     </select>
-    <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="1" cols="20" id="feature" asp-for="feature"></textarea><br />
+    <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="3" cols="40" id="feature" asp-for="feature"></textarea><br />
     <button asp-page-handler="show">Вывести слова в порядке появления</button><br />
     <button asp-page-handler="showAlphabetically">Вывести слова в алфавитном порядке</button><br />
 </form>
@@ -40,18 +42,7 @@
 
 
     @for (int i = 0; i < Model.wordsWithTags.Count; i++)
-    {
-    <div style="width:@(100/Model.wordsWithTags.Count)%;float:left;">
-        @for (int j = 0; j < Model.wordsWithTags[i].Count; j++)
-        {
-            @foreach (var item in Model.wordsWithTags[i][j])
-            {
-                @item.Key
-            }
-            <br />
-        }
-    </div>
-    }
+    {@Html.Raw(Model.wordsWithTags[i])}
 
 </div>
 <div style="clear:both;"></div>

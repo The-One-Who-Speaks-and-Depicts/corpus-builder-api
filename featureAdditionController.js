@@ -1,32 +1,58 @@
-﻿window.onload = function () {
+﻿jsons = [];
+$(document).ready(function () {
+    var values = document.getElementById('values');
+    splitValues = values.innerText.split('|');
+    for (var i = 0; i < splitValues.length; i++) {
+        $.getJSON("/database/fields/" + splitValues[i], function (data) {
+            jsons.push(data);
+            $("#keys").append("<option>" + data.name + "</option>");
+        });
+    }
+    jsons.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
 
     $("#keys").change(function () {
         $("#thisFieldValues").text("");
+        $("#userValue").val("");
         var selectedOption = $("#keys option:selected").text();
-        if (selectedOption != "Any") {
-            $('#thisFieldValues').append("<option>Any</option>");
-            $.getJSON("../database/fields/" + selectedOption + ".json", function (data) {
-                for (let i = 0; i < data.values.length; i++) {
-                    $('#thisFieldValues').append("<option>" + data.values[i] + "</option>");
+
+        for (var i = 0; i < jsons.length; i++) {
+            if (jsons[i].name == selectedOption) {
+                if (!jsons[i].isUserFilled) {
+                    $("#userValue").css("opacity", 0);
+                    $("#thisFieldValues").css("opacity", 1);
+                    $("#thisFieldValues").append("<option>Any</option>");
+                    for (var j = 0; j < jsons[i].values.length; j++) {
+                        var currValue = jsons[i].values[j];
+                        $("#thisFieldValues").append("<option>" + currValue + "</option>");
+                    }
                 }
-
-            });
+                else {
+                    $("#userValue").css("opacity", 1);
+                    $("#thisFieldValues").css("opacity", 0);
+                }
+            }
         }
-        else {
-            $('#thisFieldValues').append("<option>Any</option>");
-        }
-
     });
 
-    $('#addFeature').click(function () {
-        var selectedFeature = $("#keys option:selected").text();
-        var selectedValue = $("#thisFieldValues option:selected").text();
-        if ((selectedFeature != "Any") && (selectedValue != "Any")) {
-            if ($("#isNegative").prop("checked")) {
-                $('#feature').append("!");
-            }
-            $('#feature').append(selectedFeature + ":" + selectedValue + " ");
+    $("#addFeature").click(function () {
+        var selectedField = "";
+        var selectedValue = "";
+        isNegative = "";
+        if ($('#isNegative').is(':checked')) {
+            isNegative = "!";
         }
-    });    
+        else {
+            isNegative = "";
+        }
+        selectedField = $("#keys option:selected").text();
+        if ($("#userValue").css("opacity") == 1) {
+            selectedValue = $("#userValue").val();
+        }
+        else if ($("#thisFieldValues").css("opacity") == 1) {
+            selectedValue = $("#thisFieldValues option:selected").text();
+        }
 
-}
+        $("#feature").append(isNegative + selectedField + ":" + selectedValue + "||");
+    });
+
+});
