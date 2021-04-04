@@ -1,28 +1,52 @@
 ﻿jsons = [];
 
-window.onload = function () {
+$(document).ready(function () {
     var values = document.getElementById('values');
     splitValues = values.innerText.split('|');
     for (var i = 0; i < splitValues.length; i++) {
         $.getJSON("/database/fields/" + splitValues[i], function (data) {
-            jsons.push(data);
-            $("#keys").append("<option>" + data.name + "</option>");
-
+            if (data.type != "Document" && data.type != "Text") {
+                jsons.push(data);
+                $("#keys").append("<option>" + data.name + "</option>");
+            }
         });
     }
+    jsons.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
 
+    $("#type").change(function () {
+        if ($("keys").css("opacity") == undefined) {
+            $("#keys").css("opacity", 1);
+        }
+        $("#userValue").css("opacity", 0);
+        $("#fieldValues").css("opacity", 0);
+        $("#keys").text("<option>Any</option>");
+        for (var i = 0; i < jsons.length; i++) {
+            if (jsons[i].type == $("#type option:selected").text()) {
+                $("#keys").append("<option>" + jsons[i].name + "</option>");
+            }            
+        }
+    });
     
     $("#keys").change(function () {
         $("#fieldValues").text("");
+        $("#userValue").val(""); 
         var selectedOption = $("#keys option:selected").text();
         
         for (var i = 0; i < jsons.length; i++) {
             if (jsons[i].name == selectedOption) {
-                for (var j = 0; j < jsons[i].values.length; j++) {
-                    var currValue = jsons[i].values[j];
-                    $("#fieldValues").append("<option>" + currValue + "</option>");
+                if (!jsons[i].isUserFilled) {
+                    $("#userValue").css("opacity", 0);
+                    $("#fieldValues").css("opacity", 1);
+                    for (var j = 0; j < jsons[i].values.length; j++) {
+                        var currValue = jsons[i].values[j];
+                        $("#fieldValues").append("<option>" + currValue + "</option>");
+                    }
                 }
-            }
+                else {
+                    $("#userValue").css("opacity", 1);
+                    $("#fieldValues").css("opacity", 0);
+                }
+            }            
         }
     });
 
@@ -125,7 +149,7 @@ window.onload = function () {
 
     
 
-};
+});
 
 
 

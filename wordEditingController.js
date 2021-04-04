@@ -1,6 +1,6 @@
 ﻿jsons = [];
 
-window.onload = function () {
+$(document).ready = function () {
     $(".word").dblclick(function () {
         $('#info').text("");
         $('#info').append("Lexeme:");

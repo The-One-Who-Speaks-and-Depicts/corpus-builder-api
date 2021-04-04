@@ -17,9 +17,9 @@ $(document).ready(function () {
                         $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
                     }
                 }
-            }            
+            }
         }
-        
+
         $('#info').append("<br /><br /><br />");
         $("#identificator").text("");
         $("#identificator").append($(this).attr('id'));
@@ -57,7 +57,7 @@ $(document).ready(function () {
                                 words[i].setAttribute('data-content', newFeatures);
                             }
                         }
-                    }                    
+                    }
                 }
             }
             $(this).parent().remove();
@@ -367,7 +367,7 @@ $(document).ready(function () {
                         else {
                             words[i].setAttribute("style", "opacity:0.25;");
                         }
-                    }                    
+                    }
                 }
 
             }
@@ -389,7 +389,7 @@ $(document).ready(function () {
         for (let i = 0; i < newFeatures.length; i++) {
             if (isLexeme == true) {
                 if (newTagging == false) {
-                    currentFeatures = document.getElementById(id).getAttribute("data-content").split('***')[document.getElementById(id).getAttribute("data-content").split('***').length - 1].split(';br />');   
+                    currentFeatures = document.getElementById(id).getAttribute("data-content").split('***')[document.getElementById(id).getAttribute("data-content").split('***').length - 1].split(';br />');
                 }
                 else {
                     currentFeatures = document.getElementById(id).getAttribute("data-content").split('***')[oldTagging].split(';<br />');
@@ -425,7 +425,7 @@ $(document).ready(function () {
                                     }
                                 }
                                 if (coincidenceFound) break;
-                                
+
                             }
                         }
                         if (coincidenceFound) break;
@@ -474,7 +474,7 @@ $(document).ready(function () {
                             }
                             else {
                                 document.getElementById(id).setAttribute("data-content", new_features);
-                            }                            
+                            }
                             coincidenceFound = true;
                             break;
                         }
@@ -505,7 +505,7 @@ $(document).ready(function () {
                     else {
                         document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />")
                     }
-                    
+
                 }
                 else {
                     document.getElementById(id).setAttribute("data-content", document.getElementById(id).getAttribute("data-content") + addedFeature + ":" + addedValue + ";<br />")
@@ -548,7 +548,7 @@ $(document).ready(function () {
             if ($('#editTagging').prop('checked')) {
                 if ($('#tagNumber').val() > (document.getElementById(id).getAttribute("data-content").split('***').length - 2)) {
                     alert('Не существует разметки с этим номером!');
-                }                
+                }
                 else {
                     changing(id, true, true, $('#tagNumber').val());
                     if ($('#similarTagging').prop('checked')) {
@@ -566,7 +566,7 @@ $(document).ready(function () {
                         }
                     }
                 }
-                
+
             }
             else {
                 changing(id, true, false, - 1);
@@ -585,8 +585,8 @@ $(document).ready(function () {
                     }
                 }
             }
-            
-            
+
+
         }
         $('#info').text("");
         $('#identificator').text("");
