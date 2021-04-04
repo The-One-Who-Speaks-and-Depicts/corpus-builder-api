@@ -300,8 +300,9 @@ namespace CroatianProject.Pages
                             for (int v = 0; v < unitFields[i][key].Count; v++)
                             {
                                 string regexQuery = "^" + String.Join(".*", value.Split('*')) + "$";
-                                if (unitFields[i][key][v].name == value || Regex.IsMatch(regexQuery, value))
+                                if (unitFields[i][key][v].name == value || Regex.IsMatch(unitFields[i][key][v].name, regexQuery))
                                 {
+                                    Console.WriteLine(regexQuery + "==" + value);
                                     coincidingFields++;
                                 }
                             }
