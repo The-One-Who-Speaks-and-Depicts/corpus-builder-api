@@ -17,43 +17,24 @@ namespace CroatianProject.Pages
     {
         private IHostingEnvironment _environment;
         public string textName { get; set; }
+        public string docName { get; set; }
         public List<string> textList { get; set; }
+        public List<string> docList { get; set; }
         public List<string> fieldsList { get; set; } = new List<string>();
-        public List<string> textByWords = new List<string>();
+        public string textByWords { get; set; }
 
         public ViewTextModel(IHostingEnvironment environment)
         {
             _environment = environment;
             try
             {
-                textList = getTexts();
+                docList = getDocs();
                 fieldsList = getFields();
             }
             catch
             {
                 Redirect("./Error");
             }
-        }
-
-        public List<string> getTexts()
-        {
-            var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
-            DirectoryInfo textsDirectory = new DirectoryInfo(directory);
-            var texts = textsDirectory.GetDirectories();
-            List<string> existingTexts = new List<string>();
-            existingTexts.Add("Any");
-            foreach (var text in texts)
-            {
-                existingTexts.Add(text.Name);
-            }
-            return existingTexts;
-        }
-
-        public DirectoryInfo SearchForText(string textName, string directory)
-        {
-            DirectoryInfo dirTexts = new DirectoryInfo(directory);
-            var searchedDirectory = dirTexts.GetDirectories().Where((dir) => dir.Name == textName).First();
-            return searchedDirectory;
         }
 
         public List<string> getFields()
@@ -82,84 +63,83 @@ namespace CroatianProject.Pages
             }
             return existingFields;
         }
-
-        public void OnPostShow()
+        public List<string> getDocs()
         {
-            // TBD after DB restructuring
-            /*
-            var directory = Path.Combine(_environment.ContentRootPath, "database", "texts");
-            List<DirectoryInfo> searchedTexts = new List<DirectoryInfo>();
-            if (textName != "Any")
+            List<string> existingTexts = new List<string>();
+            try
             {
-                searchedTexts.Add(SearchForText(textName, directory));
-                List<Realization> acquiredForms = new List<Realization>();
-                foreach (var text in searchedTexts)
+                var directory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
+                var docs = directory.GetFiles();
+                foreach (var doc in docs)
                 {
-                    DirectoryInfo dirWords = new DirectoryInfo(Path.Combine(directory, text.Name, "paragraphs"));
-                    var dirResults = dirWords.GetDirectories();
-                    foreach (var wordDirectory in dirResults)
+                    string document = "";
+                    using (StreamReader r = new StreamReader(doc.FullName))
                     {
-                        var words = wordDirectory.GetFiles();
-                        string s;
-                        foreach (var word in words)
+                        var deserialized = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
+                        document += deserialized.documentID + "_" + deserialized.documentName + ":";
+                        for (int i = 0; i < deserialized.texts.Count; i++)
                         {
-
-                            using (var f = new StreamReader(word.FullName))
+                            if (i < (deserialized.texts.Count - 1))
                             {
-                                while ((s = f.ReadLine()) != null)
-                                {
-                                    acquiredForms.Add(JsonConvert.DeserializeObject<Realization>(s));
-                                }
+                                document += deserialized.texts[i].textID + "_" + deserialized.texts[i].textName + "|";
+                            }
+                            else
+                            {
+                                document += deserialized.texts[i].textID + "_" + deserialized.texts[i].textName;
                             }
                         }
-                        acquiredForms.Add(new Realization());
                     }
-                }
-                acquiredForms = acquiredForms.OrderBy(realization => Convert.ToInt32(realization.documentID)).ThenBy(realization => Convert.ToInt32(realization.clauseID)).ThenBy(realization => Convert.ToInt32(realization.realizationID)).ToList();
-                int currClause = 0;
-                foreach (var foundWord in acquiredForms)
-                {
-                  if (Convert.ToInt32(foundWord.clauseID) > currClause)
-                  {
-                    currClause++;
-                    textByWords.Add("<br />");
-                  }
-                    try
-                    {
-                        if (!String.IsNullOrEmpty(foundWord.documentID))
-                        {
-                            string fieldsOfWord = "";
-                            string hoverFields = "";
-                            foreach (var field in foundWord.realizationFields)
-                            {
-                                fieldsOfWord += field.Key;
-                                hoverFields += field.Key;
-                                fieldsOfWord += ":";
-                                hoverFields += ":";
-                                foreach (var fieldValue in field.Value)
-                                {
-                                    fieldsOfWord += fieldValue;
-                                    hoverFields += fieldValue;
-                                    fieldsOfWord += ";";
-                                    hoverFields += ";";
-                                }
-                                fieldsOfWord += "<br />";
-                                hoverFields += "\n";
-                            }
-                            textByWords.Add("<span title=\"" + hoverFields + "\" data-content=\"" + fieldsOfWord + "\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
-
-                        }
-                    }
-                    catch
-                    {
-                        textByWords.Add("<span title= \"\" data-content=\"\" class=\"word\" id=\"" + foundWord.documentID + "|" + foundWord.clauseID + "|" + foundWord.realizationID + "\"> " + foundWord.lexeme + "</span>");
-                    }
-
+                    existingTexts.Add(document + "\n");
                 }
             }
-            textList = getTexts();
+            catch
+            {
+
+            }
+            return existingTexts;
+        }
+
+        public DirectoryInfo SearchForText(string textName, string directory)
+        {
+            DirectoryInfo dirTexts = new DirectoryInfo(directory);
+            var searchedDirectory = dirTexts.GetDirectories().Where((dir) => dir.Name == textName).First();
+            return searchedDirectory;
+        }
+
+        public void OnPost(string docName, string textName)
+        {
+            try
+            {
+                docName = docName.Split('_', 2)[0];
+                textName = textName.Split('_', 2)[0];
+                var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents")).GetFiles();
+                Text text = new Text();
+                foreach (var file in files)
+                {
+                    using (StreamReader r = new StreamReader(file.FullName))
+                    {
+                        Document analyzedDocument = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
+                        if (analyzedDocument.documentID == docName)
+                        {
+                            foreach (var t in analyzedDocument.texts)
+                            {
+                                if (t.textID == textName)
+                                {
+                                    text = t;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                textByWords = text.Output();
+            }
+            catch
+            {
+
+            }
+            docList = getDocs();
             fieldsList = getFields();
-            */
         }
     }
 }

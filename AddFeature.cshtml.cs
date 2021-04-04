@@ -89,7 +89,7 @@ namespace CroatianProject.Pages.Admin
                             }
                         }
                     }
-                    existingTexts.Add(document);
+                    existingTexts.Add(document + "\n");
                 }
             }
             catch
