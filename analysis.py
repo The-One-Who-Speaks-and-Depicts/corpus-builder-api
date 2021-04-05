@@ -11,8 +11,11 @@ def analysis(processed_string, stop_symbols, decapitalization):
         prepared_words = []
         for w in current_words:
           lexeme2 = w
-          for s in stop_symbols:
-            lexeme2 = lexeme2.replace(s, "")
+          try:
+            for s in stop_symbols:
+                lexeme2 = lexeme2.replace(s, "")
+          except:
+            pass
           if (decapitalization == "True"):
             lexeme2 = lexeme2.lower()
           graphemes = list(w)
