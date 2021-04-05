@@ -136,7 +136,7 @@ namespace CroatianProject.Pages
                 engine.SetSearchPaths(paths);
                 var pythonFilePath = Path.Combine(_environment.ContentRootPath, "Scripts", "analysis.py");
                 engine.ExecuteFile(pythonFilePath, scope);
-                dynamic function = scope.GetVariable("analysis");
+                dynamic function = scope.GetVariable("analysis");                
                 IList<object> result = function(processedString, stopSymbols, decapitalization.ToString());
                 Text addedText = new Text(analyzedDocument, analyzedDocument.texts.Count.ToString(), textName);
                 addedText.textMetaData = new List<Dictionary<string, List<Value>>>();
@@ -188,11 +188,10 @@ namespace CroatianProject.Pages
             }
             catch (Exception e)
             {
-                // implement logging
                 FileStream fs = new FileStream("result1.txt", FileMode.Create);
                 using (StreamWriter w = new StreamWriter(fs))
                 {
-                    w.Write(e.Message);
+                    w.Write(e.ToString());
                 }
             }
             return RedirectToPage();
