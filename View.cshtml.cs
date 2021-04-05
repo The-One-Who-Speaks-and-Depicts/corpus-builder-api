@@ -267,11 +267,11 @@ namespace CroatianProject.Pages
                     {
                         if (neighbours[i].realizationID != acquiredRealizations[r].realizationID)
                         {
-                            KWIC += neighbours[i].Output();
+                            KWIC += neighbours[i].KeyOutput();
                         }
                         else
                         {
-                            KWIC += "<div style=\"font-weight:bold;\">" + neighbours[i].Output() + "</div>";
+                            KWIC += "<div style=\"font-weight:bold;\">" + neighbours[i].KeyOutput() + "</div>";
                         }
                     }
                     KWIC += "<br /><br /><br />";
@@ -292,21 +292,43 @@ namespace CroatianProject.Pages
                 {
                     int coincidingFields = 0;
                     for (int f = 0; f < fields.Count; f++)
-                    {
+                    {                        
                         string key = fields[f].Split(':')[0];
                         string value = fields[f].Split(':')[1];
-                        if (unitFields[i].ContainsKey(key))
+                        bool isNegative = key[0] == '!';
+                        if (isNegative)
                         {
-                            for (int v = 0; v < unitFields[i][key].Count; v++)
+                            string negativeKey = key.TrimStart('!');
+                            if (!unitFields[i].ContainsKey(negativeKey))
                             {
-                                string regexQuery = "^" + String.Join(".*", value.Split('*')) + "$";
-                                if (unitFields[i][key][v].name == value || Regex.IsMatch(unitFields[i][key][v].name, regexQuery))
+                                coincidingFields++;
+                            }
+                            else
+                            {
+                                for (int v = 0; v < unitFields[i][negativeKey].Count; v++)
                                 {
-                                    Console.WriteLine(regexQuery + "==" + value);
-                                    coincidingFields++;
+                                    string regexQuery = "^" + String.Join(".*", value.Split('*')) + "$";
+                                    if (!(unitFields[i][negativeKey][v].name == value) && !Regex.IsMatch(unitFields[i][negativeKey][v].name, regexQuery))
+                                    {
+                                        coincidingFields++;
+                                    }
                                 }
                             }
                         }
+                        else
+                        {
+                            if (unitFields[i].ContainsKey(key))
+                            {
+                                for (int v = 0; v < unitFields[i][key].Count; v++)
+                                {
+                                    string regexQuery = "^" + String.Join(".*", value.Split('*')) + "$";
+                                    if (unitFields[i][key][v].name == value || Regex.IsMatch(unitFields[i][key][v].name, regexQuery))
+                                    {
+                                        coincidingFields++;
+                                    }
+                                }
+                            }
+                        }                        
                     }
                     if (coincidingFields == fields.Count)
                     {

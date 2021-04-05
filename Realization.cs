@@ -104,21 +104,24 @@ namespace CorpusDraftCSharp
                     string result = "";
                     foreach (var optional_tagging in fields)
                     {
-                        foreach (var field in optional_tagging)
+                        if (optional_tagging.Count > 0)
                         {
-                            result += field.Key;
-                            result += ":";
-                            for (int i = 0; i < field.Value.Count; i++)
+                            foreach (var field in optional_tagging)
                             {
-                                result += field.Value[i].name;
-                                if (i < field.Value.Count - 1)
+                                result += field.Key;
+                                result += ":";
+                                for (int i = 0; i < field.Value.Count; i++)
                                 {
-                                    result += ",";
+                                    result += field.Value[i].name;
+                                    if (i < field.Value.Count - 1)
+                                    {
+                                        result += ",";
+                                    }
                                 }
+                                result += ";\n";
                             }
-                            result += ";\n";
-                        }
-                        result += "***";
+                            result += "***";
+                        }                        
                     }
                     return result;
                 };
@@ -131,6 +134,48 @@ namespace CorpusDraftCSharp
             catch
             {
                 return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.textID +  "|" + this.clauseID + "|" + this.realizationID + "\"> " + graphemes.Invoke() + "</span>";
+            }
+        }
+
+        public string KeyOutput()
+        {            
+            try
+            {
+                Func<List<Dictionary<string, List<Value>>>, string> fieldsInRawText = (List<Dictionary<string, List<Value>>> fields) =>
+                {
+                    string result = "";
+                    foreach (var optional_tagging in fields)
+                    {
+                        if (optional_tagging.Count > 0)
+                        {
+                            foreach (var field in optional_tagging)
+                            {
+                                result += field.Key;
+                                result += ":";
+                                for (int i = 0; i < field.Value.Count; i++)
+                                {
+                                    result += field.Value[i].name;
+                                    if (i < field.Value.Count - 1)
+                                    {
+                                        result += ",";
+                                    }
+                                }
+                                result += ";\n";
+                            }
+                            result += "***";
+                        }
+                    }
+                    return result;
+                };
+                Func<List<Dictionary<string, List<Value>>>, string> fieldsInHTML = (List<Dictionary<string, List<Value>>> fields) =>
+                {
+                    return fieldsInRawText.Invoke(fields).Replace("\n", "<br />");
+                };
+                return "<span title=\"" + fieldsInRawText.Invoke(realizationFields) + "\" data-content=\"" + fieldsInHTML.Invoke(realizationFields) + "\" class=\"word\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "\"> " + this.lexemeTwo + "</span>";
+            }
+            catch
+            {
+                return "<span title= \"\" data-content=\"\" class=\"word\" id=\"" + this.documentID + "|" + this.textID + "|" + this.clauseID + "|" + this.realizationID + "\"> " + this.lexemeTwo + "</span>";
             }
         }
 
