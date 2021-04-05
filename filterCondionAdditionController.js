@@ -650,7 +650,7 @@ $(document).ready(function () {
 
     function save_changes(event) {
         event.preventDefault();
-        $('changedText').text();
+        $('#changedText').text("");
         var clauses = document.getElementsByClassName('clause');
         for (let i = 0; i < clauses.length; i++) {
             if (clauses[i].dataset.content == "") {
