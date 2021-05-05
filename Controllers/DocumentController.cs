@@ -71,8 +71,8 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpGet]
-        [Route("/api/v1/[controller]/{id}")]
-        public Manuscript Get(string id)
+        [Route("/api/v1/[controller]/one")]
+        public Manuscript GetOne(string id)
         {
             IDocumentStore store = new DocumentStore()
             {
