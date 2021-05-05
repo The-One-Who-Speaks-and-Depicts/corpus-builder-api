@@ -169,7 +169,7 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpPost]
-        public void Post(string filePath, string googleDocPath, string name, string fields)
+        public void Post(string id, string filePath, string googleDocPath, string name, string fields)
         {
             IDocumentStore store = new DocumentStore()
             {
@@ -218,15 +218,25 @@ namespace corpus_builder_api.Controllers
                         manuscriptFields.Add(fieldsToAdd);
                         addedManuscript.tagging = manuscriptFields;
                     }
-                    if (!String.IsNullOrEmpty(name))
+                    if (!String.IsNullOrEmpty(name) && !String.IsNullOrEmpty(id))
+                    {
+                        addedManuscript.name = name;
+                        Session.Store(addedManuscript, id);
+                    }
+                    if (!String.IsNullOrEmpty(name) && String.IsNullOrEmpty(id))
                     {
                         addedManuscript.name = name;
                         Session.Store(addedManuscript, name);
                     }
-                    else 
+                    if (String.IsNullOrEmpty(name) && !String.IsNullOrEmpty(id))
+                    {
+                        addedManuscript.name = id;
+                        Session.Store(addedManuscript, id);
+                    }
+                    if (String.IsNullOrEmpty(name) && String.IsNullOrEmpty(id))
                     {
                         Session.Store(addedManuscript);
-                    } 
+                    }
                     Session.SaveChanges();
                 }
             }
