@@ -93,7 +93,6 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpDelete]
-        [Route("/api/v1/[controller]")]
         public void Delete(string id)
         {
             IDocumentStore store = new DocumentStore()
@@ -109,6 +108,61 @@ namespace corpus_builder_api.Controllers
                 {                    
                     Manuscript forDeletion = Session.Load<Manuscript>(id);
                     Session.Delete(forDeletion);
+                    Session.SaveChanges();
+                }
+            }
+        }
+
+        [HttpPatch]
+        public void Change(string id, string filePath, string googleDocPath, string fields)
+        {
+            IDocumentStore store = new DocumentStore()
+            {
+                Urls = new[] { "http://localhost:8080", },
+            }.Initialize();
+            RavenHelper.EnsureDatabaseExists(store);
+
+            using (store) 
+            {
+                SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
+                using (IDocumentSession Session = store.OpenSession(options))
+                {                    
+                    Manuscript forUpdate = Session.Load<Manuscript>(id);
+                    if (!String.IsNullOrEmpty(filePath))
+                    {
+                        forUpdate.filePath = filePath;
+                    }
+                    if (!String.IsNullOrEmpty(googleDocPath))
+                    {
+                        forUpdate.googleDocPath = googleDocPath;
+                    }
+                    if (!String.IsNullOrEmpty(fields))
+                    {
+                        List<Dictionary<string, List<Value>>> manuscriptFields = new List<Dictionary<string, List<Value>>>();
+                        List<string> splitFields = fields.Split(';').ToList();
+                        Dictionary<string, List<Value>> fieldsToAdd = new Dictionary<string, List<Value>>();
+                        for (int i = 0; i < splitFields.Count; i++)
+                        {
+                            if (splitFields[i] != "")
+                            {
+                                List<string> fieldAndValues = splitFields[i].Split(":").ToList();
+                                string field = fieldAndValues[0];
+                                List<string> stringValues = fieldAndValues[1].Split("|").ToList();
+                                List<Value> values = new List<Value>();
+                                for (int j = 0; j < stringValues.Count; j++)
+                                {
+                                    if (stringValues[j] != "")
+                                    {
+                                        values.Add(new Value {name = stringValues[j], connectedUnits = new List<Unit>()});
+                                    }
+                                }
+                                fieldsToAdd[field] = values;
+
+                            }
+                        }
+                        manuscriptFields.Add(fieldsToAdd);
+                        forUpdate.tagging = manuscriptFields;
+                    }
                     Session.SaveChanges();
                 }
             }
