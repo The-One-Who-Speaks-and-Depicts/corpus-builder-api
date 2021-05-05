@@ -28,10 +28,24 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpGet]
-        public Manuscript Get()
+        public IEnumerable<Manuscript> Get()
         {
-            Manuscript mockManuscript = new Manuscript();
-            return mockManuscript;
+            IDocumentStore store = new DocumentStore()
+            {
+                Urls = new[] { "http://localhost:8080", },
+            }.Initialize();
+            RavenHelper.EnsureDatabaseExists(store);
+
+            using (store) 
+            {
+                SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
+                using (IDocumentSession Session = store.OpenSession(options))
+                {
+                    
+                    var manuscripts =  Session.Query<Manuscript>().ToList(); 
+                    return manuscripts;
+                }
+            }
         }
 
         [HttpPost]
