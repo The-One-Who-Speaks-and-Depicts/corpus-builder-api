@@ -15,7 +15,7 @@ using corpus_builder_api.ServiceFunctions;
 namespace corpus_builder_api.Controllers
 {   
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/v1/[controller]")]
     public class DocumentController : ControllerBase
     {        
         
@@ -48,6 +48,28 @@ namespace corpus_builder_api.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/api/v1/[controller]/{name}")]
+        public Manuscript Get(string name)
+        {
+            IDocumentStore store = new DocumentStore()
+            {
+                Urls = new[] { "http://localhost:8080", },
+            }.Initialize();
+            RavenHelper.EnsureDatabaseExists(store);
+
+            using (store) 
+            {
+                SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
+                using (IDocumentSession Session = store.OpenSession(options))
+                {
+                    
+                    var manuscripts =  Session.Query<Manuscript>().ToList(); 
+                    return manuscripts.Where(m => m.name == name).FirstOrDefault();
+                }
+            }
+        }
+
         [HttpPost]
         public void Post(string filePath, string googleDocPath, string name, string fields)
         {
@@ -63,10 +85,19 @@ namespace corpus_builder_api.Controllers
                 using (IDocumentSession Session = store.OpenSession(options))
                 {
                     Manuscript addedManuscript = new Manuscript();
-                    addedManuscript.filePath = filePath;
-                    addedManuscript.googleDocPath = googleDocPath;
-                    addedManuscript.name = name;
-                    if (fields != "")
+                    if (!String.IsNullOrEmpty(filePath))
+                    {
+                        addedManuscript.filePath = filePath;
+                    }
+                    if (!String.IsNullOrEmpty(googleDocPath))
+                    {
+                        addedManuscript.googleDocPath = googleDocPath;
+                    }
+                    if (!String.IsNullOrEmpty(name))
+                    {
+                        addedManuscript.name = name;
+                    }
+                    if (!String.IsNullOrEmpty(fields))
                     {
                         List<Dictionary<string, List<Value>>> manuscriptFields = new List<Dictionary<string, List<Value>>>();
                         List<string> splitFields = fields.Split(';').ToList();
