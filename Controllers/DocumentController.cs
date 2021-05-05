@@ -49,8 +49,8 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpGet]
-        [Route("/api/v1/[controller]/{name}")]
-        public Manuscript Get(string name)
+        [Route("/api/v1/[controller]/{id}")]
+        public Manuscript Get(string id)
         {
             IDocumentStore store = new DocumentStore()
             {
@@ -65,7 +65,7 @@ namespace corpus_builder_api.Controllers
                 {
                     
                     var manuscripts =  Session.Query<Manuscript>().ToList(); 
-                    return manuscripts.Where(m => m.name == name).FirstOrDefault();
+                    return manuscripts.Where(m => m.Id == id).FirstOrDefault();
                 }
             }
         }
@@ -93,10 +93,6 @@ namespace corpus_builder_api.Controllers
                     {
                         addedManuscript.googleDocPath = googleDocPath;
                     }
-                    if (!String.IsNullOrEmpty(name))
-                    {
-                        addedManuscript.name = name;
-                    }
                     if (!String.IsNullOrEmpty(fields))
                     {
                         List<Dictionary<string, List<Value>>> manuscriptFields = new List<Dictionary<string, List<Value>>>();
@@ -123,8 +119,16 @@ namespace corpus_builder_api.Controllers
                         }
                         manuscriptFields.Add(fieldsToAdd);
                         addedManuscript.tagging = manuscriptFields;
-                    }                    
-                    Session.Store(addedManuscript);
+                    }
+                    if (!String.IsNullOrEmpty(name))
+                    {
+                        addedManuscript.name = name;
+                        Session.Store(addedManuscript, name);
+                    }
+                    else 
+                    {
+                        Session.Store(addedManuscript);
+                    } 
                     Session.SaveChanges();
                 }
             }
