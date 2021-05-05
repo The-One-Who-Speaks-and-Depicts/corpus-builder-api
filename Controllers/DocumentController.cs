@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Raven.Client;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
 using ManuscriptsProcessor.Fields;
 using ManuscriptsProcessor.Values;
 using ManuscriptsProcessor.Units;
@@ -34,7 +35,7 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpPost]
-        public Manuscript Post(string filePath, string googleDocPath, string name)
+        public void Post(string filePath, string googleDocPath, string name, string fields)
         {
             IDocumentStore store = new DocumentStore()
             {
@@ -42,11 +43,46 @@ namespace corpus_builder_api.Controllers
             }.Initialize();
             RavenHelper.EnsureDatabaseExists(store);
 
-            Manuscript mockManuscript = new Manuscript();
-            mockManuscript.filePath = filePath;
-            mockManuscript.googleDocPath = googleDocPath;
-            mockManuscript.name = name;
-            return mockManuscript;
+            using (store) 
+            {
+                SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
+                using (IDocumentSession Session = store.OpenSession(options))
+                {
+                    Manuscript addedManuscript = new Manuscript();
+                    addedManuscript.filePath = filePath;
+                    addedManuscript.googleDocPath = googleDocPath;
+                    addedManuscript.name = name;
+                    if (fields != "")
+                    {
+                        List<Dictionary<string, List<Value>>> manuscriptFields = new List<Dictionary<string, List<Value>>>();
+                        List<string> splitFields = fields.Split(';').ToList();
+                        Dictionary<string, List<Value>> fieldsToAdd = new Dictionary<string, List<Value>>();
+                        for (int i = 0; i < splitFields.Count; i++)
+                        {
+                            if (splitFields[i] != "")
+                            {
+                                List<string> fieldAndValues = splitFields[i].Split(":").ToList();
+                                string field = fieldAndValues[0];
+                                List<string> stringValues = fieldAndValues[1].Split("|").ToList();
+                                List<Value> values = new List<Value>();
+                                for (int j = 0; j < stringValues.Count; j++)
+                                {
+                                    if (stringValues[j] != "")
+                                    {
+                                        values.Add(new Value {name = stringValues[j], connectedUnits = new List<Unit>()});
+                                    }
+                                }
+                                fieldsToAdd[field] = values;
+
+                            }
+                        }
+                        manuscriptFields.Add(fieldsToAdd);
+                        addedManuscript.tagging = manuscriptFields;
+                    }                    
+                    Session.Store(addedManuscript);
+                    Session.SaveChanges();
+                }
+            }
         }
     }
 }
