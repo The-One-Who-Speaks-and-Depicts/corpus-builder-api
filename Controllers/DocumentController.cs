@@ -49,6 +49,28 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpGet]
+        [Route("/api/v1/[controller]/names")]
+        public IEnumerable<string> GetNames()
+        {
+            IDocumentStore store = new DocumentStore()
+            {
+                Urls = new[] { "http://localhost:8080", },
+            }.Initialize();
+            RavenHelper.EnsureDatabaseExists(store);
+
+            using (store) 
+            {
+                SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
+                using (IDocumentSession Session = store.OpenSession(options))
+                {
+                    
+                    var manuscripts =  Session.Query<Manuscript>().ToList().Select(m => m.Id).ToList(); 
+                    return manuscripts;
+                }
+            }
+        }
+
+        [HttpGet]
         [Route("/api/v1/[controller]/{id}")]
         public Manuscript Get(string id)
         {
