@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ManuscriptsProcessor.Fields;
+using ManuscriptsProcessor.Values;
+using ManuscriptsProcessor.Units;
 
 namespace corpus_builder_api.Controllers
 {

@@ -5,5 +5,9 @@
     <RootNamespace>corpus_builder_api</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ManuscriptsProcessor" Version="0.1.0" />
+  </ItemGroup>
+
 
 </Project>
