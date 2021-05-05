@@ -24,15 +24,20 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpGet]
-        public string Get()
+        public Manuscript Get()
         {
-            return "Sorry for what?";
+            Manuscript mockManuscript = new Manuscript();
+            return mockManuscript;
         }
 
         [HttpPost]
-        public string Post()
+        public Manuscript Post(string filePath, string googleDocPath, string name)
         {
-            return "I'd be right happy to!";
+            Manuscript mockManuscript = new Manuscript();
+            mockManuscript.filePath = filePath;
+            mockManuscript.googleDocPath = googleDocPath;
+            mockManuscript.name = name;
+            return mockManuscript;
         }
     }
 }
