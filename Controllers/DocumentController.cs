@@ -92,6 +92,28 @@ namespace corpus_builder_api.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("/api/v1/[controller]")]
+        public void Delete(string id)
+        {
+            IDocumentStore store = new DocumentStore()
+            {
+                Urls = new[] { "http://localhost:8080", },
+            }.Initialize();
+            RavenHelper.EnsureDatabaseExists(store);
+
+            using (store) 
+            {
+                SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
+                using (IDocumentSession Session = store.OpenSession(options))
+                {                    
+                    Manuscript forDeletion = Session.Load<Manuscript>(id);
+                    Session.Delete(forDeletion);
+                    Session.SaveChanges();
+                }
+            }
+        }
+
         [HttpPost]
         public void Post(string filePath, string googleDocPath, string name, string fields)
         {
