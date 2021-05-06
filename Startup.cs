@@ -27,7 +27,7 @@ namespace corpus_builder_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddCors();
+            services.AddCors(o => o.AddPolicy("My Policy", builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();}));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,7 +37,8 @@ namespace corpus_builder_api
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod());
+            app.UseCors("My Policy");
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
