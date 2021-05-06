@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ namespace corpus_builder_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,7 +37,7 @@ namespace corpus_builder_api
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod());
             app.UseHttpsRedirection();
 
             app.UseRouting();
