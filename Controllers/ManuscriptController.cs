@@ -17,13 +17,13 @@ namespace corpus_builder_api.Controllers
 {   
     [ApiController]
     [Route("/api/v1/[controller]")]
-    public class DocumentController : ControllerBase
+    public class ManuscriptController : ControllerBase
     {        
         
 
-        private readonly ILogger<DocumentController> _logger;
+        private readonly ILogger<ManuscriptController> _logger;
 
-        public DocumentController(ILogger<DocumentController> logger)
+        public ManuscriptController(ILogger<ManuscriptController> logger)
         {
             _logger = logger;
         }
