@@ -25,6 +25,28 @@ namespace corpus_builder_api.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
+        public bool Login(string login, string password)
+        {
+        	IDocumentStore store = new DocumentStore()
+            {
+                Urls = new[] { "http://localhost:8080", },
+            }.Initialize();
+            RavenHelper.EnsureDatabaseExists(store, "Users");
+
+            using (store) 
+            {
+                SessionOptions options = new SessionOptions {Database = "Users", TransactionMode = TransactionMode.ClusterWide};
+                using (IDocumentSession Session = store.OpenSession(options))
+                {
+                    
+                    var users =  Session.Query<User>().ToList(); 
+                    var user = users.Where(m => m.Id == login).FirstOrDefault();
+                    return user.CheckPassword(password);
+                }
+            }
+        }
+
         [HttpPost]
         public bool Register(string login, string password, string repeatedPassword)
         {
@@ -42,12 +64,12 @@ namespace corpus_builder_api.Controllers
                 SessionOptions options = new SessionOptions {Database = "Users", TransactionMode = TransactionMode.ClusterWide};
                 using (IDocumentSession Session = store.OpenSession(options))
                 {
-                    
-                    Session.Store(new User(login, password));                  
+                    User storagedUser = new User(login, password);
+                    Session.Store(storagedUser);                  
                     Session.SaveChanges();
+                    return true;
                 }
-            }
-        	return true;
+            }        	
         }
 	}
 
