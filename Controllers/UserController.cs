@@ -41,7 +41,11 @@ namespace corpus_builder_api.Controllers
                 {
                     
                     var users =  Session.Query<User>().ToList(); 
-                    var user = users.Where(m => m.Id == login).FirstOrDefault();
+                    if (users.Where(u => u.Id == login).ToList().Count < 1)
+                    {
+                    	return false;
+                    }
+                    var user = users.Where(u => u.Id == login).FirstOrDefault();
                     return user.CheckPassword(password);
                 }
             }
@@ -64,6 +68,11 @@ namespace corpus_builder_api.Controllers
                 SessionOptions options = new SessionOptions {Database = "Users", TransactionMode = TransactionMode.ClusterWide};
                 using (IDocumentSession Session = store.OpenSession(options))
                 {
+                	var users =  Session.Query<User>().ToList().Where(u => u.Id == login).ToList();
+                	if (users.Count > 0)
+                	{
+                		return false;
+                	} 
                     User storagedUser = new User(login, password);
                     Session.Store(storagedUser);                  
                     Session.SaveChanges();
