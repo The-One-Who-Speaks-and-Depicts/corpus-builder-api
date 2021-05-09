@@ -5,7 +5,7 @@ namespace corpus_builder_api.Models
 		private string id;
 		private string password;
 
-		User(string _id, string _password)
+		public User(string _id, string _password)
 		{
 			id = _id;
 			password = _password;
