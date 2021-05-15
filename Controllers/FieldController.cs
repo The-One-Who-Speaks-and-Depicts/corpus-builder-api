@@ -73,7 +73,7 @@ namespace corpus_builder_api.Controllers
 
         [HttpGet]
         [Route("/api/v1/[controller]/one")]
-        public Field GetOne(string id)
+        public Field GetOne(string name)
         {
             IDocumentStore store = new DocumentStore()
             {
@@ -88,7 +88,7 @@ namespace corpus_builder_api.Controllers
                 {
                     
                     var fields =  Session.Query<Field>().ToList(); 
-                    return fields.Where(m => m.Id == id).FirstOrDefault();
+                    return fields.Where(m => m.Id == name).FirstOrDefault();
                 }
             }
         }
@@ -134,11 +134,11 @@ namespace corpus_builder_api.Controllers
 
             using (store) 
             {
-                SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
+                SessionOptions options = new SessionOptions {Database = "Fields", TransactionMode = TransactionMode.ClusterWide};
                 using (IDocumentSession Session = store.OpenSession(options))
                 {
                     var existingFields =  Session.Query<Field>().ToList();
-                    if (existingFields.Count > 0)
+                    if (existingFields.Where(s => s.Id == name).ToList().Count > 0)
                     {
                         return "Error: Such field exists!";
                     }
