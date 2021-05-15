@@ -113,13 +113,11 @@ namespace corpus_builder_api.Controllers
                 }
             }
         }
-
-        // TODO: Change from here; add connections
+        
 
         [HttpPost]
         public string Post(string name, string description, string multiplied, string restricted, string host, string possessed, string values)
         {
-            // check for existing field!
             if (String.IsNullOrEmpty(name) || String.IsNullOrEmpty(description) || String.IsNullOrEmpty(multiplied) || String.IsNullOrEmpty(restricted) || String.IsNullOrEmpty(host) || String.IsNullOrEmpty(possessed))
             {
                 return "Error: one of the required fields is empty";
@@ -139,6 +137,11 @@ namespace corpus_builder_api.Controllers
                 SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
                 using (IDocumentSession Session = store.OpenSession(options))
                 {
+                    var existingFields =  Session.Query<Field>().ToList();
+                    if (existingFields.Count > 0)
+                    {
+                        return "Error: Such field exists!";
+                    }
                     Field addedField = new Field();
                     addedField.Id = name;
                     addedField.description = description;
@@ -165,6 +168,8 @@ namespace corpus_builder_api.Controllers
             }
         }
 
+
+        // TODO: Change from here; add connections
         [HttpPatch]
         public void Change(string id, string filePath, string googleDocPath, string fields)
         {
