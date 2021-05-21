@@ -171,7 +171,7 @@ namespace corpus_builder_api.Controllers
 
         // TODO: Change from here; add connections
         [HttpPatch]
-        public void Change(string id, string filePath, string googleDocPath, string fields)
+        public string Change(string name, string description, string multiplied, string restricted, string host, string possessed, string values)
         {
             IDocumentStore store = new DocumentStore()
             {
@@ -181,46 +181,47 @@ namespace corpus_builder_api.Controllers
 
             using (store) 
             {
-                SessionOptions options = new SessionOptions {Database = "Manuscripts", TransactionMode = TransactionMode.ClusterWide};
+                SessionOptions options = new SessionOptions {Database = "Fields", TransactionMode = TransactionMode.ClusterWide};
                 using (IDocumentSession Session = store.OpenSession(options))
                 {                    
-                    Manuscript forUpdate = Session.Load<Manuscript>(id);
-                    if (!String.IsNullOrEmpty(filePath))
+                    Field forUpdate = Session.Load<Field>(name);
+                    if (!String.IsNullOrEmpty(description))
                     {
-                        forUpdate.filePath = filePath;
+                        forUpdate.description = description;
                     }
-                    if (!String.IsNullOrEmpty(googleDocPath))
+                    if (!String.IsNullOrEmpty(multiplied))
                     {
-                        forUpdate.googleDocPath = googleDocPath;
+                        forUpdate.isMultiple = multiplied == "multiplied" ? true : false;
                     }
-                    if (!String.IsNullOrEmpty(fields))
+                    if (!String.IsNullOrEmpty(restricted))
                     {
-                        List<Dictionary<string, List<Value>>> manuscriptFields = new List<Dictionary<string, List<Value>>>();
-                        List<string> splitFields = fields.Split(';').ToList();
-                        Dictionary<string, List<Value>> fieldsToAdd = new Dictionary<string, List<Value>>();
-                        for (int i = 0; i < splitFields.Count; i++)
+                        forUpdate.isUserFilled = restricted == "restricted" ? false : true;
+                    }
+                    if (!String.IsNullOrEmpty(host))
+                    {
+                        forUpdate.host = host;
+                    }
+                    if (!String.IsNullOrEmpty(possessed))
+                    {
+                        forUpdate.possessed = possessed;
+                    }
+                    if (!String.IsNullOrEmpty(values))
+                    {
+                        if (!forUpdate.isUserFilled)
                         {
-                            if (splitFields[i] != "")
-                            {
-                                List<string> fieldAndValues = splitFields[i].Split(":").ToList();
-                                string field = fieldAndValues[0];
-                                List<string> stringValues = fieldAndValues[1].Split("|").ToList();
-                                List<Value> values = new List<Value>();
-                                for (int j = 0; j < stringValues.Count; j++)
+                            List<object> newValues = new List<object>(); 
+                            var addedValues = values.Split("<br />").ToList();
+                            for (int i = 0; i < addedValues.Count; i++){
+                                if (!String.IsNullOrEmpty(addedValues[i]))
                                 {
-                                    if (stringValues[j] != "")
-                                    {
-                                        values.Add(new Value {name = stringValues[j], connectedUnits = new List<Unit>()});
-                                    }
+                                    newValues.Add(addedValues[i].Trim());
                                 }
-                                fieldsToAdd[field] = values;
-
                             }
+                            forUpdate.values = newValues;
                         }
-                        manuscriptFields.Add(fieldsToAdd);
-                        forUpdate.tagging = manuscriptFields;
                     }
                     Session.SaveChanges();
+                    return "Success";
                 }
             }
         }
