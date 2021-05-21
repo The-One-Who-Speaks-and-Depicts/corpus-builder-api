@@ -94,7 +94,7 @@ namespace corpus_builder_api.Controllers
         }
 
         [HttpDelete]
-        public void Delete(string id)
+        public string Delete(string id)
         {
             IDocumentStore store = new DocumentStore()
             {
@@ -108,8 +108,13 @@ namespace corpus_builder_api.Controllers
                 using (IDocumentSession Session = store.OpenSession(options))
                 {                    
                     Field forDeletion = Session.Load<Field>(id);
+                    if (forDeletion == null)
+                    {
+                        return "Error: No such field in database";
+                    }
                     Session.Delete(forDeletion);
                     Session.SaveChanges();
+                    return "Success";
                 }
             }
         }
@@ -185,6 +190,10 @@ namespace corpus_builder_api.Controllers
                 using (IDocumentSession Session = store.OpenSession(options))
                 {                    
                     Field forUpdate = Session.Load<Field>(name);
+                    if (forUpdate == null)
+                    {
+                        return "Error: No such field in database";
+                    }
                     if (!String.IsNullOrEmpty(description))
                     {
                         forUpdate.description = description;
