@@ -139,9 +139,9 @@ namespace corpus_builder_api.Controllers
                     }
                     if (!String.IsNullOrEmpty(fields))
                     {
-                        List<Dictionary<string, List<Value>>> manuscriptFields = new List<Dictionary<string, List<Value>>>();
+                        List<Tagging> manuscriptFields = new List<Tagging>();
                         List<string> splitFields = fields.Split(';').ToList();
-                        Dictionary<string, List<Value>> fieldsToAdd = new Dictionary<string, List<Value>>();
+                        Tagging fieldsToAdd = new Tagging();
                         for (int i = 0; i < splitFields.Count; i++)
                         {
                             if (splitFields[i] != "")
@@ -194,9 +194,9 @@ namespace corpus_builder_api.Controllers
                     }
                     if (!String.IsNullOrEmpty(fields))
                     {
-                        List<Dictionary<string, List<Value>>> manuscriptFields = new List<Dictionary<string, List<Value>>>();
+                        List<Tagging> manuscriptFields = new List<Tagging>();
                         List<string> splitFields = fields.Split(';').ToList();
-                        Dictionary<string, List<Value>> fieldsToAdd = new Dictionary<string, List<Value>>();
+                        Tagging fieldsToAdd = new Tagging();
                         for (int i = 0; i < splitFields.Count; i++)
                         {
                             if (splitFields[i] != "")

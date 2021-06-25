@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ManuscriptsProcessor" Version="0.1.3" />
+    <PackageReference Include="ManuscriptsProcessor" Version="0.2.0" />
     <PackageReference Include="RavenDB.Client" Version="5.1.7" />
   </ItemGroup>
 
