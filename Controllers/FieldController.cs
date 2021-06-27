@@ -174,7 +174,7 @@ namespace corpus_builder_api.Controllers
         }
 
 
-        // TODO: Change from here; add connections
+        
         [HttpPatch]
         public string Change(string name, string description, string multiplied, string restricted, string host, string possessed, string values)
         {
@@ -227,6 +227,65 @@ namespace corpus_builder_api.Controllers
                                 }
                             }
                             forUpdate.values = newValues;
+                        }
+                    }
+                    Session.SaveChanges();
+                    return "Success";
+                }
+            }
+        }
+
+        // TODO: Add connections POST/PATCH/DELETE
+        [HttpPost]
+        [Route("/api/v1/[controller]/connection")]
+        public string Post (string conns)
+        {
+            if (String.IsNullOrEmpty(conns) || String.IsNullOrWhiteSpace(conns))
+            {
+                return "Error: empty query";
+            }
+            IDocumentStore store = new DocumentStore()
+            {
+                Urls = new[] { "http://localhost:8080", },
+            }.Initialize();
+            RavenHelper.EnsureDatabaseExists(store);
+
+            using (store) 
+            {
+                SessionOptions options = new SessionOptions {Database = "Fields", TransactionMode = TransactionMode.ClusterWide};
+                using (IDocumentSession Session = store.OpenSession(options))
+                {
+                    var fields =  Session.Query<Field>().ToList();                    
+                    var connsList = conns.Split("<br />").ToList();
+                    for (int i = 0; i < connsList.Count; i++)
+                    {                        
+                        var joinedFields = connsList[i].Split("=>").ToList()[1].Split(',').ToList();
+                        var fieldValue = connsList[i].Split("=>").ToList()[0];
+                        var field = fieldValue.Split(':').ToList()[0];
+                        var value = fieldValue.Split(':').ToList()[1];
+                        for (int f = 0; f < fields.Count; f++)
+                        {
+                            var coincidenceFound = false;
+                            if (field == fields[f].Id)
+                            {
+                                coincidenceFound = true;
+                                if (fields[f].connectedFields == null)
+                                {
+                                    fields[f].connectedFields = new Dictionary<string, List<string>>();
+                                }
+                                if (!fields[f].connectedFields.ContainsKey(value))
+                                {
+                                    fields[f].connectedFields[value] = new List<string>();
+                                }
+                                for (int c = 0; c < joinedFields.Count; c++)
+                                {
+                                    if (!fields[f].connectedFields[value].Contains(joinedFields[c]))
+                                    {
+                                        fields[f].connectedFields[value].Add(joinedFields[c]);
+                                    }
+                                }
+                            }
+                            if (coincidenceFound) break;
                         }
                     }
                     Session.SaveChanges();
