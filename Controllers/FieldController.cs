@@ -279,7 +279,7 @@ namespace corpus_builder_api.Controllers
                                 }
                                 for (int c = 0; c < joinedFields.Count; c++)
                                 {
-                                    if (!fields[f].connectedFields[value].Contains(joinedFields[c]))
+                                    if (!fields[f].connectedFields[value].Contains(joinedFields[c]) && fields.Any(fld => fld.Id == joinedFields[c]))
                                     {
                                         fields[f].connectedFields[value].Add(joinedFields[c]);
                                     }
