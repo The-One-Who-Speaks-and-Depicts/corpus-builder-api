@@ -39,7 +39,7 @@ namespace corpus_builder_api
             }
             app.UseCors("My Policy");
             
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 
