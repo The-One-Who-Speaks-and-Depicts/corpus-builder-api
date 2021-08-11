@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -255,11 +256,12 @@ namespace corpus_builder_api.Controllers
                 using (IDocumentSession Session = store.OpenSession(options))
                 {
                     var fields =  Session.Query<Field>().ToList();                    
-                    var connsList = conns.Split(";\n").ToList();
+                    var connsList = conns.Trim().Split(";").ToList();
+                    connsList = connsList.Where(x => !String.IsNullOrEmpty(x) && !String.IsNullOrEmpty(x)).ToList();
                     for (int i = 0; i < connsList.Count; i++)
-                    {                        
-                        var joinedFields = connsList[i].Split("=>").ToList()[1].Split(',').ToList();
-                        var fieldValue = connsList[i].Split("=>").ToList()[0];
+                    {                      
+                        var joinedFields = connsList[i].Trim().Split("=>").ToList()[1].Split(',').ToList();
+                        var fieldValue = connsList[i].Trim().Split("=>").ToList()[0];
                         var field = fieldValue.Split(':').ToList()[0];
                         var value = fieldValue.Split(':').ToList()[1];
                         for (int f = 0; f < fields.Count; f++)
@@ -313,11 +315,12 @@ namespace corpus_builder_api.Controllers
                 using (IDocumentSession Session = store.OpenSession(options))
                 {
                     var fields =  Session.Query<Field>().ToList();                    
-                    var connsList = conns.Split(";\n").ToList();
+                    var connsList = conns.Trim().Split(";").ToList();
+                    connsList = connsList.Where(x => !String.IsNullOrEmpty(x) && !String.IsNullOrEmpty(x)).ToList();
                     for (int i = 0; i < connsList.Count; i++)
                     {                        
-                        var joinedFields = connsList[i].Split("=>").ToList()[1].Split(',').ToList();
-                        var fieldValue = connsList[i].Split("=>").ToList()[0];
+                        var joinedFields = connsList[i].Trim().Split("=>").ToList()[1].Split(',').ToList();
+                        var fieldValue = connsList[i].Trim().Split("=>").ToList()[0];
                         var field = fieldValue.Split(':').ToList()[0];
                         var value = fieldValue.Split(':').ToList()[1];
                         for (int f = 0; f < fields.Count; f++)
