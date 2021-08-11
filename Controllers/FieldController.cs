@@ -313,7 +313,7 @@ namespace corpus_builder_api.Controllers
                 using (IDocumentSession Session = store.OpenSession(options))
                 {
                     var fields =  Session.Query<Field>().ToList();                    
-                    var connsList = conns.Split("<br />").ToList();
+                    var connsList = conns.Split(";\n").ToList();
                     for (int i = 0; i < connsList.Count; i++)
                     {                        
                         var joinedFields = connsList[i].Split("=>").ToList()[1].Split(',').ToList();
