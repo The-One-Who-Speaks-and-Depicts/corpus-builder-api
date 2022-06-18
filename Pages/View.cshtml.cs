@@ -15,7 +15,7 @@ namespace CroatianProject.Pages
 {
     public class ViewModel : PageModel
     {
-        
+
         [BindProperty]
         public string wordSearched { get; set; }
         [BindProperty]
@@ -30,8 +30,8 @@ namespace CroatianProject.Pages
         [BindProperty]
         public string docName { get; set; }
 
-        private IHostingEnvironment _environment;
-        public ViewModel(IHostingEnvironment environment)
+        private IWebHostEnvironment _environment;
+        public ViewModel(IWebHostEnvironment environment)
         {
             _environment = environment;
             try
@@ -73,7 +73,7 @@ namespace CroatianProject.Pages
         }
         public List<Document> getDocs()
         {
-            List<Document> existingDocs = new List<Document>();            
+            List<Document> existingDocs = new List<Document>();
             try
             {
                 var directory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
@@ -95,7 +95,7 @@ namespace CroatianProject.Pages
             }
             return existingDocs;
         }
-        
+
 
         public void OnPostShow()
         {
@@ -124,7 +124,7 @@ namespace CroatianProject.Pages
                     using (StreamReader r = new StreamReader(field.FullName))
                     {
                         existingFields.Add(JsonConvert.DeserializeObject<Field>(r.ReadToEnd()));
-                        
+
                     }
                 }
                 List<string> requiredFields = feature.Split("||").ToList();
@@ -155,8 +155,8 @@ namespace CroatianProject.Pages
                     {
                         graphemeFields.AddRange(requiredFields.Where(f => (f.Split(':')[0] == existingFields[i].name) || (f.Split(':')[0].Replace("!", "") == existingFields[i].name)));
                     }
-                }                
-                
+                }
+
                 bool fieldsMatch = true;
                 if (documentFields.Count > 0)
                 {
@@ -166,7 +166,7 @@ namespace CroatianProject.Pages
                     {
                         fieldsMatch = false;
                     }
-                }                
+                }
                 if (fieldsMatch)
                 {
                     List<Text> extractedTexts = new List<Text>();
@@ -181,7 +181,7 @@ namespace CroatianProject.Pages
                         {
                             fieldsMatch = false;
                         }
-                    }                    
+                    }
                     if (fieldsMatch)
                     {
                         List<Clause> extractedClauses = new List<Clause>();
@@ -203,7 +203,7 @@ namespace CroatianProject.Pages
                             for (int c = 0; c < extractedClauses.Count; c++)
                             {
                                 extractedRealizations.AddRange(extractedClauses[c].realizations);
-                            }                            
+                            }
                             if (realizationFields.Count > 0)
                             {
                                 extractedRealizations = extractedRealizations.Where(r => ContainsField(realizationFields, r.realizationFields)).ToList();
@@ -247,7 +247,7 @@ namespace CroatianProject.Pages
                         }
                     }
                 }
-                
+
             }
             if (acquiredRealizations.Count > 0)
             {
@@ -281,7 +281,7 @@ namespace CroatianProject.Pages
             docList = getDocs();
             fieldsList = getFields();
         }
-        
+
 
         public bool ContainsField(List<string> fields, List<Dictionary<string, List<Value>>> unitFields)
         {
@@ -292,7 +292,7 @@ namespace CroatianProject.Pages
                 {
                     int coincidingFields = 0;
                     for (int f = 0; f < fields.Count; f++)
-                    {                        
+                    {
                         string key = fields[f].Split(':')[0];
                         string value = fields[f].Split(':')[1];
                         bool isNegative = key[0] == '!';
@@ -328,7 +328,7 @@ namespace CroatianProject.Pages
                                     }
                                 }
                             }
-                        }                        
+                        }
                     }
                     if (coincidingFields == fields.Count)
                     {
@@ -341,7 +341,7 @@ namespace CroatianProject.Pages
             {
                 return false;
             }
-            
+
             return taggingFound;
         }
 
@@ -349,7 +349,7 @@ namespace CroatianProject.Pages
         {
             throw new NotImplementedException();
             /*
-            var directory = Path.Combine(_environment.ContentRootPath, "database", "dictionary");            
+            var directory = Path.Combine(_environment.ContentRootPath, "database", "dictionary");
             if ((textName == "Any") && (String.IsNullOrEmpty(feature)) && (wordSearched == null))
             {
                 textList = getTexts();
@@ -421,7 +421,7 @@ namespace CroatianProject.Pages
                         List<string> groupOfFeatures = feature.Split(" & ").ToList();
                         for (int l = 0; l < groupOfFeatures.Count; l++)
                         {
-                            
+
                             List<string> features = groupOfFeatures[l].Split(' ').ToList();
                             for (int i = 0; i < features.Count; i++)
                             {
@@ -572,10 +572,10 @@ namespace CroatianProject.Pages
                                 }
 
                             }
-                        }                        
+                        }
 
-                        
-                        
+
+
                     }
                     else
                     {
@@ -743,9 +743,9 @@ namespace CroatianProject.Pages
                                 }
 
                             }
-                        }                        
+                        }
 
-                        
+
                     }
                 }
                 foreach (var foundGroup in neededWords)
@@ -757,7 +757,7 @@ namespace CroatianProject.Pages
                         foundItem.Add(word.lemma, "");
                         searchUnit.Add(foundItem);
                     }
-                    //wordsWithTags.Add(searchUnit);                   
+                    //wordsWithTags.Add(searchUnit);
                 }
 
                 textList = getTexts();

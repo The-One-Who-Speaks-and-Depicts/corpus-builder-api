@@ -74,9 +74,9 @@ namespace CroatianProject.Pages
         [BindProperty]
         public List<string> convertedTexts { get; set; }
 
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
 
-        public CollectDictionaryModel (IHostingEnvironment environment)
+        public CollectDictionaryModel (IWebHostEnvironment environment)
         {
             _environment = environment;
         }

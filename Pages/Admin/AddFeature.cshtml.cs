@@ -95,7 +95,7 @@ namespace CroatianProject.Pages.Admin
             catch
             {
 
-            }            
+            }
             return existingTexts;
         }
 
@@ -106,8 +106,8 @@ namespace CroatianProject.Pages.Admin
             return searchedDirectory;
         }
 
-        private IHostingEnvironment _environment;
-        public AddFeatureModel(IHostingEnvironment environment)
+        private IWebHostEnvironment _environment;
+        public AddFeatureModel(IWebHostEnvironment environment)
         {
             _environment = environment;
             try

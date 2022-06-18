@@ -14,8 +14,8 @@ namespace CroatianProject.Pages.Admin
     public class CorrectionModel : PageModel
     {
         public string correction {get; set;}
-        private IHostingEnvironment _environment;
-        public CorrectionModel(IHostingEnvironment environment)
+        private IWebHostEnvironment _environment;
+        public CorrectionModel(IWebHostEnvironment environment)
         {
             _environment = environment;
         }
@@ -25,7 +25,7 @@ namespace CroatianProject.Pages.Admin
             var docs = directory.GetFiles();
             var changedDocs = new Dictionary<string, Document>();
             foreach (var doc in docs)
-            {                
+            {
                 using (StreamReader r = new StreamReader(doc.FullName))
                 {
                     var changed = false;
@@ -35,7 +35,7 @@ namespace CroatianProject.Pages.Admin
                         foreach (var clause in text.clauses)
                         {
                             foreach (var realization in clause.realizations)
-                            {                                
+                            {
                                 if (realization.realizationFields != null)
                                 {
                                     foreach (var tagging in realization.realizationFields)
@@ -52,11 +52,11 @@ namespace CroatianProject.Pages.Admin
                                                 for (int i = 0; i < edited.Length; i++)
                                                 {
                                                     realization.letters.Add(new Grapheme(realization.documentID, deserialized.filePath, realization.textID, realization.clauseID, realization.realizationID, i.ToString(), edited[i].ToString()));
-                                                }                                                
+                                                }
                                             }
                                         }
                                     }
-                                    realization.realizationFields = realization.realizationFields.Where(t => !t.ContainsKey(correction)).ToList();                                    
+                                    realization.realizationFields = realization.realizationFields.Where(t => !t.ContainsKey(correction)).ToList();
                                 }
                             }
                         }
@@ -65,7 +65,7 @@ namespace CroatianProject.Pages.Admin
                     {
                         changedDocs[doc.FullName] = deserialized;
                     }
-                }                
+                }
             }
             foreach (var deserialized in changedDocs)
             {
@@ -76,8 +76,8 @@ namespace CroatianProject.Pages.Admin
                 using (StreamWriter w = new StreamWriter(fs))
                 {
                     w.Write(documentInJSON);
-                }  
-            }             
+                }
+            }
         }
     }
 }

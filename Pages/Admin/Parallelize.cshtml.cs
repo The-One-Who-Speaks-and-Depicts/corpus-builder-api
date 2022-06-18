@@ -13,7 +13,7 @@ namespace CroatianProject.Pages
 {
     public class ParallelizeModel : PageModel
     {
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         public string documentPicked { get; set; }
         public List<string> documentNames
         {
@@ -41,7 +41,7 @@ namespace CroatianProject.Pages
             }
         }
 
-        public ParallelizeModel(IHostingEnvironment environment)
+        public ParallelizeModel(IWebHostEnvironment environment)
         {
             _environment = environment;
         }

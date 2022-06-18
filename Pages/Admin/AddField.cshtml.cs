@@ -38,7 +38,7 @@ namespace CroatianProject.Pages.Admin
         [BindProperty]
         public string connections { get; set; }
 
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
 
         public string[] SetOptions()
         {
@@ -76,7 +76,7 @@ namespace CroatianProject.Pages.Admin
             }
             return existingFields;
         }
-        public AddFieldModel(IHostingEnvironment environment)
+        public AddFieldModel(IWebHostEnvironment environment)
         {
             _environment = environment;
             try

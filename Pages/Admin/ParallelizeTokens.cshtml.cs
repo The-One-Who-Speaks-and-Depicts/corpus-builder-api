@@ -49,8 +49,8 @@ namespace CroatianProject.Pages
         [BindProperty]
         public string sequenceOfParallelTokens {get; set;}
 
-        private IHostingEnvironment _environment;
-        public ParallelizeTokensModel(IHostingEnvironment environment)
+        private IWebHostEnvironment _environment;
+        public ParallelizeTokensModel(IWebHostEnvironment environment)
         {
             _environment = environment;
         }

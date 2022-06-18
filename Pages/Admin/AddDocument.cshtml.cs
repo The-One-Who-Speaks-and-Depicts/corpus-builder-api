@@ -13,7 +13,7 @@ namespace CroatianProject.Pages.Admin
 {
     public class AddDocumentModel : PageModel
     {
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         [BindProperty]
         public IFormFile Upload { get; set; }
         [BindProperty]
@@ -46,7 +46,7 @@ namespace CroatianProject.Pages.Admin
             return existingFields;
         }
 
-        public AddDocumentModel(IHostingEnvironment environment)
+        public AddDocumentModel(IWebHostEnvironment environment)
         {
             _environment = environment;
             filePath = "";
@@ -67,7 +67,7 @@ namespace CroatianProject.Pages.Admin
             var dirData = Path.Combine(_environment.ContentRootPath, "database");
             Directory.CreateDirectory(dirData);
             try
-            {                
+            {
                 var file = Path.Combine(dirUploads, Upload.FileName);
                 var dirTexts = Path.Combine(dirData, "documents");
                 Directory.CreateDirectory(dirTexts);
@@ -95,7 +95,7 @@ namespace CroatianProject.Pages.Admin
                             document.documentMetaData[0].Add(key, typedValues);
                         }
                     }
-                }                
+                }
                 string documentInJSON = document.Jsonize();
                 var documentDBFile = Path.Combine(dirTexts, directoryTextsInfo.GetFiles().Length.ToString() + "_" + textName + ".json");
                 FileStream fs = new FileStream(documentDBFile, FileMode.Create);

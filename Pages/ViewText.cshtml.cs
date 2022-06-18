@@ -15,7 +15,7 @@ namespace CroatianProject.Pages
     [BindProperties]
     public class ViewTextModel : PageModel
     {
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         public string textName { get; set; }
         public string docName { get; set; }
         public List<string> textList { get; set; }
@@ -23,7 +23,7 @@ namespace CroatianProject.Pages
         public List<string> fieldsList { get; set; } = new List<string>();
         public string textByWords { get; set; }
 
-        public ViewTextModel(IHostingEnvironment environment)
+        public ViewTextModel(IWebHostEnvironment environment)
         {
             _environment = environment;
             try

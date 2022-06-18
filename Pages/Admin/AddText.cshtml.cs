@@ -23,8 +23,8 @@ namespace CroatianProject.Pages
         public int Cols { get; set; } = 50;
 
 
-        private IHostingEnvironment _environment;
-        public AddTextModel(IHostingEnvironment environment)
+        private IWebHostEnvironment _environment;
+        public AddTextModel(IWebHostEnvironment environment)
         {
             _environment = environment;
             try
@@ -81,7 +81,7 @@ namespace CroatianProject.Pages
         [BindProperty]
         public string connections { get; set; }
         [BindProperty]
-        public List<string> FieldList { get; set; } 
+        public List<string> FieldList { get; set; }
 
         public List<string> getFields()
         {
@@ -127,16 +127,16 @@ namespace CroatianProject.Pages
 
 
         public IActionResult OnPostProcess()
-        {            
+        {
             try
-            {                
+            {
                 ScriptEngine engine = Python.CreateEngine();
                 ScriptScope scope = engine.CreateScope();
                 var paths = engine.GetSearchPaths();
                 engine.SetSearchPaths(paths);
                 var pythonFilePath = Path.Combine(_environment.ContentRootPath, "Scripts", "analysis.py");
                 engine.ExecuteFile(pythonFilePath, scope);
-                dynamic function = scope.GetVariable("analysis");                
+                dynamic function = scope.GetVariable("analysis");
                 IList<object> result = function(processedString, stopSymbols, decapitalization.ToString());
                 Text addedText = new Text(analyzedDocument, analyzedDocument.texts.Count.ToString(), textName);
                 addedText.textMetaData = new List<Dictionary<string, List<Value>>>();
@@ -168,7 +168,7 @@ namespace CroatianProject.Pages
                     Clause addedClause = new Clause(addedText, i.ToString(), (string)clauseFullData[0]);
                     var realizations = (IList<object>) clauseFullData[1];
                     for (int j = 0; j < realizations.Count; j++)
-                    {                        
+                    {
                         var realizationFullData = (IList<object>) realizations[j];
                         Realization addedRealization = new Realization(addedClause, j.ToString(), (string)realizationFullData[0], (string)realizationFullData[1]);
                         var graphemes = (IList<object>) realizationFullData[2];
