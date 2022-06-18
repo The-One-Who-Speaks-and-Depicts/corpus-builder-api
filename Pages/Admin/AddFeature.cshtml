@@ -1,0 +1,93 @@
+﻿@page
+@model CroatianProject.Pages.Admin.AddFeatureModel
+@{
+    ViewData["Title"] = "Анализ";
+}
+<html>
+<head>
+    <script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
+    <script src="~/js/filterCondionAdditionController.js"></script>
+    <script src="~/js/documentTextAdditionController.js"></script>
+</head>
+<body>
+    <div id="values" style="display:none;">
+        @foreach (var field in Model.fieldsList)
+        {@(field + "|")}
+    </div>
+    <div id="doctexts" style="display:none;">
+        @foreach (var doc in Model.docList)
+        {
+           @(doc)
+        }
+    </div>
+<h2>Добавление признаков в текст</h2>
+<form align="center" method="get">
+    <select id="docs" asp-for="docName">
+        <option>Any</option>
+    </select>
+    <select id="texts" asp-for="textName">
+        <option>Any</option>
+    </select>
+    <button>Показать текст</button><br />
+</form><br /><br /><br />
+
+                   <div align="center">
+                       <textarea id="wordFilter"></textarea> <br />
+                       <input id="isNegative" type="checkbox" value="Искать слова без этого признака" />
+                       <select id="keysFilter">
+                           <option>Any</option>
+                       </select>
+                       <select id="valuesFilter">
+                           <option>Any</option>
+                       </select> <button id="featureAdditionButton">Добавить признак</button><br />
+                       <textarea id="featureFilter"></textarea><br />
+                       <button id="buttonFilter">Фильтровать по слову/признакам</button>
+                       <button id="buttonFilterDeletion">Убрать фильтр</button>
+                   </div><br /><br /><br />
+
+<div>
+    <div align="justify" style="float:left; width:50%;">
+        <form method="post">
+            <textarea id="changedText" style="display:none;" asp-for="currentText"></textarea>
+            <div id="currText">
+                @Html.Raw(Model.textByWords)
+            </div>
+            <button id="SaveChanges">Сохранить изменения</button><br />
+            <button>Внести изменения</button>
+        </form>
+
+    </div>
+
+    <div align="center" style="right:0;width:50%;position:fixed;bottom:0;position:fixed;overflow-y:scroll;overflow-x:hidden;">
+        <div id="info"></div>
+        <textarea id="identificator" style="display:none;"></textarea>
+        <textarea id="fieldInfo" style="display:none;"></textarea>
+        <select id="keys">
+            <option>Any</option>
+        </select> <br> <br />
+        <select id="thisFieldValues" style="opacity:0.0">
+            <option>Any</option>
+        </select> <br /> <br />
+        <textarea id="userValue" style="opacity:0.0" rows="1" cols="25"></textarea> <br /> <br />
+        <button id="mainFeatureButton">Добавить признак в разметку</button> <br /> <br />
+        <button id="doubleTaggingButton">Использовать предыдущую разметку</button> <br /> <br />
+        <div id="connected"></div> <br /> <br />
+        Разметка текущей единицы:
+        <div id="tagging"></div><br /><br />
+        <input type="checkbox" id="similarTagging" name="similarTagging" value="similarTagging" style="opacity:0.0">
+        <label id="similarTaggingLabel" style="opacity:0.0" for="similarTagging">Разметить идентичные словоформы?</label><br />
+        <input type="checkbox" id="editTagging" name="editTagging" value="editTagging" style="opacity:0.0">
+        <label id="editTaggingLabel" style="opacity:0.0" for="editTagging">Отредактировать разметку?</label><br />
+        <input id="tagNumber" name="tagNumber" type="number" min="0" value="0" style="opacity:0.0">
+        <label id="tagNumberLabel" style="opacity:0.0" for="tagNumber">Номер разметки</label><br />
+        <button id="changeButton">Изменить разметку</button>
+    </div>
+</div>
+
+
+<div style="clear:both;"></div>
+<div align="center">
+    <a href="/Admin/AddFeature" align="center">Вернуться назад</a>
+</div>
+</body>
+</html>

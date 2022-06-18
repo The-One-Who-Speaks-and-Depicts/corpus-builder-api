@@ -1,0 +1,53 @@
+﻿@page
+@model CroatianProject.Pages.ParallelizeTokensModel
+@{
+    ViewData["Title"] = "Parallelization UI";
+}
+<script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
+<script src="~/js/tokenParallelization.js"></script>
+<link rel="stylesheet" type="text/css" href="~/css/tokens.css" />
+<div align="center">
+    <form method="post">
+        Pick a document for tagging:<br />
+        <select asp-for="documentPicked">
+            @foreach (var doc in Model.documents)
+            {
+                <option>@(doc.name + "[" + doc.id + "]")</option>
+            }
+        </select>
+        <input type="submit" class="btn btn-default" value="Get document from database" />
+    </form>
+
+    <div>
+        <div align="justify" style="width:50%;float:left;">
+            <table border="1">
+            @foreach (var row in Model.parallelizedClauses) {
+                <tr>
+                @foreach (var clause in row) {
+                    <td>@Html.Raw(clause)</td>
+                }
+                </tr>
+            }
+            </table>
+            <form method="post" asp-page-handler="tag">
+                <div id="final">
+                    @foreach (var token in Model.parallelizedTokens) {
+                        @Html.Raw(token)
+                    }
+                </div>
+                <input style="opacity:0.0" id="finalInput" type="text" asp-for="sequenceOfParallelTokens" />
+                <input id="transferClick" type="submit" class="btn btn-default" value="Send to database"/>
+            </form>
+        </div>
+
+        <div align="justify" style="width:50%;float:right;right:0;position:fixed;bottom:1;position:fixed;overflow-y:scroll;overflow-x:hidden;">
+            <span id="intermediate"></span>
+            <button id="transferText">
+                Submit
+            </button>
+        </div>
+    </div>
+
+    <div style="clear:both;"></div>
+
+</div>

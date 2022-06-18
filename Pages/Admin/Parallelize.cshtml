@@ -1,0 +1,33 @@
+﻿@page
+@model CroatianProject.Pages.ParallelizeModel
+@{
+    ViewData["Title"] = "Превращение документа в параллельный текст";
+}
+<html>
+<head>
+    <script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+    <h2 align="center" id="word">Manuscript conversion to parallel form</h2>
+
+
+    <div style="min-width:500px; width:100%;">
+
+        <div align="center">
+            <form asp-page-handler="parallelize" method="post">
+               Pick a manuscript:<br />
+                <select asp-for="documentPicked">
+                    @foreach (var doc in Model.documentNames)
+                    {
+                        <option>@doc</option>
+                    }
+                </select>
+                <input type="submit" class="btn btn-default" value="Send to database"/>
+            </form>
+        </div>
+        <br />
+        <br />
+        <br />
+    <div style="clear:both;"></div>
+</body>
+</html>

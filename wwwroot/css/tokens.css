@@ -1,0 +1,22 @@
+.clause:hover {
+    cursor: pointer;
+}
+.word:hover {
+    cursor:pointer;
+}
+td {
+    vertical-align: top;
+    padding: 10px;
+}
+
+label {
+    font-weight: normal;
+}
+
+.parallels {
+    list-style: square outside;
+}
+
+.graphemeFeatures {
+    list-style: circle outside;
+}
