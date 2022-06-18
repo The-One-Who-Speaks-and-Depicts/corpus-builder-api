@@ -20,7 +20,7 @@
                 <select asp-for="documentPicked">
                     @foreach (var doc in Model.documents)
                     {
-                        <option>@(doc.documentID + "_" + @doc.documentName)</option>
+                        <option>@doc</option>
                     }
                 </select>
                 <input type="submit" class="btn btn-default" />
