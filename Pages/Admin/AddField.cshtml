@@ -36,7 +36,7 @@
                 графеме? <br />
                 @foreach (var option in Model.ValueTypeOptions)
                 {
-                    <input type="radio" asp-for="Type" value="@option" />@option<br />
+                    <input type="radio" asp-for="type" value="@option" />@option<br />
                 }
                 <button asp-page-handler="add">Добавить признак</button>
             </form>
@@ -85,7 +85,7 @@
             {
 
             }
-            <br />            
+            <br />
             <button id="submit">Связать поля</button><br/>
             <button id="clear" div align="right">Очистить поле ввода</button>
             <form method="post">
@@ -98,7 +98,3 @@
     <div style="clear:both;"></div>
 </body>
 </html>
-    
-    
-
-

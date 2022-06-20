@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using CorpusDraftCSharp;
-using System.Diagnostics;
+using ManuscriptsProcessor.Fields;
+using ManuscriptsProcessor;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
@@ -16,7 +10,13 @@ namespace CroatianProject.Pages.Admin
     public class AddFieldModel : PageModel
     {
         [BindProperty]
-        public List<string> FieldList { get; set; }
+        public List<string> FieldList
+        {
+            get
+            {
+                return MyExtensions.GetFields(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields"));
+            }
+        }
         [BindProperty]
         public string FieldName { get; set; }
         [BindProperty]
@@ -26,70 +26,40 @@ namespace CroatianProject.Pages.Admin
         [BindProperty]
         public string Multiply { get; set; }
         [BindProperty]
-        public string[] MultiplyOptions { get; set; } = new[] { "Single", "Multiple"};
+        public string[] MultiplyOptions
+        {
+            get
+            {
+                return new[] { "Single", "Multiple" };
+            }
+        }
         [BindProperty]
-        public string Type { get; set; }
+        public string type { get; set; }
         [BindProperty]
-        public string[] ValueTypeOptions { get; set; } = new[] { "Value of document", "Value of text", "Value of text unit", "Value of single word", "Value of letter" };
+        public string[] ValueTypeOptions
+        {
+            get
+            {
+                return new[] { "Manuscript", "Section",  "Segment", "Clause", "Token", "Grapheme" };
+            }
+        }
         [BindProperty]
-        public string[] UserFilledOptions { get; set; } = new[] { "User-restricted", "User-filled" };
+        public string[] UserFilledOptions
+        {
+            get
+            {
+                return new[] { "User-restricted", "User-filled" };
+            }
+        }
         [BindProperty]
         public string Filled { get; set; }
         [BindProperty]
         public string connections { get; set; }
 
         private IWebHostEnvironment _environment;
-
-        public string[] SetOptions()
-        {
-            return new[] { "Single", "Multiple" };
-        }
-
-        public string[] SetValues()
-        {
-            return new[] { "Value of document", "Value of text", "Value of text unit", "Value of single token", "Value of letter" };
-        }
-
-        public string[] SetFullfillment()
-        {
-            return new[] { "User-restricted", "User-filled" };
-        }
-
-
-        public List<string> getFields()
-        {
-            List<string> existingFields = new List<string>();
-            try
-            {
-                var directory = Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields");
-                DirectoryInfo fieldsDirectory = new DirectoryInfo(directory);
-                var fields = fieldsDirectory.GetFiles();
-                existingFields.Add("Any");
-                foreach (var field in fields)
-                {
-                    existingFields.Add(field.Name.Split(".json")[0]);
-                }
-            }
-            catch
-            {
-
-            }
-            return existingFields;
-        }
         public AddFieldModel(IWebHostEnvironment environment)
         {
             _environment = environment;
-            try
-            {
-                FieldList = getFields();
-                MultiplyOptions = SetOptions();
-                ValueTypeOptions = SetValues();
-                UserFilledOptions = SetFullfillment();
-            }
-            catch
-            {
-                Redirect("./Error");
-            }
         }
 
         public void OnPostAdd()
@@ -105,28 +75,9 @@ namespace CroatianProject.Pages.Admin
                 {
                     field.MakeSingle();
                 }
-                if (Type == SetValues()[0])
-                {
-                    field.changeType("Document");
-                }
-                else if (Type == SetValues()[1])
-                {
-                    field.changeType("Text");
-                }
-                else if (Type == SetValues()[2])
-                {
-                    field.changeType("Clause");
-                }
-                else if (Type == SetValues()[3])
-                {
-                    field.changeType("Realization");
-                }
-                else if (Type == SetValues()[4])
-                {
-                    field.changeType("Grapheme");
-                }
+                field.changeType(type);
                 field.MakeUserFilled();
-                if (Filled == SetFullfillment()[0])
+                if (Filled == "User-restricted")
                 {
                     field.MakeRestricted();
                     string[] values = FieldVals.Split('\n');
@@ -146,10 +97,6 @@ namespace CroatianProject.Pages.Admin
                 {
                     w.Write(fieldInJSON);
                 }
-                FieldList = getFields();
-                MultiplyOptions = SetOptions();
-                ValueTypeOptions = SetValues();
-                UserFilledOptions = SetFullfillment();
             }
             catch (Exception e)
             {
@@ -164,52 +111,34 @@ namespace CroatianProject.Pages.Admin
 
         public void OnPostConnect()
         {
-            try
+            var addedConnections = from connection in connections.Split('\n')
+                                   select connection.Trim();
+            var fieldFiles = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields")).GetFiles();
+            List<Field> fields = new List<Field>();
+            foreach (var fieldFile in fieldFiles)
             {
-                var addedConnections = from connection in connections.Split('\n')
-                                       select connection.Trim();
-                var fieldFiles = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields")).GetFiles();
-                List<Field> fields = new List<Field>();
-                foreach (var fieldFile in fieldFiles)
+                using (StreamReader r = new StreamReader(fieldFile.FullName))
                 {
-                    using (StreamReader r = new StreamReader(fieldFile.FullName))
-                    {
-                        fields.Add(JsonConvert.DeserializeObject<Field>(r.ReadToEnd()));
-                    }
+                    fields.Add(JsonConvert.DeserializeObject<Field>(r.ReadToEnd()));
                 }
-                foreach (var connection in addedConnections)
+            }
+            foreach (var connection in addedConnections)
+            {
+                string mother = connection.Split("->")[0];
+                string[] children = connection.Split("->")[1].Split(',');
+                string name = mother.Split(':')[0];
+                string value = mother.Split(':')[1];
+                foreach (var field in fields)
                 {
-                    string mother = connection.Split("->")[0];
-                    string[] children = connection.Split("->")[1].Split(',');
-                    string name = mother.Split(':')[0];
-                    string value = mother.Split(':')[1];
-                    foreach (var field in fields)
+                    if (field.name == name)
                     {
-                        if (field.name == name)
+                        if (field.connectedFields != null)
                         {
-                            if (field.connectedFields != null)
+                            if (field.connectedFields.Keys.Contains(value))
                             {
-                                if (field.connectedFields.Keys.Contains(value))
+                                foreach (var child in children)
                                 {
-                                    foreach (var child in children)
-                                    {
-                                        if (!field.connectedFields[value].Contains(child))
-                                        {
-                                            var motherType = field.type;
-                                            foreach (var potentialChild in fields)
-                                            {
-                                                if (potentialChild.name == child && potentialChild.type == motherType)
-                                                {
-                                                    field.connectedFields[value].Add(child);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    field.connectedFields[value] = new List<string>();
-                                    foreach (var child in children)
+                                    if (!field.connectedFields[value].Contains(child))
                                     {
                                         var motherType = field.type;
                                         foreach (var potentialChild in fields)
@@ -224,7 +153,6 @@ namespace CroatianProject.Pages.Admin
                             }
                             else
                             {
-                                field.connectedFields = new Dictionary<string, List<string>>();
                                 field.connectedFields[value] = new List<string>();
                                 foreach (var child in children)
                                 {
@@ -239,24 +167,32 @@ namespace CroatianProject.Pages.Admin
                                 }
                             }
                         }
-                    }
-                }
-                foreach (var field in fields)
-                {
-                    using (StreamWriter w = new StreamWriter(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields", field.name + ".json")))
-                    {
-                        w.Write(field.Jsonize());
+                        else
+                        {
+                            field.connectedFields = new Dictionary<string, List<string>>();
+                            field.connectedFields[value] = new List<string>();
+                            foreach (var child in children)
+                            {
+                                var motherType = field.type;
+                                foreach (var potentialChild in fields)
+                                {
+                                    if (potentialChild.name == child && potentialChild.type == motherType)
+                                    {
+                                        field.connectedFields[value].Add(child);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-            catch
+            foreach (var field in fields)
             {
-
+                using (StreamWriter w = new StreamWriter(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields", field.name + ".json")))
+                {
+                    w.Write(field.Jsonize());
+                }
             }
-            FieldList = getFields();
-            MultiplyOptions = SetOptions();
-            ValueTypeOptions = SetValues();
-            UserFilledOptions = SetFullfillment();
         }
 
 
