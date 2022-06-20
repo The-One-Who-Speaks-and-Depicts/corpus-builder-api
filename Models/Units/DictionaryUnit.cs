@@ -17,11 +17,11 @@ namespace CorpusDraftCSharp
         [JsonProperty]
         public string lemma;
         [JsonProperty]
-        public List<Realization> realizations;
+        public List<Token> realizations;
         #endregion
 
         [JsonConstructor]
-        public DictionaryUnit(string lemma, List<Realization> realizations)
+        public DictionaryUnit(string lemma, List<Token> realizations)
         {
             this.lemma = lemma;
             this.realizations = realizations;

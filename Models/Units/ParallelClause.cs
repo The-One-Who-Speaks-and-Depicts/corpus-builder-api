@@ -5,13 +5,15 @@ using System.Collections.Generic;
 namespace CorpusDraftCSharp
 {
     [Serializable]
-    public class ParallelClause
+    public class ParallelClause : ICorpusUnit
     {
         [JsonProperty]
-        public string textName;
+        public string Id { get; set; }
+        [JsonProperty]
+        public string text { get; set; }
         [JsonProperty]
 
-        public List<Dictionary<string, List<Value>>> textMetaData;
+        public List<Dictionary<string, List<Value>>> tagging { get; set; }
         [JsonProperty]
         public Clause clause;
 
@@ -20,6 +22,11 @@ namespace CorpusDraftCSharp
         {
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
             return json;
+        }
+
+        public string Output()
+        {
+            return "";
         }
     }
 }

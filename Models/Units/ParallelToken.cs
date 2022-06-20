@@ -5,10 +5,10 @@ using System;
 
 namespace CorpusDraftCSharp
 {
-    public class ParallelToken : List<RealizationGroup>
+    public class ParallelToken : List<TokenGroup>
     {
 
-        public List<RealizationGroup> GetParallels(RealizationGroup source)
+        public List<TokenGroup> GetParallels(TokenGroup source)
         {
             var parallels = this.Where(r => r != source).ToList();
             return parallels;

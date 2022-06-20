@@ -10,11 +10,11 @@ using System.Text.RegularExpressions;
 
 namespace CorpusDraftCSharp
 {
-    
+
         public static class MyExtensions
         {
 
-        //new method of DataTable class; called on dataTable object, takes first rowNum rows (by default, 5), 
+        //new method of DataTable class; called on dataTable object, takes first rowNum rows (by default, 5),
         //prints them into console if print is true (by default, false), and returns new DataTable object
         //in case something is wrong, exception is thrown and empty DataTable is returned
             public static DataTable Head (this DataTable dataTable, int rowNum = 5, bool print = false)
@@ -35,13 +35,13 @@ namespace CorpusDraftCSharp
                         head.Rows[i][j] = dataTable.Rows[i][j];
                     }
                 }
-                                
+
                 if (print)
                 {
                     for (int i = 0; i < rowNum; i++)
-                    {                        
+                    {
                         for (int j = 0; j < head.Columns.Count; j++)
-                        {                            
+                        {
                             Console.Write(head.Rows[i][j] + " ");
                         }
                         Console.WriteLine();
@@ -56,13 +56,13 @@ namespace CorpusDraftCSharp
             }
             }
 
-        
 
-        public static bool MaskMatches (this Realization realization, string query)
+
+        public static bool MaskMatches (this Token realization, string query)
         {
             string regexQuery = "^" + String.Join(".{1,}", query.Split('*')) + "$";
             Debug.WriteLine(regexQuery);
-            if (Regex.IsMatch(realization.lexemeTwo, regexQuery) || Regex.IsMatch(realization.lexemeOne, regexQuery))
+            if (Regex.IsMatch(realization.text, regexQuery) || Regex.IsMatch(realization.lexemeView, regexQuery))
             {
                 return true;
             }
@@ -78,7 +78,7 @@ namespace CorpusDraftCSharp
             //Console should use Consolas font
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); //use registerprovider to say
-            Console.OutputEncoding = Encoding.UTF8; //use Unicode encoding 
+            Console.OutputEncoding = Encoding.UTF8; //use Unicode encoding
         }
         public static int KeyCreation(string valueCreated)
         {
@@ -181,11 +181,11 @@ namespace CorpusDraftCSharp
 
         public static List<string> SingleFieldIntoList(Dictionary<string, DataTable> spreadsheets, string value, string upperLevelValue, string thisLevelID, string textsheetName,
             string colName, int colNumber)
-        {            
-            DataTable textSheet = spreadsheets[textsheetName];            
+        {
+            DataTable textSheet = spreadsheets[textsheetName];
             string expression = colName + " = " + "'" + thisLevelID + "'";
             DataRow[] foundRows;
-            foundRows = textSheet.Select(expression);            
+            foundRows = textSheet.Select(expression);
             List<string> preparedlList = new List<string>(); //creating our list
             foreach (DataRow row in foundRows) //converting row into a string of list
             {
@@ -214,7 +214,7 @@ namespace CorpusDraftCSharp
         public static Dictionary<string, string> CreateAdditionalFields(string ID, Dictionary<string, DataTable> spreadsheets, string thisUnitValue, string fieldKey,
             string textSheetName, string colName, int colNumber)
         {
-            Dictionary<string, string> fieldsRetrieved = new Dictionary<string, string>();                            
+            Dictionary<string, string> fieldsRetrieved = new Dictionary<string, string>();
                     List<string> listPrepared = SingleFieldIntoList(spreadsheets, fieldKey, thisUnitValue, ID, textSheetName, colName, colNumber);
                     fieldsRetrieved[fieldKey] = listPrepared[0];
             return fieldsRetrieved;
@@ -241,7 +241,7 @@ namespace CorpusDraftCSharp
                 preparedlList.Add(currentValue);
             }
             preparedlList = preparedlList.Distinct().ToList();
-            return preparedlList; 				
+            return preparedlList;
         }
 
         public static List<string> GenerateThisLevelIDs(string higherOrderID, List<string> colValues)
@@ -265,7 +265,7 @@ namespace CorpusDraftCSharp
                     //transform file into the dataset
                     var result = reader.AsDataSet(new ExcelDataSetConfiguration()
                     {
-                        // Gets or sets a value indicating whether to set the DataColumn.DataType 
+                        // Gets or sets a value indicating whether to set the DataColumn.DataType
                         // property in a second pass.
                         UseColumnDataType = true,
 
@@ -273,17 +273,17 @@ namespace CorpusDraftCSharp
                         // in the DataSet. Called once per sheet before ConfigureDataTable.
                         FilterSheet = (tableReader, sheetIndex) => true,
 
-                        // Gets or sets a callback to obtain configuration options for a DataTable. 
+                        // Gets or sets a callback to obtain configuration options for a DataTable.
                         ConfigureDataTable = (tableReader) => new ExcelDataTableConfiguration()
                         {
                             // Gets or sets a value indicating the prefix of generated column names.
                             EmptyColumnNamePrefix = "Column",
 
-                            // Gets or sets a value indicating whether to use a row from the 
+                            // Gets or sets a value indicating whether to use a row from the
                             // data as column names.
                             UseHeaderRow = true,
 
-                            // Gets or sets a callback to determine whether to include the 
+                            // Gets or sets a callback to determine whether to include the
                             // current row in the DataTable.
                             FilterRow = (rowReader) =>
                             {
@@ -291,7 +291,7 @@ namespace CorpusDraftCSharp
                             },
 
                             // Gets or sets a callback to determine whether to include the specific
-                            // column in the DataTable. Called once per column after reading the 
+                            // column in the DataTable. Called once per column after reading the
                             // headers.
                             FilterColumn = (rowReader, columnIndex) =>
                             {
@@ -308,7 +308,7 @@ namespace CorpusDraftCSharp
                 }
             }
         }
-        
+
         public static bool isNum(string word)
         {
             try
@@ -326,5 +326,67 @@ namespace CorpusDraftCSharp
         {
             return false;
         }
+
+        public static List<int> SplitId(string Id)
+        {
+           return  Id.Split('|').Where(x => x != "").Select(x => Convert.ToInt32(x)).ToList();
+        }
+        public static int CompareIds(string _Id, string _otherId)
+        {
+            var currentId = SplitId(_Id);
+            var otherId = SplitId(_otherId);
+            for (int i = 0; i < currentId.Count; i++)
+            {
+                if (currentId[i] == otherId[i])
+                {
+                    continue;
+                }
+                return currentId[i] - otherId[i];
+            }
+            return 0;
+        }
+
+        public static string getFieldsInText(List<Dictionary<string, List<Value>>> fields)
+        {
+            string result = "";
+            foreach (var optional_tagging in fields)
+            {
+                foreach (var field in optional_tagging)
+                {
+                    result += field.Key;
+                    result += ":";
+                    foreach (var fieldValue in field.Value)
+                    {
+                        result += fieldValue.name;
+                        result += ";";
+                    }
+                    result += "||";
+                }
+                result += "\n";
+            }
+            return result;
+        }
+
+        public static string PartOutput(this IUnitGroup<ICorpusUnit> corpusUnit)
+        {
+            string collected = "";
+            corpusUnit.subunits.Sort();
+            foreach (var unit in corpusUnit.subunits)
+            {
+                collected += unit.Output();
+            }
+            return collected;
+        }
+
+        public static string UnitOutput(ICorpusUnit corpusUnit, bool atomicUnit = false)
+        {
+            var innerText = (corpusUnit is Grapheme || atomicUnit) ? (corpusUnit as IUnitGroup<ICorpusUnit>).PartOutput() : corpusUnit.text;
+            if (corpusUnit.tagging is null || corpusUnit.tagging.Count < 1)
+            {
+                return "<span title= \"\" data-content=\"\" class=\"text\" id=\"" + corpusUnit.Id + "\"> " + innerText + "</span><br />";
+            }
+            return "<span title=\"" + getFieldsInText (corpusUnit.tagging) + "\" data-content=\"" + getFieldsInText (corpusUnit.tagging).Replace("\n", "<br />") + "\" class=\"text\" id=\"" + corpusUnit.Id + "\"> " + innerText + "</span><br />";
+        }
+
     }
 }
