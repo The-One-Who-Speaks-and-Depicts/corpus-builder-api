@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Data;
-using System.Linq;
 using ExcelDataReader;
-using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using ManuscriptsProcessor.Units;
 using ManuscriptsProcessor.Values;
+using Newtonsoft.Json;
 
 namespace ManuscriptsProcessor
 {
@@ -348,7 +345,7 @@ namespace ManuscriptsProcessor
             return 0;
         }
 
-        public static string getFieldsInText(List<Dictionary<string, List<Value>>> fields)
+        public static string GetFieldsInText(List<Dictionary<string, List<Value>>> fields)
         {
             string result = "";
             foreach (var optional_tagging in fields)
@@ -385,9 +382,40 @@ namespace ManuscriptsProcessor
             var innerText = (corpusUnit is Grapheme || atomicUnit) ? (corpusUnit as IUnitGroup<ICorpusUnit>).PartOutput() : corpusUnit.text;
             if (corpusUnit.tagging is null || corpusUnit.tagging.Count < 1)
             {
-                return "<span title= \"\" data-content=\"\" class=\"text\" id=\"" + corpusUnit.Id + "\"> " + innerText + "</span><br />";
+                return "<span title= \"\" data-content=\"\" class=\"" + corpusUnit.GetType() + "\" id=\"" + corpusUnit.Id + "\"> " + innerText + "</span><br />";
             }
-            return "<span title=\"" + getFieldsInText (corpusUnit.tagging) + "\" data-content=\"" + getFieldsInText (corpusUnit.tagging).Replace("\n", "<br />") + "\" class=\"text\" id=\"" + corpusUnit.Id + "\"> " + innerText + "</span><br />";
+            return "<span title=\"" + GetFieldsInText (corpusUnit.tagging) + "\" data-content=\"" + GetFieldsInText (corpusUnit.tagging).Replace("\n", "<br />") + "\" class=\"" + corpusUnit.GetType() + "\" id=\"" + corpusUnit.Id + "\"> " + innerText + "</span><br />";
+        }
+
+        public static List<string> GetFields(string path)
+        {
+            List<string> existingFields = new List<string>();
+            DirectoryInfo fieldsDirectory = new DirectoryInfo(path);
+            var fields = fieldsDirectory.GetFiles();
+            existingFields.Add("Any");
+            if (fields.Length > 0)
+            {
+                fields.ToList().ForEach(x => existingFields.Add(x.Name.Split(".json")[0]));
+
+            }
+            return existingFields;
+        }
+
+        public static List<string> GetManuscripts(string path)
+        {
+            var directory = new DirectoryInfo(path);
+            var manuscripts = directory.GetFiles();
+            if (manuscripts.Length < 1)
+            {
+                return new List<string>();
+            }
+            return manuscripts.Select(script =>
+            {
+                using (StreamReader r = new StreamReader(script.FullName))
+                {
+                    return JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
+                }
+            }).Select(script => script.text).ToList();
         }
 
     }

@@ -26,9 +26,9 @@
     <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="1" cols="20" asp-for="wordSearched"></textarea><br />
     <select asp-for="docName">
         <option>Any</option>
-        @foreach (var doc in Model.docList)
+        @foreach (var doc in Model.scriptList)
         {
-            <option>@doc.documentName</option>
+            <option>@doc</option>
         }
     </select>
     <textarea style="text-wrap:none; white-space:nowrap; resize:none;" rows="3" cols="40" id="feature" asp-for="feature"></textarea><br />

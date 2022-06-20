@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CorpusDraftCSharp;
-using Microsoft.AspNetCore.Hosting;
+﻿using ManuscriptsProcessor;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using ManuscriptsProcessor.Units;
+using ManuscriptsProcessor.Values;
 
 namespace CroatianProject.Pages
 {
@@ -19,86 +14,26 @@ namespace CroatianProject.Pages
         public string textName { get; set; }
         public string docName { get; set; }
         public List<string> textList { get; set; }
-        public List<string> docList { get; set; }
-        public List<string> fieldsList { get; set; } = new List<string>();
+        public List<string> scriptsList
+        {
+            get
+            {
+                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "database", "manuscripts"));
+            }
+        }
+        public List<string> fieldsList
+        {
+            get
+            {
+                return MyExtensions.GetFields(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields"));
+            }
+        }
         public string textByWords { get; set; }
 
         public ViewTextModel(IWebHostEnvironment environment)
         {
             _environment = environment;
-            try
-            {
-                docList = getDocs();
-                fieldsList = getFields();
-            }
-            catch
-            {
-                Redirect("./Error");
-            }
         }
-
-        public List<string> getFields()
-        {
-            List<string> existingFields = new List<string>();
-            try
-            {
-                var directory = Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields");
-                DirectoryInfo fieldsDirectory = new DirectoryInfo(directory);
-                var fields = fieldsDirectory.GetFiles();
-                for (int i = 0; i < fields.Length; i++)
-                {
-                    if (i < fields.Length - 1)
-                    {
-                        existingFields.Add(fields[i].Name + "|");
-                    }
-                    else
-                    {
-                        existingFields.Add(fields[i].Name);
-                    }
-                }
-            }
-            catch
-            {
-
-            }
-            return existingFields;
-        }
-        public List<string> getDocs()
-        {
-            List<string> existingTexts = new List<string>();
-            try
-            {
-                var directory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
-                var docs = directory.GetFiles();
-                foreach (var doc in docs)
-                {
-                    string document = "";
-                    using (StreamReader r = new StreamReader(doc.FullName))
-                    {
-                        var deserialized = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
-                        document += deserialized.documentID + "_" + deserialized.documentName + ":";
-                        for (int i = 0; i < deserialized.texts.Count; i++)
-                        {
-                            if (i < (deserialized.texts.Count - 1))
-                            {
-                                document += deserialized.texts[i].textID + "_" + deserialized.texts[i].textName + "|";
-                            }
-                            else
-                            {
-                                document += deserialized.texts[i].textID + "_" + deserialized.texts[i].textName;
-                            }
-                        }
-                    }
-                    existingTexts.Add(document + "\n");
-                }
-            }
-            catch
-            {
-
-            }
-            return existingTexts;
-        }
-
         public DirectoryInfo SearchForText(string textName, string directory)
         {
             DirectoryInfo dirTexts = new DirectoryInfo(directory);
@@ -108,38 +43,31 @@ namespace CroatianProject.Pages
 
         public void OnPost(string docName, string textName)
         {
-            try
+            docName = docName.Split('_', 2)[0];
+            textName = textName.Split('_', 2)[0];
+            var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "manuscripts")).GetFiles();
+            if (files.Length < 1) return;
+            var section = new Section();
+            foreach (var file in files)
             {
-                docName = docName.Split('_', 2)[0];
-                textName = textName.Split('_', 2)[0];
-                var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents")).GetFiles();
-                Text text = new Text();
-                foreach (var file in files)
+                using (StreamReader r = new StreamReader(file.FullName))
                 {
-                    using (StreamReader r = new StreamReader(file.FullName))
+                    var analyzedManuscript = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
+                    if (analyzedManuscript.subunits is null || analyzedManuscript.subunits.Count < 1) continue;
+                    if (analyzedManuscript.Id == docName)
                     {
-                        Document analyzedDocument = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
-                        if (analyzedDocument.documentID == docName)
+                        foreach (var s in analyzedManuscript.subunits)
                         {
-                            foreach (var t in analyzedDocument.texts)
+                            if (s.Id.Split('_')[1] == textName)
                             {
-                                if (t.textID == textName)
-                                {
-                                    text = t;
-                                    break;
-                                }
+                                section = s;
+                                break;
                             }
                         }
                     }
                 }
-                textByWords = text.Output();
             }
-            catch
-            {
-
-            }
-            docList = getDocs();
-            fieldsList = getFields();
+            textByWords = section.Output();
         }
     }
 }

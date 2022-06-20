@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CorpusDraftCSharp;
-using Microsoft.AspNetCore.Hosting;
+﻿using ManuscriptsProcessor.Units;
+using ManuscriptsProcessor.Values;
+using ManuscriptsProcessor.Fields;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using ManuscriptsProcessor;
 
 namespace CroatianProject.Pages
 {
@@ -22,9 +18,21 @@ namespace CroatianProject.Pages
         public string feature { get; set; }
         public List<string> wordsWithTags = new List<string>();
         [BindProperty]
-        public List<Document> docList { get; set; }
+        public List<string> scriptList
+        {
+            get
+            {
+                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "database", "manuscripts"));
+            }
+        }
         [BindProperty]
-        public List<string> fieldsList { get; set; }
+        public List<string> fieldsList
+        {
+            get
+            {
+                return MyExtensions.GetFields(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields"));
+            }
+        }
         [BindProperty]
         public string textName { get; set; }
         [BindProperty]
@@ -34,72 +42,13 @@ namespace CroatianProject.Pages
         public ViewModel(IWebHostEnvironment environment)
         {
             _environment = environment;
-            try
-            {
-                docList = getDocs();
-                fieldsList = getFields();
-            }
-            catch
-            {
-                Redirect("./Error");
-            }
-        }
-
-        public List<string> getFields()
-        {
-            List<string> existingFields = new List<string>();
-            try
-            {
-                var directory = Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields");
-                DirectoryInfo fieldsDirectory = new DirectoryInfo(directory);
-                var fields = fieldsDirectory.GetFiles();
-                for (int i = 0; i < fields.Length; i++)
-                {
-                    if (i < fields.Length - 1)
-                    {
-                        existingFields.Add(fields[i].Name + "|");
-                    }
-                    else
-                    {
-                        existingFields.Add(fields[i].Name);
-                    }
-                }
-            }
-            catch
-            {
-
-            }
-            return existingFields;
-        }
-        public List<Document> getDocs()
-        {
-            List<Document> existingDocs = new List<Document>();
-            try
-            {
-                var directory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
-                var docs = directory.GetFiles();
-                foreach (var doc in docs)
-                {
-                    Document document = new Document();
-                    using (StreamReader r = new StreamReader(doc.FullName))
-                    {
-                        var deserialized = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
-                        document = deserialized;
-                    }
-                    existingDocs.Add(document);
-                }
-            }
-            catch
-            {
-
-            }
-            return existingDocs;
         }
 
 
         public void OnPostShow()
         {
-            List<Field> existingFields = new List<Field>();
+            throw new NotImplementedException();
+            /*List<Field> existingFields = new List<Field>();
             List<Realization> acquiredRealizations = new List<Realization>();
             var docDir = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
             var docs = docDir.GetFiles();
@@ -280,6 +229,7 @@ namespace CroatianProject.Pages
             }
             docList = getDocs();
             fieldsList = getFields();
+            */
         }
 
 

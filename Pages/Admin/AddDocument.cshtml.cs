@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using CorpusDraftCSharp;
+using ManuscriptsProcessor.Units;
+using ManuscriptsProcessor.Values;
+using ManuscriptsProcessor;
 
 namespace CroatianProject.Pages.Admin
 {
@@ -23,42 +18,21 @@ namespace CroatianProject.Pages.Admin
         [BindProperty]
         public string connections { get; set; }
         [BindProperty]
-        public List<string> FieldList { get; set; }
-
-        public List<string> getFields()
+        public List<string> FieldList
         {
-            List<string> existingFields = new List<string>();
-            try
+            get
             {
-                var directory = Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields");
-                DirectoryInfo fieldsDirectory = new DirectoryInfo(directory);
-                var fields = fieldsDirectory.GetFiles();
-                existingFields.Add("Any");
-                foreach (var field in fields)
-                {
-                    existingFields.Add(field.Name.Split(".json")[0]);
-                }
+                return MyExtensions.GetFields(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields"));
             }
-            catch
-            {
-
-            }
-            return existingFields;
         }
+
+
 
         public AddDocumentModel(IWebHostEnvironment environment)
         {
             _environment = environment;
             filePath = "";
             textName = "";
-            try
-            {
-                FieldList = getFields();
-            }
-            catch
-            {
-                Redirect("./Error");
-            }
         }
         public async Task<IActionResult> OnPostAsync()
         {
@@ -69,12 +43,12 @@ namespace CroatianProject.Pages.Admin
             try
             {
                 var file = Path.Combine(dirUploads, Upload.FileName);
-                var dirTexts = Path.Combine(dirData, "documents");
+                var dirTexts = Path.Combine(dirData, "manuscripts");
                 Directory.CreateDirectory(dirTexts);
                 DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirTexts);
-                Document document = new Document(directoryTextsInfo.GetFiles().Length.ToString(), textName, file, filePath);
-                document.documentMetaData = new List<Dictionary<string, List<Value>>>();
-                document.documentMetaData.Add(new Dictionary<string, List<Value>>());
+                var manuscript = new Manuscript(directoryTextsInfo.GetFiles().Length.ToString(), textName, file, filePath);
+                manuscript.tagging = new List<Dictionary<string, List<Value>>>();
+                manuscript.tagging.Add(new Dictionary<string, List<Value>>());
                 if (!String.IsNullOrEmpty(connections) && !String.IsNullOrWhiteSpace(connections))
                 {
                     string[] tags = connections.Split("\n");
@@ -92,16 +66,16 @@ namespace CroatianProject.Pages.Admin
                                     typedValues.Add(new Value(stringValue));
                                 }
                             }
-                            document.documentMetaData[0].Add(key, typedValues);
+                            manuscript.tagging[0].Add(key, typedValues);
                         }
                     }
                 }
-                string documentInJSON = document.Jsonize();
-                var documentDBFile = Path.Combine(dirTexts, directoryTextsInfo.GetFiles().Length.ToString() + "_" + textName + ".json");
-                FileStream fs = new FileStream(documentDBFile, FileMode.Create);
+                string manuscriptInJSON = manuscript.Jsonize();
+                var manuscriptDBFile = Path.Combine(dirTexts, directoryTextsInfo.GetFiles().Length.ToString() + "_" + textName + ".json");
+                FileStream fs = new FileStream(manuscriptDBFile, FileMode.Create);
                 using (StreamWriter w = new StreamWriter(fs))
                 {
-                    w.Write(documentInJSON);
+                    w.Write(manuscriptInJSON);
                 }
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
@@ -117,7 +91,6 @@ namespace CroatianProject.Pages.Admin
                     w.Write(e.StackTrace);
                 }
             }
-            FieldList = getFields();
             return RedirectToPage();
 
         }
