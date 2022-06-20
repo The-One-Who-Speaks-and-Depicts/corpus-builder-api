@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 
-namespace CorpusDraftCSharp
+namespace ManuscriptsProcessor.Units
 {
-    public class TokenGroup : List<Token>
+    public class RealizationGroup : List<Token>
     {
-        public TokenGroup()
+        public RealizationGroup()
         {
 
         }

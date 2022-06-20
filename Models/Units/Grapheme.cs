@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using ManuscriptsProcessor.Values;
 
-namespace CorpusDraftCSharp
+namespace ManuscriptsProcessor.Units
 {
     [Serializable]
     public class Grapheme : ICorpusUnit, IComparable<Grapheme>

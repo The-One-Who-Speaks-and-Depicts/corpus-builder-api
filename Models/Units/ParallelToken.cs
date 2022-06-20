@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace CorpusDraftCSharp
+namespace ManuscriptsProcessor.Units
 {
-    public class ParallelToken : List<TokenGroup>
+    public class ParallelToken : List<RealizationGroup>
     {
 
-        public List<TokenGroup> GetParallels(TokenGroup source)
+        public List<RealizationGroup> GetParallels(RealizationGroup source)
         {
             var parallels = this.Where(r => r != source).ToList();
             return parallels;

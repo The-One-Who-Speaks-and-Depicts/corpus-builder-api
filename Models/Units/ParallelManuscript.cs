@@ -1,8 +1,9 @@
 using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using ManuscriptsProcessor.Values;
 
-namespace CorpusDraftCSharp {
+namespace ManuscriptsProcessor.Units {
     [Serializable]
     public class ParallelManuscript : ICorpusUnit, IComparable<ParallelManuscript>
     {

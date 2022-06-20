@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using ManuscriptsProcessor.Values;
 
-namespace CorpusDraftCSharp
+namespace ManuscriptsProcessor.Units
 {
     [Serializable]
     public class Token : ICorpusUnit, IUnitGroup<Grapheme>, IEquatable<Token>, IComparable<Token>

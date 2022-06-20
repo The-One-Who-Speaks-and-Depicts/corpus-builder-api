@@ -1,8 +1,6 @@
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 
-namespace CorpusDraftCSharp
+namespace ManuscriptsProcessor.Values
 {
 	public class Value
     {

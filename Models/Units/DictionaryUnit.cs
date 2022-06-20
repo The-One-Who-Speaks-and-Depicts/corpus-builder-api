@@ -5,7 +5,7 @@ using System.Data;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace CorpusDraftCSharp
+namespace ManuscriptsProcessor.Units
 {
     public class DictionaryUnit
     {

@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System;
+using ManuscriptsProcessor.Values;
 
-namespace CorpusDraftCSharp
+namespace ManuscriptsProcessor.Units
 {
     public class Segment : ICorpusUnit, IUnitGroup<Clause>, IComparable<Segment>
     {
