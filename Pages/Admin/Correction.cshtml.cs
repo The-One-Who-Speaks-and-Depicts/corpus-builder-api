@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Hosting;
-using CorpusDraftCSharp;
-using System.IO;
+using ManuscriptsProcessor.Units;
+using ManuscriptsProcessor.Values;
 using Newtonsoft.Json;
 
 namespace CroatianProject.Pages.Admin
@@ -23,42 +17,46 @@ namespace CroatianProject.Pages.Admin
         {
             var directory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
             var docs = directory.GetFiles();
-            var changedDocs = new Dictionary<string, Document>();
+            var changedDocs = new Dictionary<string, Manuscript>();
             foreach (var doc in docs)
             {
                 using (StreamReader r = new StreamReader(doc.FullName))
                 {
                     var changed = false;
-                    var deserialized = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
-                    foreach (var text in deserialized.texts)
+                    var deserialized = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
+                    foreach (var section in deserialized.subunits)
                     {
-                        foreach (var clause in text.clauses)
+                        foreach (var segment in section.subunits)
                         {
-                            foreach (var realization in clause.realizations)
+                            foreach (var clause in segment.subunits)
                             {
-                                if (realization.realizationFields != null)
+                                foreach (var realization in clause.subunits)
                                 {
-                                    foreach (var tagging in realization.realizationFields)
+                                    if (realization.tagging != null)
                                     {
-                                        foreach (KeyValuePair<string, List<Value>> kv in tagging)
+                                        foreach (var tagging in realization.tagging)
                                         {
-                                            if (kv.Key == correction)
+                                            foreach (KeyValuePair<string, List<Value>> kv in tagging)
                                             {
-                                                changed = true;
-                                                string edited = kv.Value[0].name;
-                                                realization.lexemeOne = edited;
-                                                realization.lexemeTwo = edited;
-                                                realization.letters = new List<Grapheme>();
-                                                for (int i = 0; i < edited.Length; i++)
+                                                if (kv.Key == correction)
                                                 {
-                                                    realization.letters.Add(new Grapheme(realization.documentID, deserialized.filePath, realization.textID, realization.clauseID, realization.realizationID, i.ToString(), edited[i].ToString()));
+                                                    changed = true;
+                                                    string edited = kv.Value[0].name;
+                                                    realization.lexemeView = edited;
+                                                    realization.text = edited;
+                                                    realization.subunits = new List<Grapheme>();
+                                                    for (int i = 0; i < edited.Length; i++)
+                                                    {
+                                                        realization.subunits.Add(new Grapheme(realization, i.ToString(), edited[i].ToString()));
+                                                    }
                                                 }
                                             }
                                         }
+                                        realization.tagging = realization.tagging.Where(t => !t.ContainsKey(correction)).ToList();
                                     }
-                                    realization.realizationFields = realization.realizationFields.Where(t => !t.ContainsKey(correction)).ToList();
                                 }
                             }
+
                         }
                     }
                     if (changed)
