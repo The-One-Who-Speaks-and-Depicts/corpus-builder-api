@@ -35,41 +35,33 @@ namespace CroatianProject.Pages
                 scriptToParallelize = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
             }
             DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirTexts);
-            var parallelManuscrupt = new ParallelManuscript();
-            parallelManuscrupt.Id = directoryTextsInfo.GetFiles().Length.ToString();
-            parallelManuscrupt.text = scriptToParallelize.text;
-            parallelManuscrupt.tagging = scriptToParallelize.tagging;
+            var parallelManuscript = new ParallelManuscript();
+            parallelManuscript.Id = directoryTextsInfo.GetFiles().Length.ToString();
+            parallelManuscript.text = scriptToParallelize.text;
+            parallelManuscript.tagging = scriptToParallelize.tagging;
             int maxClausesNumber = scriptToParallelize.subunits.SelectMany(t => t.subunits).Select(t => t.subunits.Count).Max();
             ParallelClause[,] parallelMatrix = new ParallelClause[scriptToParallelize.subunits.Count, maxClausesNumber];
-            for (int i = 0; i < maxClausesNumber; i++)
+            for (int i = 0; i < scriptToParallelize.subunits.Count; i++)
             {
-                for (int j = 0; j < docToParallelize.texts.Count; j++)
+                var sectionClauses = scriptToParallelize.subunits[i].subunits.SelectMany(t => t.subunits).ToList();
+                for (int j = 0; j < maxClausesNumber; j++)
                 {
-                    if (docToParallelize.texts[j].clauses.Count > i)
-                    {
-                        parallelMatrix[i, j] = new ParallelClause
-                        {
-                            textName = docToParallelize.texts[j].textName,
-                            textMetaData = docToParallelize.texts[j].textMetaData,
-                            clause = docToParallelize.texts[j].clauses[i]
-                        };
-                        continue;
-                    }
+                    if (sectionClauses[j] is null) break;
                     parallelMatrix[i, j] = new ParallelClause
                     {
-                        textName = docToParallelize.texts[j].textName,
-                        textMetaData = docToParallelize.texts[j].textMetaData,
-                        clause = null
+                        text = scriptToParallelize.subunits[i].text,
+                        tagging = scriptToParallelize.subunits[i].tagging,
+                        clause = sectionClauses[j]
                     };
                 }
             }
-            parallelDocument.parallelClauses = parallelMatrix;
-            string documentInJSON = JsonConvert.SerializeObject(parallelDocument, Formatting.Indented);
-            var documentDBFile = Path.Combine(dirTexts, directoryTextsInfo.GetFiles().Length.ToString() + "_" + docToParallelize.documentName + ".json");
-            FileStream fs = new FileStream(documentDBFile, FileMode.Create);
+            parallelManuscript.parallelClauses = parallelMatrix;
+            string scriptInJSON = JsonConvert.SerializeObject(parallelManuscript, Formatting.Indented);
+            var scriptDBFile = Path.Combine(dirTexts, directoryTextsInfo.GetFiles().Length.ToString() + "_" + scriptToParallelize.text + ".json");
+            FileStream fs = new FileStream(scriptDBFile, FileMode.Create);
             using (StreamWriter w = new StreamWriter(fs))
             {
-                w.Write(documentInJSON);
+                w.Write(scriptInJSON);
             }
         }
     }
