@@ -37,20 +37,31 @@ namespace CroatianProject.Pages
         }
 
         [HttpPost]
-        public void OnPost(string documentPicked)
+        public void OnPost(string manuscriptPicked)
         {
-            var id = documentPicked.Split('[')[1].Split(']')[0];
-            var doc = documents.Where(d => d.id == id).FirstOrDefault();
-            var clauses = doc.parallelClauses;
+            var id = manuscriptPicked.Split('[')[1].Split(']')[0];
+            var deserializedManuscripts = new List<ParallelManuscript>();
+            var scriptDirectory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "parallelizedManuscripts"));
+            var jsonedScripts = scriptDirectory.GetFiles();
+            if (jsonedScripts.Length < 1) return;
+            foreach (var script in jsonedScripts)
+            {
+                using (StreamReader r = new StreamReader(script.FullName))
+                {
+                    deserializedManuscripts.Add(JsonConvert.DeserializeObject<ParallelManuscript>(r.ReadToEnd()));
+                }
+            }
+            var manuscript = deserializedManuscripts.Where(d => d.Id == id).FirstOrDefault();
+            var clauses = manuscript.parallelClauses;
             for (int i = 0; i < clauses.GetLength(0); i++)
             {
                 parallelizedClauses.Add(new List<string>());
                 for (int j = 0; j < clauses.GetLength(1); j++)
                 {
-                    parallelizedClauses[i].Add(clauses[i, j].clause is null ? "-" : String.Join(' ', clauses[i, j].clause.realizations.Select(r => "<span class=\"token\" id=\"" + id  + "|" + i + "|" + j + "\">" + r.Output() + "</span>")));
+                    parallelizedClauses[i].Add(clauses[i, j].clause is null ? "-" : String.Join(' ', clauses[i, j].clause.subunits.Select(t => "<span class=\"token\" id=\"" + id  + "|" + i + "|" + j + "|" + t.Id.Split('|')[4] + "\">" + t.Output() + "</span>")));
                 }
             }
-            var tokens = doc.parallelTokens;
+            var tokens = manuscript.parallelTokens;
             if (!(tokens is null))
             {
                 for (int i = 0; i < tokens.Count; i++)
@@ -60,7 +71,7 @@ namespace CroatianProject.Pages
                     {
                         for (int k = 0; k < tokens[i][j].Count; k++)
                         {
-                            parallelizedTokens[i] += "{" + tokens[i][j][k].documentID + "|" + tokens[i][j][k].clauseID + "|" + tokens[i][j][k].textID + "|" + tokens[i][j][k].realizationID + " - " + tokens[i][j][k].lexemeTwo + "};";
+                            parallelizedTokens[i] += "{" + tokens[i][j][k].Id + " - " + tokens[i][j][k].text + "};";
                         }
                     }
                     parallelizedTokens[i] += "<button id=\"deleteTemporary\">[[Delete]]</button></div>";
@@ -73,7 +84,7 @@ namespace CroatianProject.Pages
         public IActionResult OnPostTag(string sequenceOfParallelTokens)
         {
             var parallels = sequenceOfParallelTokens.Trim().Split("[[Delete]]").Where(parallel => parallel != "").ToList();
-            ParallelDocument parallelSubcorpus = null;
+            ParallelManuscript parallelSubcorpus = null;
             string parallelSubcorpusFilePath = null;
             foreach (var parallel in parallels)
             {
