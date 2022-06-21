@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Collections.Generic;
-using CorpusDraftCSharp;
-using System.IO;
+using ManuscriptsProcessor.Units;
+using ManuscriptsProcessor;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Hosting;
 using System.Linq;
@@ -17,34 +16,16 @@ namespace CroatianProject.Pages
         [BindProperty]
         public List<string> parallelizedTokens {get; set;} = new List<string>();
         [BindProperty]
-        public List<ParallelDocument> documents
+        public List<string> manuscripts
         {
             get
             {
-                List<ParallelDocument> deserializedDocuments = new List<ParallelDocument>();
-                try
-                {
-                    DirectoryInfo docDirectory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "parallelizedDocuments"));
-                    var jsonedDocuments = docDirectory.GetFiles();
-                    foreach (var doc in jsonedDocuments)
-                    {
-                        using (StreamReader r = new StreamReader(doc.FullName))
-                        {
-                            deserializedDocuments.Add(JsonConvert.DeserializeObject<ParallelDocument>(r.ReadToEnd()));
-                        }
-                    }
-                    return deserializedDocuments;
-                }
-                catch
-                {
-                    return deserializedDocuments;
-                }
-
+                return MyExtensions.GetParallelManuscripts(Path.Combine(_environment.ContentRootPath, "database", "parallelizedManuscripts"));
             }
         }
 
         [BindProperty]
-        public string documentPicked { get; set; }
+        public string manuscriptPicked { get; set; }
 
         [BindProperty]
         public string sequenceOfParallelTokens {get; set;}

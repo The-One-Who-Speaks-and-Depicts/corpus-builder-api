@@ -418,5 +418,21 @@ namespace ManuscriptsProcessor
             }).Select(script => script.text + "[" + script.Id + "]").ToList();
         }
 
+        public static List<string> GetParallelManuscripts (string path)
+        {
+            var deserializedManuscripts = new List<ParallelManuscript>();
+            var scriptDirectory = new DirectoryInfo(path);
+            var jsonedScripts = scriptDirectory.GetFiles();
+            if (jsonedScripts.Length < 1) return new List<string>();
+            foreach (var script in jsonedScripts)
+            {
+                using (StreamReader r = new StreamReader(script.FullName))
+                {
+                    deserializedManuscripts.Add(JsonConvert.DeserializeObject<ParallelManuscript>(r.ReadToEnd()));
+                }
+            }
+            return deserializedManuscripts.Select(script => script.text + "[" + script.Id + "]").ToList();
+        }
+
     }
 }

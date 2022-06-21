@@ -9,10 +9,10 @@
 <div align="center">
     <form method="post">
         Pick a document for tagging:<br />
-        <select asp-for="documentPicked">
-            @foreach (var doc in Model.documents)
+        <select asp-for="manuscriptPicked">
+            @foreach (var script in Model.manuscripts)
             {
-                <option>@(doc.name + "[" + doc.id + "]")</option>
+                <option>@script</option>
             }
         </select>
         <input type="submit" class="btn btn-default" value="Get document from database" />
