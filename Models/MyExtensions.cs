@@ -415,7 +415,7 @@ namespace ManuscriptsProcessor
                 {
                     return JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
                 }
-            }).Select(script => script.text).ToList();
+            }).Select(script => script.text + "[" + script.Id + "]").ToList();
         }
 
     }

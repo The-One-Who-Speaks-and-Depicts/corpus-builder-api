@@ -4,40 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using CorpusDraftCSharp;
-using System.IO;
+using ManuscriptsProcessor.Units;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Hosting;
-
+using ManuscriptsProcessor;
 namespace CroatianProject.Pages
 {
     public class ParallelizeModel : PageModel
     {
         private IWebHostEnvironment _environment;
-        public string documentPicked { get; set; }
-        public List<string> documentNames
+        public string manuscriptPicked { get; set; }
+        public List<string> manuscriptsNames
         {
             get
             {
-                List<Document> deserializedDocuments = new List<Document>();
-                try
-                {
-                    DirectoryInfo docDirectory = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents"));
-                    var jsonedDocuments = docDirectory.GetFiles();
-                    foreach (var doc in jsonedDocuments)
-                    {
-                        using (StreamReader r = new StreamReader(doc.FullName))
-                        {
-                            deserializedDocuments.Add(JsonConvert.DeserializeObject<Document>(r.ReadToEnd()));
-                        }
-                    }
-                    return deserializedDocuments.Select(d => d.documentID + "_" + d.documentName).ToList();
-                }
-                catch
-                {
-                    return new List<string>();
-                }
-
+                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "database", "parallelizedManuscripts"));
             }
         }
 
@@ -47,20 +27,20 @@ namespace CroatianProject.Pages
         }
         public void OnPostParallelize(string documentPicked)
         {
-            var dirTexts = Path.Combine(_environment.ContentRootPath, "database", "parallelizedDocuments");
+            var dirTexts = Path.Combine(_environment.ContentRootPath, "database", "parallelizedManuscripts");
             Directory.CreateDirectory(dirTexts);
-            Document docToParallelize = new Document();
-            using (StreamReader r = new StreamReader(new FileStream(Path.Combine(_environment.ContentRootPath, "database", "documents", documentPicked + ".json"), FileMode.Open)))
+            var scriptToParallelize = new Manuscript();
+            using (StreamReader r = new StreamReader(new FileStream(Path.Combine(_environment.ContentRootPath, "database", "manuscripts", documentPicked + ".json"), FileMode.Open)))
             {
-                docToParallelize = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
+                scriptToParallelize = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
             }
             DirectoryInfo directoryTextsInfo = new DirectoryInfo(dirTexts);
-            ParallelDocument parallelDocument = new ParallelDocument();
-            parallelDocument.id = directoryTextsInfo.GetFiles().Length.ToString();
-            parallelDocument.name = docToParallelize.documentName;
-            parallelDocument.documentMetaData = docToParallelize.documentMetaData;
-            int maxClausesNumber = docToParallelize.texts.Select(t => t.clauses.Count).Max();
-            ParallelClause[,] parallelMatrix = new ParallelClause[maxClausesNumber, docToParallelize.texts.Count];
+            var parallelManuscrupt = new ParallelManuscript();
+            parallelManuscrupt.Id = directoryTextsInfo.GetFiles().Length.ToString();
+            parallelManuscrupt.text = scriptToParallelize.text;
+            parallelManuscrupt.tagging = scriptToParallelize.tagging;
+            int maxClausesNumber = scriptToParallelize.subunits.SelectMany(t => t.subunits).Select(t => t.subunits.Count).Max();
+            ParallelClause[,] parallelMatrix = new ParallelClause[scriptToParallelize.subunits.Count, maxClausesNumber];
             for (int i = 0; i < maxClausesNumber; i++)
             {
                 for (int j = 0; j < docToParallelize.texts.Count; j++)

@@ -16,8 +16,8 @@
         <div align="center">
             <form asp-page-handler="parallelize" method="post">
                Pick a manuscript:<br />
-                <select asp-for="documentPicked">
-                    @foreach (var doc in Model.documentNames)
+                <select asp-for="manuscriptPicked">
+                    @foreach (var doc in Model.manuscriptsNames)
                     {
                         <option>@doc</option>
                     }

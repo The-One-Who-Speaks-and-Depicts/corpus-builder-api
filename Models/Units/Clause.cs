@@ -40,10 +40,10 @@ namespace ManuscriptsProcessor.Units
             this.text = _clauseText;
         }
 
-        public Clause(Section text, string _clauseID, string _clauseText)
+        public Clause(Segment segment, string _clauseID, string _clauseText)
         {
-            this.Id = text.Id + "|" + _clauseID;
-            this.filePath = text.filePath;
+            this.Id = segment.Id + "|" + _clauseID;
+            this.filePath = segment.filePath;
             this.text = _clauseText;
         }
         public Clause()

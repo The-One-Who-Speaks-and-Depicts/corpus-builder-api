@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using CorpusDraftCSharp;
+using ManuscriptsProcessor.Values;
+using ManuscriptsProcessor.Units;
 using Newtonsoft.Json;
+using ManuscriptsProcessor;
 
 namespace CroatianProject.Pages
 {
@@ -29,36 +24,15 @@ namespace CroatianProject.Pages
         [BindProperty]
         public string googleDocPath { get; set; } = "";
         [BindProperty]
-        public static Document analyzedDocument { get; set; } = new Document();
+        public static Manuscript? analyzedManuscript { get; set; }
         [BindProperty]
-        public string documentPicked { get; set; }
+        public string manuscriptPicked { get; set; }
         [BindProperty]
-        public List<string> documents
+        public List<string> manuscripts
         {
             get
             {
-                var deserializedDocuments = new List<string>();
-                var pathToDocuments = Path.Combine(_environment.ContentRootPath, "database", "documents");
-                Directory.CreateDirectory(pathToDocuments);
-                var docDirectory = new DirectoryInfo(pathToDocuments);
-                var jsonedDocuments = docDirectory.GetFiles();
-                if (jsonedDocuments.Length < 1)
-                {
-                    return deserializedDocuments;
-                }
-                return jsonedDocuments
-                /* Select(x => (x) => {
-
-                }). */
-                .Select(file => file.FullName)
-                .Select(name => {
-                    using (StreamReader r = new StreamReader(name))
-                    {
-                        return JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
-                    }
-                })
-                .Select(document => document.documentName + "[" + document.documentID + "]")
-                .ToList();
+                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "database", "manuscripts"));
             }
         }
         [BindProperty]
@@ -76,39 +50,24 @@ namespace CroatianProject.Pages
         {
             get
             {
-                List<string> existingFields = new List<string>();
-                var pathToFields = Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields");
-                Directory.CreateDirectory(Path.Combine(pathToFields));
-                DirectoryInfo fieldsDirectory = new DirectoryInfo(pathToFields);
-                var fields = fieldsDirectory.GetFiles();
-                existingFields.Add("Any");
-                Console.WriteLine(fields.Length.ToString());
-                if (fields.Length < 1)
-                {
-                    return existingFields;
-                }
-                foreach (var field in fields)
-                {
-                    existingFields.Add(field.Name.Split(".json")[0]);
-                }
-                return existingFields;
+                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields"));
             }
         }
 
-        public void OnGet(string documentPicked)
+        public void OnGet(string manuscriptPicked)
         {
-            if (!String.IsNullOrEmpty(documentPicked) && !String.IsNullOrWhiteSpace(documentPicked))
+            if (!String.IsNullOrEmpty(manuscriptPicked) && !String.IsNullOrWhiteSpace(manuscriptPicked))
             {
-                var documentID = documentPicked.Split('[')[1].Split(']')[0];
-                var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents")).GetFiles();
+                var manuscriptID = manuscriptPicked.Split('[')[1].Split(']')[0];
+                var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "manuscripts")).GetFiles();
                 var requiredDocFile = files
-                .Where(x => x.Name.Split('_')[0] == documentID)
+                .Where(x => x.Name.Split('_')[0] == manuscriptID)
                 .Single();
                 using (var r = new StreamReader(requiredDocFile.FullName))
                 {
-                    var requiredDoc = JsonConvert.DeserializeObject<Document>(r.ReadToEnd());
-                    googleDocPath = requiredDoc.googleDocPath;
-                    analyzedDocument = requiredDoc;
+                    var requiredScript = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
+                    googleDocPath = requiredScript.googleDocPath;
+                    analyzedManuscript = requiredScript;
                 }
             }
         }
@@ -116,10 +75,10 @@ namespace CroatianProject.Pages
 
         public IActionResult OnPostProcess()
         {
-
-            Text addedText = new Text(analyzedDocument, analyzedDocument.texts.Count.ToString(), textName);
-            addedText.textMetaData = new List<Dictionary<string, List<Value>>>();
-            addedText.textMetaData.Add(new Dictionary<string, List<Value>>());
+            var manuscriptSectionsCount = analyzedManuscript is null ? "0" : analyzedManuscript.subunits.Count.ToString();
+            var addedSection = new Section(analyzedManuscript, manuscriptSectionsCount, textName);
+            addedSection.tagging = new List<Dictionary<string, List<Value>>>();
+            addedSection.tagging.Add(new Dictionary<string, List<Value>>());
             if (!String.IsNullOrEmpty(connections) && !String.IsNullOrWhiteSpace(connections))
             {
                 string[] tags = connections.Split("\n");
@@ -137,12 +96,12 @@ namespace CroatianProject.Pages
                                 typedValues.Add(new Value(stringValue));
                             }
                         }
-                        addedText.textMetaData[0].Add(key, typedValues);
+                        addedSection.tagging[0].Add(key, typedValues);
                     }
                 }
             }
             var clauses = processedString.Split(new char[] {'\n', '\r'}).Where(x => x != "").ToList();
-            var wordsByClauses = new List<DecomposedClause>();
+            var wordsByClauses = new List<DecomposedSegment>();
             foreach (var clause in clauses)
             {
                 var tokens = clause.Split(' ').Where(x => x != "").ToList();
@@ -166,31 +125,37 @@ namespace CroatianProject.Pages
                         graphemes = graphemes
                     });
                 }
-                wordsByClauses.Add(new DecomposedClause
+                wordsByClauses.Add(new DecomposedSegment
                 {
                     clause = clause,
                     tokens = preparedTokens
                 });
             }
+            addedSection.subunits = new List<Segment>();
             for (int i = 0; i < wordsByClauses.Count; i++)
             {
-                var addedClause = new Clause(addedText, i.ToString(), wordsByClauses[i].clause);
+                var addedSegment = new Segment(addedSection, i.ToString(), wordsByClauses[i].clause);
+                var addedClause = new Clause(addedSegment, i.ToString(), wordsByClauses[i].clause);
+                addedClause.subunits = new List<Token>();
                 var realizations = wordsByClauses[i].tokens;
                 for (int j = 0; j < realizations.Count; j++)
                 {
-                    var addedRealization = new Realization(addedClause, j.ToString(), realizations[j].lexemeOne, realizations[j].lexemeTwo);
+                    var addedRealization = new Token(addedClause, j.ToString(), realizations[j].lexemeOne, realizations[j].lexemeTwo);
+                    addedRealization.subunits = new List<Grapheme>();
                     for (int k = 0; k < realizations[j].graphemes.Count; k++)
                     {
-                        addedRealization.letters.Add(new Grapheme(addedRealization, k.ToString(), realizations[j].graphemes[k]));
+                        addedRealization.subunits.Add(new Grapheme(addedRealization, k.ToString(), realizations[j].graphemes[k]));
                     }
-                    addedClause.realizations.Add(addedRealization);
+                    addedClause.subunits.Add(addedRealization);
                 }
-                addedText.clauses.Add(addedClause);
+                addedSegment.subunits = new List<Clause>();
+                addedSection.subunits.Add(addedSegment);
             }
-            analyzedDocument.texts.Add(addedText);
-            using (StreamWriter w = new StreamWriter(Path.Combine(_environment.ContentRootPath, "database", "documents", analyzedDocument.documentID + "_" + analyzedDocument.documentName + ".json")))
+            analyzedManuscript.subunits = new List<Section>();
+            analyzedManuscript.subunits.Add(addedSection);
+            using (StreamWriter w = new StreamWriter(Path.Combine(_environment.ContentRootPath, "database", "manuscripts", analyzedManuscript.Id + "_" + analyzedManuscript.text + ".json")))
             {
-                w.Write(analyzedDocument.Jsonize());
+                w.Write(analyzedManuscript.Jsonize());
             }
             return RedirectToPage();
 
