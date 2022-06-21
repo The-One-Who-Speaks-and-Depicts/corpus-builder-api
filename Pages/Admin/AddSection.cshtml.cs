@@ -7,7 +7,7 @@ using ManuscriptsProcessor;
 
 namespace CroatianProject.Pages
 {
-    public class AddTextModel : PageModel
+    public class AddSectionModel : PageModel
     {
 
         public int Rows { get; set; } = 20;
@@ -15,7 +15,7 @@ namespace CroatianProject.Pages
 
 
         private IWebHostEnvironment _environment;
-        public AddTextModel(IWebHostEnvironment environment)
+        public AddSectionModel(IWebHostEnvironment environment)
         {
             _environment = environment;
         }
