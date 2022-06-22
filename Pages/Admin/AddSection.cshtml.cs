@@ -50,7 +50,7 @@ namespace CroatianProject.Pages
         {
             get
             {
-                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields"));
+                return MyExtensions.GetFields(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields"));
             }
         }
 
@@ -75,7 +75,7 @@ namespace CroatianProject.Pages
 
         public IActionResult OnPostProcess()
         {
-            var manuscriptSectionsCount = analyzedManuscript is null ? "0" : analyzedManuscript.subunits.Count.ToString();
+            var manuscriptSectionsCount = analyzedManuscript.subunits is null ? "0" : analyzedManuscript.subunits.Count.ToString();
             var addedSection = new Section(analyzedManuscript, manuscriptSectionsCount, textName);
             addedSection.tagging = new List<Dictionary<string, List<Value>>>();
             addedSection.tagging.Add(new Dictionary<string, List<Value>>());

@@ -8,8 +8,8 @@ $(document).ready(function () {
     splitValues = values.innerText.split('|');
     for (var i = 0; i < splitValues.length; i++) {
         $.getJSON("/database/fields/" + splitValues[i] + ".json", function (data) {
-            if (data.type == "Text") {
-                jsons.push(data);
+            jsons.push(data);
+            if (data.type == "Section") {
                 $("#keys").append("<option>" + data.name + "</option>");
             }
 

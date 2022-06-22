@@ -17,7 +17,7 @@
         <div align="center">
             <form method="get">
                 Выберите документ для добавления текста:<br />
-                <select asp-for="manuscriptPicked"></select>
+                <select asp-for="manuscriptPicked">
                     @foreach (var doc in Model.manuscripts)
                     {
                         <option>@doc</option>

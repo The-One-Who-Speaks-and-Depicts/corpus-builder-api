@@ -395,6 +395,7 @@ namespace ManuscriptsProcessor
             existingFields.Add("Any");
             if (fields.Length > 0)
             {
+                fields.ToList().ForEach(x => Console.WriteLine(x));
                 fields.ToList().ForEach(x => existingFields.Add(x.Name.Split(".json")[0]));
 
             }

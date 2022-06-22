@@ -1,17 +1,17 @@
 ﻿jsons = [];
 
 $(document).ready(function () {
-    
+
 
 
     var values = document.getElementById('values');
     splitValues = values.innerText.split('|');
     for (var i = 0; i < splitValues.length; i++) {
         $.getJSON("/database/fields/" + splitValues[i] + ".json", function (data) {
-            if (data.type == "Document") {
+            if (data.type == "Manuscript") {
                 jsons.push(data);
                 $("#keys").append("<option>" + data.name + "</option>");
-            }           
+            }
 
         });
     }
@@ -183,13 +183,13 @@ $(document).ready(function () {
         }
     });
 
-    
+
     $("#submit").click(function () {
         var currentFields = $("#connections").val().split('\n');
-        if ($("#thisFieldValues").css("opacity") > 0 && $("#thisFieldValues option:selected").text() != "Any") {            
+        if ($("#thisFieldValues").css("opacity") > 0 && $("#thisFieldValues option:selected").text() != "Any") {
             if ($("#connections").val() != "") {
-                var coincidenceFound = false;               
-                for (var i = 0; i < currentFields.length; i++) {                    
+                var coincidenceFound = false;
+                for (var i = 0; i < currentFields.length; i++) {
                     if (currentFields[i].split('=>')[0] == $("#keys option:selected").text()) {
                         for (var j = 0; j < currentFields[i].split('=>')[1].split(';').length; j++) {
                             if (currentFields[i].split('=>')[1].split(';')[j] == $("#thisFieldValues option:selected").text()) {
@@ -210,8 +210,8 @@ $(document).ready(function () {
                             coincidenceFound = true;
                             break;
                         }
-                        
-                    }                    
+
+                    }
                 }
                 if (!coincidenceFound) {
                     var addedKeyValuePair = $("#keys option:selected").text() + "=>" + $("#thisFieldValues option:selected").text() + ";\n";
@@ -220,7 +220,7 @@ $(document).ready(function () {
                 else {
                     $("#connections").val(currentFields.join('\n'));
                 }
-                
+
             }
             else {
                 $("#connections").val($("#keys option:selected").text() + "=>" + $("#thisFieldValues option:selected").text() + ";\n");
@@ -229,7 +229,7 @@ $(document).ready(function () {
         else if ($("#userValue").css("opacity") > 0 && $("#userValue").val() != "") {
             if ($("#connections").val() != "") {
                 var coincidenceFound = false;
-                for (var i = 0; i < currentFields.length; i++) {                    
+                for (var i = 0; i < currentFields.length; i++) {
                     if (currentFields[i].split('=>')[0] == $("#keys option:selected").text()) {
                         for (var j = 0; j < currentFields[i].split('=>')[1].split(';').length; j++) {
                             if (currentFields[i].split('=>')[1].split(';')[j] == $("#userValue").val()) {
