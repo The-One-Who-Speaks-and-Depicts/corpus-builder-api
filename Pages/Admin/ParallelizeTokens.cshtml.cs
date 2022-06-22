@@ -107,22 +107,17 @@ namespace CroatianProject.Pages
                 {
                     Console.WriteLine(token);
                     var splitID = token.Split('|').Where(x => x != "").ToList();
-                    RealizationGroup currentGroup;
-                    if (token2Add.Where(g => g.Id == splitID[0] && g.textID == splitID[2] && g.clauseID == splitID[1]).ToList().Count == 0)
+                    TokenGroup currentGroup;
+                    if (token2Add.subunits.Where(g => g.Id.Split('|')[0] == splitID[0] && g.Id.Split('|')[1] == splitID[1] && g.Id.Split('|')[2] == splitID[2]).ToList().Count == 0)
                     {
-                        currentGroup = new RealizationGroup();
-                        currentGroup.documentID = splitID[0];
-                        currentGroup.textID = splitID[2];
-                        currentGroup.clauseID = splitID[1];
-                        token2Add.Add(currentGroup);
+                        currentGroup = new TokenGroup();
+                        currentGroup.Id = String.Join('|', new string[] { splitID[0], splitID[1], splitID[2] });
                     }
-                    currentGroup = token2Add.Where(g => g.documentID == splitID[0] && g.textID == splitID[2] && g.clauseID == splitID[1]).FirstOrDefault();
+                    currentGroup = token2Add.subunits.Where(g => g.Id.Split('|')[0] == splitID[0] && g.Id.Split('|')[1] == splitID[1] && g.Id.Split('|')[2] == splitID[2]).FirstOrDefault();
 
-                    var singleToken = parallelSubcorpus.parallelClauses[Convert.ToInt32(splitID[2]), Convert.ToInt32(splitID[1])].clause.realizations.Where(r => r.realizationID == splitID[3]).FirstOrDefault();
-                    singleToken.documentID = splitID[0];
-                    singleToken.textID = splitID[2];
-                    singleToken.clauseID = splitID[1];
-                    if (!currentGroup.Contains(singleToken)) currentGroup.Add(singleToken);
+                    var singleToken = parallelSubcorpus.parallelClauses[Convert.ToInt32(splitID[1]), Convert.ToInt32(splitID[2])].clause.subunits.Where(r => r.Id == splitID[4]).FirstOrDefault();
+                    singleToken.Id = String.Join('|', new string[] { splitID[0], splitID[1], singleToken.Id.Split('|')[2], splitID[2],  singleToken.Id.Split('|')[4] });
+                    if (!currentGroup.subunits.Contains(singleToken)) currentGroup.subunits.Add(singleToken);
                 }
                 if (!parallelSubcorpus.parallelTokens.Contains(token2Add)) parallelSubcorpus.parallelTokens.Add(token2Add);
             }

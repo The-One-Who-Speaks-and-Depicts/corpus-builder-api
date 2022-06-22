@@ -15,7 +15,7 @@
             <form method="post">
                 <label>Would you like to save acquired text to file? @Html.CheckBox("dictsToFiles")</label><br/>
                 <strong>Available texts</strong><br />
-                @foreach (var option in Model.documentNames)
+                @foreach (var option in Model.manuscriptNames)
                 {
                     <label><input name="chosenTexts" type="checkbox" value="@option" /> @option</label><br />
                 }
@@ -27,7 +27,7 @@
             <form method="post" asp-page-handler="parallel">
                 <label>Would you like to save acquired text to file? @Html.CheckBox("parallelDictsToFiles")</label><br/>
                 <strong>Available texts</strong><br />
-                @foreach (var manuscript in Model.parallelDocumentNames)
+                @foreach (var manuscript in Model.parallelManuscriptNames)
                 {
                     @foreach(var part in manuscript.Value)
                     {

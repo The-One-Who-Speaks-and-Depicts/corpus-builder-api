@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.IO;
 using Newtonsoft.Json;
-using CorpusDraftCSharp;
+using ManuscriptsProcessor.Units;
+using ManuscriptsProcessor;
 using System.Text.RegularExpressions;
 
 namespace CroatianProject.Pages
@@ -14,56 +15,36 @@ namespace CroatianProject.Pages
     public class CollectDictionaryModel : PageModel
     {
         [BindProperty]
-        public List<string> documentNames
+        public List<string> manuscriptNames
         {
             get
             {
-                try
-                {
-                    return new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents")).GetFiles().Select(f =>
-                    {
-                        using (StreamReader r = new StreamReader(new FileStream(f.FullName, FileMode.Open, FileAccess.Read), System.Text.Encoding.UTF8))
-                        {
-                            return JsonConvert.DeserializeObject<Document>(r.ReadToEnd()).documentName;
-                        }
-                    })
-                    .OrderBy(x => x)
-                    .ToList();
-                }
-                catch
-                {
-                    return new List<string>();
-                }
+                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "database", "documents"));
             }
         }
         [BindProperty]
-        public List<KeyValuePair<string, List<string>>> parallelDocumentNames
+        public List<KeyValuePair<string, List<string>>> parallelManuscriptNames
         {
             get
             {
-                try
+                var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "parallelizedDocuments")).GetFiles();
+                if (files.Length < 1) return new List<KeyValuePair<string, List<string>>>();
+                return files.Select(f =>
                 {
-                    return new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "parallelizedDocuments")).GetFiles().Select(f =>
+                    using (StreamReader r = new StreamReader(new FileStream(f.FullName, FileMode.Open, FileAccess.Read), System.Text.Encoding.UTF8))
                     {
-                        using (StreamReader r = new StreamReader(new FileStream(f.FullName, FileMode.Open, FileAccess.Read), System.Text.Encoding.UTF8))
+                        var parallelizedScript = JsonConvert.DeserializeObject<ParallelManuscript>(r.ReadToEnd());
+                        var parallelizedClausesNames = new List<string>();
+                        for (int i = 0; i < parallelizedScript.parallelClauses.GetLength(0); i++)
                         {
-                            var parallelizedDoc = JsonConvert.DeserializeObject<ParallelDocument>(r.ReadToEnd());
-                            var parallelizedClausesNames = new List<string>();
-                            for (int i = 0; i < parallelizedDoc.parallelClauses.GetLength(1); i++)
-                            {
-                                parallelizedClausesNames.Add(parallelizedDoc.parallelClauses[0, i].textName + " (" + i.ToString()+ ")");
-                            }
-                            return new KeyValuePair<string, List<string>>(parallelizedDoc.name, parallelizedClausesNames);
+                            parallelizedClausesNames.Add(parallelizedScript.parallelClauses[i, 0].text + " (" + i.ToString()+ ")");
                         }
-                    })
-                    .OrderBy(x => x.Key)
-                    .ToList();
-                }
-                catch
-                {
-                    return new List<KeyValuePair<string, List<string>>>();
-                }
-            }
+                        return new KeyValuePair<string, List<string>>(parallelizedScript.text, parallelizedClausesNames);
+                    }
+                })
+                .OrderBy(x => x.Key)
+                .ToList();
+        }
         }
         [BindProperty]
         public List<string> chosenTexts { get; set; }
@@ -88,32 +69,34 @@ namespace CroatianProject.Pages
         public void OnPost()
         {
             var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "documents")).GetFiles();
-            var documents = new List<Document>();
+            var scripts = new List<Manuscript>();
             if (files.Length > 0)
             {
                 for (int f = 0; f < files.Length; f++)
                 {
                     using (StreamReader r = new StreamReader(new FileStream(files[f].FullName, FileMode.Open, FileAccess.Read)))
                     {
-                        documents.Add(JsonConvert.DeserializeObject<Document>(r.ReadToEnd()));
+                        scripts.Add(JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd()));
                     }
 
                 }
-                documents = documents.Where(x => chosenTexts.Contains(x.documentName)).ToList();
-                var taggedDocs = documents.Where(d => d.documentMetaData.Any(f => f.ContainsKey("Tagged") && f["Tagged"].Any(t => t.name != "Not_tagged"))).ToList();
-                var untaggedDocs = documents.Where(d => d.documentMetaData.Any(f => !f.ContainsKey("Tagged") || f["Tagged"].Any(t => t.name == "Not_tagged"))).ToList();
-                List<string> untaggedLemmata = untaggedDocs
-                    .SelectMany(d => d.texts)
-                    .SelectMany(t => t.clauses)
-                    .SelectMany(c => c.realizations)
-                    .Select(r => r.lexemeTwo)
+                scripts = scripts.Where(x => chosenTexts.Contains(x.text)).ToList();
+                var taggedScripts = scripts.Where(s => s.tagging.Any(f => f.ContainsKey("Tagged") && f["Tagged"].Any(t => t.name != "Not_tagged"))).ToList();
+                var untaggedScripts = scripts.Where(s => s.tagging.Any(f => !f.ContainsKey("Tagged") || f["Tagged"].Any(t => t.name == "Not_tagged"))).ToList();
+                List<string> untaggedLemmata = untaggedScripts
+                    .SelectMany(s => s.subunits)
+                    .SelectMany(sct => sct.subunits)
+                    .SelectMany(sgm => sgm.subunits)
+                    .SelectMany(c => c.subunits)
+                    .Select(t => t.text)
                     .Distinct()
                     .ToList();
-                List<string> taggedLemmata = taggedDocs
-                    .SelectMany(d => d.texts)
-                    .SelectMany(t => t.clauses)
-                    .SelectMany(c => c.realizations)
-                    .SelectMany(r => r.realizationFields.Where(t => t.ContainsKey("Lemma"))
+                List<string> taggedLemmata = taggedScripts
+                    .SelectMany(s => s.subunits)
+                    .SelectMany(sct => sct.subunits)
+                    .SelectMany(sgm => sgm.subunits)
+                    .SelectMany(c => c.subunits)
+                    .SelectMany(tkn => tkn.tagging.Where(t => t.ContainsKey("Lemma"))
                     .SelectMany(t => t["Lemma"])
                     .Select(v => v.name))
                     .Distinct()
@@ -121,7 +104,7 @@ namespace CroatianProject.Pages
                 taggedLemmata.AddRange(untaggedLemmata);
                 List<string> lemmata = taggedLemmata.Distinct().ToList();
                 var finalDictionary = new List<DictionaryUnit>();
-                lemmata.ForEach(lemma => finalDictionary.Add(new DictionaryUnit(lemma, untaggedDocs.SelectMany(d => d.texts).SelectMany(t => t.clauses).SelectMany(c => c.realizations).Where(r => r.lexemeTwo == lemma).ToList().Concat(taggedDocs.SelectMany(d => d.texts).SelectMany(t => t.clauses).SelectMany(c => c.realizations).Where(r => r.realizationFields.Where(f => f.ContainsKey("Lemma")).SelectMany(kvp => kvp["Lemma"]).Any(v => v.name == lemma)).ToList()).ToList())));
+                lemmata.ForEach(lemma => finalDictionary.Add(new DictionaryUnit(lemma, untaggedScripts.SelectMany(s => s.subunits).SelectMany(sct => sct.subunits).SelectMany(sgm => sgm.subunits).SelectMany(c => c.subunits).Where(tkn => tkn.text == lemma).ToList().Concat(taggedScripts.SelectMany(s => s.subunits).SelectMany(sct => sct.subunits).SelectMany(sgm => sgm.subunits).SelectMany(c => c.subunits).Where(tkn => tkn.tagging.Where(f => f.ContainsKey("Lemma")).SelectMany(kvp => kvp["Lemma"]).Any(v => v.name == lemma)).ToList()).ToList())));
                 finalDictionary = finalDictionary.OrderBy(unit => unit.lemma).ToList();
                 if (dictsToFiles == true)
                 {
@@ -143,13 +126,13 @@ namespace CroatianProject.Pages
                         }
                     }
                 }
-                finalDictionary.ForEach(x => convertedTexts.Add("<b>" + x.lemma + "(" + x.realizations.Count + ")</b><br /><br/><br/>" + ((x.realizations.Count > 0) ? string.Join("<br /><br/>", x.realizations.Select(r => "<i>" + r.lexemeTwo + "</i>(<i>" + documents.Where(d => d.documentID == r.documentID).SelectMany(d => d.texts).Where(t => t.textID == r.textID).SelectMany(t => t.clauses).Where(c => c.clauseID == r.clauseID).First().clauseText + "</i>)" + ((r.realizationFields != null) ? ":<br/>" + string.Join("<br />", r.realizationFields.SelectMany(t => t).Where(a => a.Key != "Lemma").Select(a => a.Key + ": " + string.Join("", a.Value.SelectMany(v => v.name).ToList())).Distinct().ToList()) : "")).ToList()) : "") + "<br/><br/><br/><br/>"));
+                finalDictionary.ForEach(x => convertedTexts.Add("<b>" + x.lemma + "(" + x.realizations.Count + ")</b><br /><br/><br/>" + ((x.realizations.Count > 0) ? string.Join("<br /><br/>", x.realizations.Select(r => "<i>" + r.text + "</i>(<i>" + scripts.Where(s => s.Id == r.Id.Split('|')[0]).SelectMany(s => s.subunits).Where(sct => sct.Id.Split('|')[1] == r.Id.Split('|')[1]).SelectMany(sgm => sgm.subunits).Where(c => c.Id.Split('|')[2] == r.Id.Split('|')[2]).SelectMany(c => c.subunits).Where(c => c.Id.Split('|')[3] == r.Id.Split('|')[3]).First().text + "</i>)" + ((r.tagging != null) ? ":<br/>" + string.Join("<br />", r.tagging.SelectMany(t => t).Where(a => a.Key != "Lemma").Select(a => a.Key + ": " + string.Join("", a.Value.SelectMany(v => v.name).ToList())).Distinct().ToList()) : "")).ToList()) : "") + "<br/><br/><br/><br/>"));
             }
         }
 
         public void OnPostParallel()
         {
-            var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "parallelizedDocuments")).GetFiles();
+            var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "parallelizedManuscripts")).GetFiles();
             var documents = new List<ParallelDocument>();
             if (files.Length > 0)
             {
