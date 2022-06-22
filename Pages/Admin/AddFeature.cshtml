@@ -15,17 +15,14 @@
         {@(field + "|")}
     </div>
     <div id="doctexts" style="display:none;">
-        @foreach (var doc in Model.docList)
+        @foreach (var doc in Model.manuscriptList)
         {
            @(doc)
         }
     </div>
 <h2>Добавление признаков в текст</h2>
 <form align="center" method="get">
-    <select id="docs" asp-for="docName">
-        <option>Any</option>
-    </select>
-    <select id="texts" asp-for="textName">
+    <select id="manuscriptList" asp-for="names">
         <option>Any</option>
     </select>
     <button>Показать текст</button><br />
@@ -48,9 +45,9 @@
 <div>
     <div align="justify" style="float:left; width:50%;">
         <form method="post">
-            <textarea id="changedText" style="display:none;" asp-for="currentText"></textarea>
+            <textarea id="changedText" style="display:none;" asp-for="currentSection"></textarea>
             <div id="currText">
-                @Html.Raw(Model.textByWords)
+                @Html.Raw(Model.sectionByWords)
             </div>
             <button id="SaveChanges">Сохранить изменения</button><br />
             <button>Внести изменения</button>

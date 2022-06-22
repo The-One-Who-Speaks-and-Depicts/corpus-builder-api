@@ -91,80 +91,19 @@ namespace CroatianProject.Pages.Admin
                     }
                 }
             }
-            foreach (Clause clause in editedDocument.texts.Where(t => t.textID == text_edited).ToList()[0].clauses)
+            foreach (var clause in editedManuscript.subunits.Where(t => t.Id.Split('|')[1] == text_edited).Single().subunits.SelectMany(sgm => sgm.subunits).ToList())
             {
-                List<string> forEditing = units.Select(c => c.Value).Where(v => Regex.Replace(v.Split('|')[2], @"(\s.*|\})", "") == clause.clauseID).ToList();
+                List<string> forEditing = units.Select(c => c.Value).Where(v => (Regex.Replace(v.Split('|')[2], @"(\s.*|\})", "") + "|" + Regex.Replace(v.Split('|')[2], @"(\s.*|\})", ""))  == (clause.Id.Split('|')[2] + "|" + clause.Id.Split('|')[3])).ToList();
                 for (int i = 0; i < forEditing.Count; i++)
                 {
-                    if (Regex.IsMatch(forEditing[i], @"\{(\d*\|){2}(\d*)(\s.*?\}|\})"))
+                    if (Regex.IsMatch(forEditing[i], @"\{(\d*\|){3}(\d*)(\s.*?\}|\})"))
                     {
-                        try
+                        List<string> addedFields = forEditing[i].Split(" => ")[1].Replace("{", "").Split(";<br />").ToList();
+                        List<Dictionary<string, List<Value>>> newFields = new List<Dictionary<string, List<Value>>>();
+                        Dictionary<string, List<Value>> addedField = new Dictionary<string, List<Value>>();
+                        for (int j = 0; j < addedFields.Count; j++)
                         {
-                            List<string> addedFields = forEditing[i].Split(" => ")[1].Replace("{", "").Split(";<br />").ToList();
-                            List<Dictionary<string, List<Value>>> newFields = new List<Dictionary<string, List<Value>>>();
-                            Dictionary<string, List<Value>> addedField = new Dictionary<string, List<Value>>();
-                            for (int j = 0; j < addedFields.Count; j++)
-                            {
-                                if (addedFields[j] != "")
-                                {
-                                    List<string> currentFields = addedFields[j].Replace(" ;}", "").Split(";").ToList();
-                                    for (int f = 0; f < currentFields.Count; f++)
-                                    {
-                                        if (currentFields[f] != "}")
-                                        {
-                                            string field = currentFields[f].Split(':')[0];
-                                            string values = currentFields[f].Split(':')[1];
-                                            List<Value> addedValues = new List<Value>();
-                                            if (values.Contains(','))
-                                            {
-                                                List<string> splitValues = values.Split(",").ToList();
-                                                for (int k = 0; k < splitValues.Count; k++)
-                                                {
-                                                    addedValues.Add(new Value(splitValues[k].Trim()));
-                                                }
-                                            }
-                                            else
-                                            {
-                                                addedValues.Add(new Value(values.Trim()));
-                                            }
-                                            addedField[field] = addedValues;
-                                        }
-                                    }
-                                }
-                            }
-                            newFields.Add(addedField);
-                            clause.clauseFields = newFields;
-                        }
-                        catch (IndexOutOfRangeException)
-                        {
-                            try
-                            {
-                                if (clause.clauseFields.Count < 1)
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    clause.clauseFields.Clear();
-                                }
-                            }
-                            catch (NullReferenceException)
-                            {
-                                continue;
-                            }
-                        }
-                    }
-                    else if (Regex.IsMatch(forEditing[i], @"\{(\d*\|){4}(\d*)(\s.*?\}|\})"))
-                    {
-                        string realizationID = Regex.Replace(forEditing[i].Split('|')[3], @"(\s.*|\})", "");
-                        string graphemeID = Regex.Replace(forEditing[i].Split('|')[4], @"(\s.*|\})", "");
-                        Grapheme grapheme = clause.realizations.Where(r => r.realizationID == realizationID).Select(r => r.letters).ToList()[0].Where(g => g.graphemeID == graphemeID).ToList()[0];
-                        try
-                        {
-                            List<string> addedFields = forEditing[i].Split(" => ")[1].Replace("{", "").Split(";<br />").ToList();
-                            List<Dictionary<string, List<Value>>> newFields = new List<Dictionary<string, List<Value>>>();
-                            Dictionary<string, List<Value>> addedField = new Dictionary<string, List<Value>>();
-                            for (int j = 0; j < addedFields.Count; j++)
+                            if (addedFields[j] != "")
                             {
                                 List<string> currentFields = addedFields[j].Replace(" ;}", "").Split(";").ToList();
                                 for (int f = 0; f < currentFields.Count; f++)
@@ -190,106 +129,104 @@ namespace CroatianProject.Pages.Admin
                                     }
                                 }
                             }
-                            newFields.Add(addedField);
-                            grapheme.graphemeFields = newFields;
                         }
-                        catch (IndexOutOfRangeException)
-                        {
-                            try
-                            {
-                                if (grapheme.graphemeFields.Count < 1)
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    grapheme.graphemeFields.Clear();
-                                }
-                            }
-                            catch (NullReferenceException)
-                            {
-                                continue;
-                            }
-                        }
+                        newFields.Add(addedField);
+                        clause.tagging = newFields;
                     }
-                    else if (Regex.IsMatch(forEditing[i], @"\{(\d*\|){3}(\d*)(\s.*?\}|\})"))
+                    else if (Regex.IsMatch(forEditing[i], @"\{(\d*\|){5}(\d*)(\s.*?\}|\})"))
                     {
-                        Realization realization = clause.realizations.Where(r => r.realizationID == Regex.Replace(forEditing[i].Split('|')[3], @"(\s.*|\})", "")).ToList()[0];
-                        try
+                        string realizationID = Regex.Replace(forEditing[i].Split('|')[4], @"(\s.*|\})", "");
+                        string graphemeID = Regex.Replace(forEditing[i].Split('|')[5], @"(\s.*|\})", "");
+                        var grapheme = clause.subunits.Where(r => r.Id.Split('|')[4] == realizationID).Select(r => r.subunits).First().Where(g => g.Id.Split('|')[5] == graphemeID).First();
+                        List<string> addedFields = forEditing[i].Split(" => ")[1].Replace("{", "").Split(";<br />").ToList();
+                        List<Dictionary<string, List<Value>>> newFields = new List<Dictionary<string, List<Value>>>();
+                        Dictionary<string, List<Value>> addedField = new Dictionary<string, List<Value>>();
+                        for (int j = 0; j < addedFields.Count; j++)
                         {
-                            List<string> addedFields = forEditing[i].Split(" => ")[1].Split("***").ToList();
-                            List<Dictionary<string, List<Value>>> newFields = new List<Dictionary<string, List<Value>>>();
-                            for (int j = 0; j < addedFields.Count; j++)
+                            List<string> currentFields = addedFields[j].Replace(" ;}", "").Split(";").ToList();
+                            for (int f = 0; f < currentFields.Count; f++)
                             {
-                                Dictionary<string, List<Value>> addedTagging = new Dictionary<string, List<Value>>();
-                                if (addedFields[j] != "")
+                                if (currentFields[f] != "}")
                                 {
-                                    List<string> tagging = addedFields[j].Split(";<br />").ToList();
-                                    for (int f = 0; f < tagging.Count; f++)
+                                    string field = currentFields[f].Split(':')[0];
+                                    string values = currentFields[f].Split(':')[1];
+                                    List<Value> addedValues = new List<Value>();
+                                    if (values.Contains(','))
                                     {
-                                        if (tagging[f] != "}")
+                                        List<string> splitValues = values.Split(",").ToList();
+                                        for (int k = 0; k < splitValues.Count; k++)
                                         {
-                                            List<string> fieldsToAdd = tagging[f].Split(" ;").ToList();
-                                            for (int n = 0; n < fieldsToAdd.Count; n++)
+                                            addedValues.Add(new Value(splitValues[k].Trim()));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        addedValues.Add(new Value(values.Trim()));
+                                    }
+                                    addedField[field] = addedValues;
+                                }
+                            }
+                        }
+                        newFields.Add(addedField);
+                        grapheme.tagging = newFields;
+                    }
+                    else if (Regex.IsMatch(forEditing[i], @"\{(\d*\|){4}(\d*)(\s.*?\}|\})"))
+                    {
+                        var token = clause.subunits.Where(r => r.Id.Split('|')[4] == Regex.Replace(forEditing[i].Split('|')[4], @"(\s.*|\})", "")).First();
+                        List<string> addedFields = forEditing[i].Split(" => ")[1].Split("***").ToList();
+                        List<Dictionary<string, List<Value>>> newFields = new List<Dictionary<string, List<Value>>>();
+                        for (int j = 0; j < addedFields.Count; j++)
+                        {
+                            Dictionary<string, List<Value>> addedTagging = new Dictionary<string, List<Value>>();
+                            if (addedFields[j] != "")
+                            {
+                                List<string> tagging = addedFields[j].Split(";<br />").ToList();
+                                for (int f = 0; f < tagging.Count; f++)
+                                {
+                                    if (tagging[f] != "}")
+                                    {
+                                        List<string> fieldsToAdd = tagging[f].Split(" ;").ToList();
+                                        for (int n = 0; n < fieldsToAdd.Count; n++)
+                                        {
+                                            if (fieldsToAdd[n] != "" && fieldsToAdd[n] != ";")
                                             {
-                                                if (fieldsToAdd[n] != "" && fieldsToAdd[n] != ";")
+                                                List<string> splitFields = fieldsToAdd[n].Split(';').ToList();
+                                                for (int s = 0; s < splitFields.Count; s++)
                                                 {
-                                                    List<string> splitFields = fieldsToAdd[n].Split(';').ToList();
-                                                    for (int s = 0; s < splitFields.Count; s++)
+                                                    if (splitFields[s] != ";" && splitFields[s] != "")
                                                     {
-                                                        if (splitFields[s] != ";" && splitFields[s] != "")
+                                                        string field = splitFields[s].Split(':')[0];
+                                                        string values = splitFields[s].Split(':')[1].Replace(";", "");
+                                                        List<Value> addedValues = new List<Value>();
+                                                        if (values.Contains(','))
                                                         {
-                                                            string field = splitFields[s].Split(':')[0];
-                                                            string values = splitFields[s].Split(':')[1].Replace(";", "");
-                                                            List<Value> addedValues = new List<Value>();
-                                                            if (values.Contains(','))
+                                                            List<string> splitValues = values.Split(",").ToList();
+                                                            for (int k = 0; k < splitValues.Count; k++)
                                                             {
-                                                                List<string> splitValues = values.Split(",").ToList();
-                                                                for (int k = 0; k < splitValues.Count; k++)
-                                                                {
-                                                                    addedValues.Add(new Value(splitValues[k].Trim()));
-                                                                }
+                                                                addedValues.Add(new Value(splitValues[k].Trim()));
                                                             }
-                                                            else
-                                                            {
-                                                                addedValues.Add(new Value(values.Trim()));
-                                                            }
-                                                            addedTagging[field] = addedValues;
                                                         }
+                                                        else
+                                                        {
+                                                            addedValues.Add(new Value(values.Trim()));
+                                                        }
+                                                        addedTagging[field] = addedValues;
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                newFields.Add(addedTagging);
                             }
-                            realization.realizationFields = newFields;
-                            realization.realizationFields = realization.realizationFields.Where(d => d.Count != 0).ToList();
+                            newFields.Add(addedTagging);
                         }
-                        catch (IndexOutOfRangeException)
-                        {
-                            try
-                            {
-                                if (realization.realizationFields.Count < 1)
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    realization.realizationFields.Clear();
-                                }
-                            }
-                            catch
-                            {
-                                continue;
-                            }
-                        }
+                        token.tagging = newFields;
+                        token.tagging = token.tagging.Where(d => d.Count != 0).ToList();
                     }
                 }
             }
-            string documentInJSON = editedDocument.Jsonize();
-            var documentDBFile = Path.Combine(_environment.ContentRootPath, "database", "documents", editedDocument.documentID + "_" + editedDocument.documentName + ".json");
+            string documentInJSON = editedManuscript.Jsonize();
+            var documentDBFile = Path.Combine(_environment.ContentRootPath, "database", "manuscripts", editedManuscript.Id + "_" + editedManuscript.text + ".json");
             FileStream fs = new FileStream(documentDBFile, FileMode.Create);
             using (StreamWriter w = new StreamWriter(fs))
             {
