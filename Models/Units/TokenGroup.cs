@@ -1,9 +1,10 @@
-using Newtonsoft.Json;
 using ManuscriptsProcessor.Values;
+using ManuscriptsProcessor;
+using Newtonsoft.Json;
 
 namespace ManuscriptsProcessor.Units
 {
-    public class ParallelToken : ICorpusUnit, IUnitGroup<TokenGroup>, IComparable<ParallelToken>
+    public class TokenGroup : ICorpusUnit, IUnitGroup<Token>, IComparable<TokenGroup>
     {
         [JsonProperty]
         public string Id { get; set; }
@@ -12,22 +13,17 @@ namespace ManuscriptsProcessor.Units
         [JsonProperty]
         public List<Dictionary<string, List<Value>>> tagging { get; set; }
         [JsonProperty]
-        public List<TokenGroup> subunits { get; set; }
-
-        public List<TokenGroup> GetParallels(TokenGroup source)
-        {
-            var parallels = this.subunits.Where(r => r != source).ToList();
-            return parallels;
-        }
+        public List<Token> subunits { get; set; }
         [JsonConstructor]
-        public ParallelToken (string _Id, string _text, List<Dictionary<string, List<Value>>> _tagging, List<TokenGroup> _subunits)
+        public TokenGroup (string _Id, string _text, List<Dictionary<string, List<Value>>> _tagging, List<Token> _subunits)
         {
             Id = _Id;
             text = _text;
             tagging = _tagging;
             subunits = _subunits;
         }
-        public ParallelToken()
+
+        public TokenGroup()
         {
 
         }
@@ -41,10 +37,9 @@ namespace ManuscriptsProcessor.Units
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
-        public int CompareTo(ParallelToken other)
+        public int CompareTo(TokenGroup other)
         {
             return MyExtensions.CompareIds(Id, other.Id);
         }
-
     }
 }

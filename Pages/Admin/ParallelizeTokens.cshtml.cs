@@ -67,11 +67,11 @@ namespace CroatianProject.Pages
                 for (int i = 0; i < tokens.Count; i++)
                 {
                     parallelizedTokens.Add("<div>");
-                    for (int j = 0; j < tokens[i].Count; j++)
+                    for (int j = 0; j < tokens[i].subunits.Count; j++)
                     {
-                        for (int k = 0; k < tokens[i][j].Count; k++)
+                        for (int k = 0; k < tokens[i].subunits[j].subunits.Count; k++)
                         {
-                            parallelizedTokens[i] += "{" + tokens[i][j][k].Id + " - " + tokens[i][j][k].text + "};";
+                            parallelizedTokens[i] += "{" + tokens[i].subunits[j].subunits[k].Id + " - " + tokens[i].subunits[j].subunits[k].text + "};";
                         }
                     }
                     parallelizedTokens[i] += "<button id=\"deleteTemporary\">[[Delete]]</button></div>";
@@ -84,21 +84,21 @@ namespace CroatianProject.Pages
         public IActionResult OnPostTag(string sequenceOfParallelTokens)
         {
             var parallels = sequenceOfParallelTokens.Trim().Split("[[Delete]]").Where(parallel => parallel != "").ToList();
-            ParallelManuscript parallelSubcorpus = null;
-            string parallelSubcorpusFilePath = null;
+            ParallelManuscript? parallelSubcorpus = null;
+            string? parallelSubcorpusFilePath = null;
             foreach (var parallel in parallels)
             {
                 var sequencesSplit = parallel.Split("};").Where(token => token != "").ToList();
                 var sequencesIDs = sequencesSplit.Select(x => x.Trim().Trim('{').Split(" - ")[0]).ToList();
                 if (parallelSubcorpus is null)
                 {
-                    string documentID = sequencesIDs[0].Split('|')[0];
+                    string scriptID = sequencesIDs[0].Split('|')[0];
                     var dirParallelCorpus =Path.Combine(_environment.ContentRootPath, "database", "parallelizedDocuments");
                     DirectoryInfo directoryParallelCorpusInfo = new DirectoryInfo(dirParallelCorpus);
-                    parallelSubcorpusFilePath = directoryParallelCorpusInfo.GetFiles().Where(f => f.Name.Split('_')[0] == documentID).FirstOrDefault().FullName;
+                    parallelSubcorpusFilePath = directoryParallelCorpusInfo.GetFiles().Where(f => f.Name.Split('_')[0] == scriptID).FirstOrDefault().FullName;
                     using (StreamReader r = new StreamReader(new FileStream(parallelSubcorpusFilePath, FileMode.Open)))
                     {
-                        parallelSubcorpus = JsonConvert.DeserializeObject<ParallelDocument>(r.ReadToEnd());
+                        parallelSubcorpus = JsonConvert.DeserializeObject<ParallelManuscript>(r.ReadToEnd());
                     }
                     parallelSubcorpus.parallelTokens = new List<ParallelToken>();
                 }
@@ -108,7 +108,7 @@ namespace CroatianProject.Pages
                     Console.WriteLine(token);
                     var splitID = token.Split('|').Where(x => x != "").ToList();
                     RealizationGroup currentGroup;
-                    if (token2Add.Where(g => g.documentID == splitID[0] && g.textID == splitID[2] && g.clauseID == splitID[1]).ToList().Count == 0)
+                    if (token2Add.Where(g => g.Id == splitID[0] && g.textID == splitID[2] && g.clauseID == splitID[1]).ToList().Count == 0)
                     {
                         currentGroup = new RealizationGroup();
                         currentGroup.documentID = splitID[0];
