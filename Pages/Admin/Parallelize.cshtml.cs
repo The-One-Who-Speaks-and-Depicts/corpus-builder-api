@@ -17,7 +17,7 @@ namespace CroatianProject.Pages
         {
             get
             {
-                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "database", "parallelizedManuscripts"));
+                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "database", "manuscripts"));
             }
         }
 
@@ -25,12 +25,12 @@ namespace CroatianProject.Pages
         {
             _environment = environment;
         }
-        public void OnPostParallelize(string documentPicked)
+        public void OnPostParallelize(string manuscriptPicked)
         {
             var dirTexts = Path.Combine(_environment.ContentRootPath, "database", "parallelizedManuscripts");
             Directory.CreateDirectory(dirTexts);
             var scriptToParallelize = new Manuscript();
-            using (StreamReader r = new StreamReader(new FileStream(Path.Combine(_environment.ContentRootPath, "database", "manuscripts", documentPicked + ".json"), FileMode.Open)))
+            using (StreamReader r = new StreamReader(new FileStream(Path.Combine(_environment.ContentRootPath, "database", "manuscripts", manuscriptPicked + ".json"), FileMode.Open)))
             {
                 scriptToParallelize = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
             }
