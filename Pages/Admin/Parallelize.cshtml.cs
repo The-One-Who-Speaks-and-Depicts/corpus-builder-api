@@ -30,7 +30,7 @@ namespace CroatianProject.Pages
             var dirTexts = Path.Combine(_environment.ContentRootPath, "database", "parallelizedManuscripts");
             Directory.CreateDirectory(dirTexts);
             var scriptToParallelize = new Manuscript();
-            using (StreamReader r = new StreamReader(new FileStream(Path.Combine(_environment.ContentRootPath, "database", "manuscripts", manuscriptPicked + ".json"), FileMode.Open)))
+            using (StreamReader r = new StreamReader(new FileStream(Path.Combine(_environment.ContentRootPath, "database", "manuscripts", manuscriptPicked.Split('[')[1].Split(']')[0] + "_" + manuscriptPicked.Split('[')[0] + ".json"), FileMode.Open)))
             {
                 scriptToParallelize = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
             }
@@ -39,20 +39,21 @@ namespace CroatianProject.Pages
             parallelManuscript.Id = directoryTextsInfo.GetFiles().Length.ToString();
             parallelManuscript.text = scriptToParallelize.text;
             parallelManuscript.tagging = scriptToParallelize.tagging;
-            int maxClausesNumber = scriptToParallelize.subunits.SelectMany(t => t.subunits).Select(t => t.subunits.Count).Max();
+            int maxClausesNumber = scriptToParallelize.subunits.Select(sct => sct.subunits.Count * sct.subunits.Select(c => c.subunits.Count).ToList().Count).Max();
             ParallelClause[,] parallelMatrix = new ParallelClause[scriptToParallelize.subunits.Count, maxClausesNumber];
             for (int i = 0; i < scriptToParallelize.subunits.Count; i++)
             {
                 var sectionClauses = scriptToParallelize.subunits[i].subunits.SelectMany(t => t.subunits).ToList();
                 for (int j = 0; j < maxClausesNumber; j++)
                 {
-                    if (sectionClauses[j] is null) break;
+                    if (j >= sectionClauses.Count) continue;
                     parallelMatrix[i, j] = new ParallelClause
                     {
                         text = scriptToParallelize.subunits[i].text,
                         tagging = scriptToParallelize.subunits[i].tagging,
                         clause = sectionClauses[j]
                     };
+
                 }
             }
             parallelManuscript.parallelClauses = parallelMatrix;

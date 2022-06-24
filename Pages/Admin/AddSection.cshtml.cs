@@ -100,7 +100,7 @@ namespace CroatianProject.Pages
                     }
                 }
             }
-            var clauses = processedString.Split(new char[] {'\n', '\r'}).Where(x => x != "").ToList();
+            var clauses = processedString.Split(new char[] { '\n', '\r' }).Where(x => x != "").ToList();
             var wordsByClauses = new List<DecomposedSegment>();
             foreach (var clause in clauses)
             {
@@ -131,27 +131,29 @@ namespace CroatianProject.Pages
                     tokens = preparedTokens
                 });
             }
-            addedSection.subunits = new List<Segment>();
+            if (addedSection.subunits is null || addedSection.subunits.Count < 1) addedSection.subunits = new List<Segment>();
             for (int i = 0; i < wordsByClauses.Count; i++)
             {
                 var addedSegment = new Segment(addedSection, i.ToString(), wordsByClauses[i].clause);
                 var addedClause = new Clause(addedSegment, i.ToString(), wordsByClauses[i].clause);
+                if (addedClause.subunits is null || addedClause.subunits.Count < 1) addedClause.subunits = new List<Token>();
                 addedClause.subunits = new List<Token>();
                 var realizations = wordsByClauses[i].tokens;
                 for (int j = 0; j < realizations.Count; j++)
                 {
                     var addedRealization = new Token(addedClause, j.ToString(), realizations[j].lexemeOne, realizations[j].lexemeTwo);
-                    addedRealization.subunits = new List<Grapheme>();
+                    if (addedRealization.subunits is null || addedRealization.subunits.Count < 1)addedRealization.subunits = new List<Grapheme>();
                     for (int k = 0; k < realizations[j].graphemes.Count; k++)
                     {
                         addedRealization.subunits.Add(new Grapheme(addedRealization, k.ToString(), realizations[j].graphemes[k]));
                     }
                     addedClause.subunits.Add(addedRealization);
                 }
-                addedSegment.subunits = new List<Clause>();
+                if (addedSegment.subunits is null || addedSegment.subunits.Count < 1)addedSegment.subunits = new List<Clause>();
+                addedSegment.subunits.Add(addedClause);
                 addedSection.subunits.Add(addedSegment);
             }
-            analyzedManuscript.subunits = new List<Section>();
+            if (analyzedManuscript.subunits is null || analyzedManuscript.subunits.Count < 1)analyzedManuscript.subunits = new List<Section>();
             analyzedManuscript.subunits.Add(addedSection);
             using (StreamWriter w = new StreamWriter(Path.Combine(_environment.ContentRootPath, "database", "manuscripts", analyzedManuscript.Id + "_" + analyzedManuscript.text + ".json")))
             {

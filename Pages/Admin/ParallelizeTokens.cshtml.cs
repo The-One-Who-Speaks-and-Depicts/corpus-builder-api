@@ -53,12 +53,13 @@ namespace CroatianProject.Pages
             }
             var manuscript = deserializedManuscripts.Where(d => d.Id == id).FirstOrDefault();
             var clauses = manuscript.parallelClauses;
-            for (int i = 0; i < clauses.GetLength(0); i++)
+            for (int i = 0; i < clauses.GetLength(1); i++)
             {
                 parallelizedClauses.Add(new List<string>());
-                for (int j = 0; j < clauses.GetLength(1); j++)
+                for (int j = 0; j < clauses.GetLength(0); j++)
                 {
-                    parallelizedClauses[i].Add(clauses[i, j].clause is null ? "-" : String.Join(' ', clauses[i, j].clause.subunits.Select(t => "<span class=\"token\" id=\"" + id  + "|" + i + "|" + j + "|" + t.Id.Split('|')[4] + "\">" + t.Output() + "</span>")));
+                    if (clauses[j, i] is null) continue;
+                    parallelizedClauses[i].Add(clauses[j, i].clause is null ? "-" : String.Join(' ', clauses[j, i].clause.subunits.Select(t => "<span class=\"token\" id=\"" + id  + "|" + i + "|" + j + "|" + t.Id.Split('|')[4] + "\">" + t.Output() + "</span>")));
                 }
             }
             var tokens = manuscript.parallelTokens;
