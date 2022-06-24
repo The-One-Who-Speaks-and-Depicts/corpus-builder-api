@@ -12,25 +12,21 @@ namespace ManuscriptsProcessor.Units
         [JsonProperty]
         public string text { get; set; }
         [JsonProperty]
-        public string filePath { get; set; }
-        [JsonProperty]
         public List<Dictionary<string, List<Value>>> tagging { get; set; }
         [JsonProperty]
         public List<Clause> subunits { get; set; }
         [JsonConstructor]
-        public Segment(string _Id, string _text, List<Dictionary<string, List<Value>>> _tagging, List<Clause> _subunits, string _filePath)
+        public Segment(string _Id, string _text, List<Dictionary<string, List<Value>>> _tagging, List<Clause> _subunits)
         {
             Id = _Id;
             text = _text;
             tagging = _tagging;
             subunits = _subunits;
-            filePath = _filePath;
         }
 
         public Segment(Section _section, string _segmentId, string name)
         {
             Id = _section.Id + "|" + _segmentId;
-            filePath = _section.filePath;
             text = name;
         }
 

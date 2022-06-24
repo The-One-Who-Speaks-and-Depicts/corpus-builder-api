@@ -11,8 +11,6 @@ namespace ManuscriptsProcessor.Units
 
         #region objectValues
         [JsonProperty]
-        public string filePath { get; set; }
-        [JsonProperty]
         public List<Dictionary<string, List<Value>>> tagging { get; set; }
         [JsonProperty]
         public string Id { get; set; }
@@ -27,9 +25,8 @@ namespace ManuscriptsProcessor.Units
         #region Constructors
 
         [JsonConstructor]
-        public Token(string _filePath, List<Dictionary<string, List<Value>>> _fields, string _realizationID, string _lexemeOne, string _lexemeTwo, List<Grapheme> _letters)
+        public Token(List<Dictionary<string, List<Value>>> _fields, string _realizationID, string _lexemeOne, string _lexemeTwo, List<Grapheme> _letters)
         {
-            this.filePath = _filePath;
             this.tagging = _fields;
             this.Id = _realizationID;
             this.lexemeView = _lexemeOne;
@@ -39,16 +36,14 @@ namespace ManuscriptsProcessor.Units
 
         public Token(Clause clause, string _realizationID, string _lexemeOne, string _lexemeTwo)
         {
-            this.filePath = clause.filePath;
             this.Id = clause.Id + "|" +_realizationID;
             this.lexemeView =_lexemeOne;
             this.text = _lexemeTwo;
         }
 
 
-        public Token(string _filePath, string _realizationID, string _lexemeOne, string _lexemeTwo)
+        public Token(string _realizationID, string _lexemeOne, string _lexemeTwo)
         {
-            this.filePath = _filePath;
             this.Id = _realizationID;
             this.lexemeView = _lexemeOne;
             this.text = _lexemeTwo;

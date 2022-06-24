@@ -11,8 +11,6 @@ namespace ManuscriptsProcessor.Units
 
         #region objectValues
         [JsonProperty]
-        public string filePath { get; set; }
-        [JsonProperty]
         public List<Dictionary<string, List<Value>>> tagging { get; set; }
         [JsonProperty]
         public string Id { get; set; }
@@ -25,17 +23,15 @@ namespace ManuscriptsProcessor.Units
 
         #region Constructors
         [JsonConstructor]
-        public Clause(string _filePath, string _clauseID, string _clauseText, List<Dictionary<string, List<Value>>> _clauseFields, List<Token> _realizations)
+        public Clause(string _clauseID, string _clauseText, List<Dictionary<string, List<Value>>> _clauseFields, List<Token> _realizations)
         {
-            this.filePath = _filePath;
             this.Id = _clauseID;
             this.text = _clauseText;
             this.tagging = _clauseFields;
             this.subunits = _realizations;
         }
-        public Clause(string _filePath, string _clauseID, string _clauseText)
+        public Clause(string _clauseID, string _clauseText)
         {
-            this.filePath = _filePath;
             this.Id = _clauseID;
             this.text = _clauseText;
         }
@@ -43,7 +39,6 @@ namespace ManuscriptsProcessor.Units
         public Clause(Segment segment, string _clauseID, string _clauseText)
         {
             this.Id = segment.Id + "|" + _clauseID;
-            this.filePath = segment.filePath;
             this.text = _clauseText;
         }
         public Clause()
