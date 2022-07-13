@@ -48,23 +48,26 @@ namespace CroatianProject.Pages.Admin
         }
         public void OnGet(string names)
         {
-            var manuscriptId = names.Split("||")[0].Split('[')[1].Split(']')[0];
-            var sectionId = names.Split("||")[1].Split('[')[1].Split(']')[0];
-            var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "manuscripts")).GetFiles();
-            if (files.Length < 1) return;
-            foreach (var file in files)
+            if (names != null)
             {
-                using (StreamReader r = new StreamReader(file.FullName))
+                var manuscriptId = names.Split("||")[0].Split('[')[1].Split(']')[0];
+                var sectionId = names.Split("||")[1].Split('[')[1].Split(']')[0];
+                var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "manuscripts")).GetFiles();
+                if (files.Length < 1) return;
+                foreach (var file in files)
                 {
-                    var analyzedManuscript = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
-                    if (analyzedManuscript.Id == manuscriptId)
+                    using (StreamReader r = new StreamReader(file.FullName))
                     {
-                        foreach (var s in analyzedManuscript.subunits)
+                        var analyzedManuscript = JsonConvert.DeserializeObject<Manuscript>(r.ReadToEnd());
+                        if (analyzedManuscript.Id == manuscriptId)
                         {
-                            if (s.Id.Split('|')[1] == sectionId)
+                            foreach (var s in analyzedManuscript.subunits)
                             {
-                                sectionByWords = s.Output();
-                                break;
+                                if (s.Id.Split('|')[1] == sectionId)
+                                {
+                                    sectionByWords = s.Output();
+                                    break;
+                                }
                             }
                         }
                     }
