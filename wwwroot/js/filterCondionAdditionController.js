@@ -3,7 +3,18 @@ lastTagging = undefined;
 
 $(document).ready(function () {
 
-    $(".word").dblclick(function () {
+    var values = document.getElementById('values');
+    splitValues = values.innerText.split('|');
+    for (var i = 0; i < splitValues.length; i++) {
+        $.getJSON("/database/fields/" + splitValues[i], function (data) {
+            jsons.push(data);
+            $("#keys").append("<option>" + data.name + "</option>");
+        });
+    }
+    jsons.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+    console.log(jsons);
+
+    $(".Token").dblclick(function () {
         $('#tagging').text("");
         $('#info').text("");
         $('#info').append("Lexeme:");
@@ -43,7 +54,7 @@ $(document).ready(function () {
 
         $(".deleteTaggedButton").click(function () {
 
-            var words = $(".word");
+            var words = $(".Token");
             for (let i = 0; i < words.length; i++) {
                 if (words[i].id == $("#identificator").val()) {
                     var taggings = $(words[i]).attr('data-content').split('***');
@@ -66,7 +77,7 @@ $(document).ready(function () {
         })
     });
 
-    $('.grapheme').bind('contextmenu', show_graphemes);
+    $('.Grapheme').bind('contextmenu', show_graphemes);
 
     function show_graphemes(event) {
         event.preventDefault();
@@ -101,7 +112,7 @@ $(document).ready(function () {
             $("#tagNumberLabel").css("opacity", 0.0);
         }
         $(".deleteTaggedButton").click(function () {
-            var graphemes = $(".grapheme");
+            var graphemes = $(".Grapheme");
             for (let i = 0; i < graphemes.length; i++) {
                 if (graphemes[i].id == $("#identificator").val()) {
                     var features = $(graphemes[i]).attr('data-content').split('<br />');
@@ -554,7 +565,7 @@ $(document).ready(function () {
                 else {
                     changing(id, true, true, $('#tagNumber').val());
                     if ($('#similarTagging').prop('checked')) {
-                        words = $(".word");
+                        words = $(".Token");
                         var wordText = "";
                         for (let i = 0; i < words.length; i++) {
                             if (words[i].id == id) {
@@ -574,7 +585,7 @@ $(document).ready(function () {
             else {
                 changing(id, true, false, - 1);
                 if ($('#similarTagging').prop('checked')) {
-                    words = $(".word");
+                    words = $(".Token");
                     var wordText = "";
                     for (let i = 0; i < words.length; i++) {
                         if (words[i].id == id) {
@@ -735,7 +746,7 @@ $(document).ready(function () {
 
         $(".deleteTaggedButton").click(function () {
 
-            var clauses = $(".clause");
+            var clauses = $(".Clause");
             for (let i = 0; i < clauses.length; i++) {
                 if (clauses[i].id == $("#identificator").val()) {
                     var features = $(clauses[i]).attr('data-content').split('<br />');

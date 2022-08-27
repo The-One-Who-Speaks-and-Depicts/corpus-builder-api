@@ -366,27 +366,6 @@ namespace ManuscriptsProcessor
             return result;
         }
 
-        public static string PartOutput(this IUnitGroup<ICorpusUnit> corpusUnit)
-        {
-            string collected = "";
-            corpusUnit.subunits.Sort();
-            foreach (var unit in corpusUnit.subunits)
-            {
-                collected += unit.Output();
-            }
-            return collected;
-        }
-
-        public static string UnitOutput(ICorpusUnit corpusUnit, bool atomicUnit = false)
-        {
-            var innerText = (corpusUnit is Grapheme || atomicUnit) ? (corpusUnit as IUnitGroup<ICorpusUnit>).PartOutput() : corpusUnit.text;
-            if (corpusUnit.tagging is null || corpusUnit.tagging.Count < 1)
-            {
-                return "<span title= \"\" data-content=\"\" class=\"" + corpusUnit.GetType() + "\" id=\"" + corpusUnit.Id + "\"> " + innerText + "</span><br />";
-            }
-            return "<span title=\"" + GetFieldsInText (corpusUnit.tagging) + "\" data-content=\"" + GetFieldsInText (corpusUnit.tagging).Replace("\n", "<br />") + "\" class=\"" + corpusUnit.GetType() + "\" id=\"" + corpusUnit.Id + "\"> " + innerText + "</span><br />";
-        }
-
         public static List<string> GetFields(string path)
         {
             List<string> existingFields = new List<string>();

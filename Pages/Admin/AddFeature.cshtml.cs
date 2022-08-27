@@ -50,8 +50,8 @@ namespace CroatianProject.Pages.Admin
         {
             if (names != null)
             {
-                var manuscriptId = names.Split("||")[0].Split('[')[1].Split(']')[0];
-                var sectionId = names.Split("||")[1].Split('[')[1].Split(']')[0];
+                var manuscriptId = names.Split(":")[1].Split('[')[1].Split('|')[0];
+                var sectionId = names.Split(":")[1].Split('[')[1].Split('|')[1].Split(']')[0];
                 var files = new DirectoryInfo(Path.Combine(_environment.ContentRootPath, "database", "manuscripts")).GetFiles();
                 if (files.Length < 1) return;
                 foreach (var file in files)

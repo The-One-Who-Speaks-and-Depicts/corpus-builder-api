@@ -5,6 +5,7 @@ using ManuscriptsProcessor.Values;
 
 namespace ManuscriptsProcessor.Units
 {
+    [Serializable]
     public class Segment : ICorpusUnit, IUnitGroup<Clause>, IComparable<Segment>
     {
         [JsonProperty]
@@ -42,7 +43,11 @@ namespace ManuscriptsProcessor.Units
 
         public string Output()
         {
-            return MyExtensions.UnitOutput(this);
+            if (tagging is null || tagging.Count < 1)
+            {
+                return "<span title= \"\" data-content=\"\" class=\"" + this.GetType().Name + "\" id=\"" + Id + "\"> " + String.Join(' ', subunits.Select(x => x.Output())) + "</span><br />";
+            }
+            return "<span title=\"" + MyExtensions.GetFieldsInText(tagging) + "\" data-content=\"" + MyExtensions.GetFieldsInText(tagging).Replace("\n", "<br />") + "\" class=\"" + this.GetType().Name + "\" id=\"" + Id + "\"> " + String.Join(' ', subunits.Select(x => x.Output())) + "</span><br />";
         }
         public int CompareTo(Segment other)
         {

@@ -60,7 +60,12 @@ namespace ManuscriptsProcessor.Units
 
         public string Output()
         {
-            return MyExtensions.UnitOutput(this);
+            if (tagging is null || tagging.Count < 1)
+            {
+                return "<span title= \"\" data-content=\"\" class=\"" + this.GetType().Name + "\" id=\"" + Id + "\"> " + String.Join('\n', subunits.Select(x => x.Output())) + "</span><br />";
+            }
+            return "<span title=\"" + MyExtensions.GetFieldsInText(tagging) + "\" data-content=\"" + MyExtensions.GetFieldsInText(tagging).Replace("\n", "<br />") + "\" class=\"" + this.GetType().Name + "\" id=\"" + Id + "\"> " + String.Join('\n', subunits.Select(x => x.Output()))+ "</span><br />";
+
         }
         #endregion
 
