@@ -15,7 +15,7 @@ namespace CroatianProject.Pages.Admin
         {
             get
             {
-                return MyExtensions.GetManuscripts(Path.Combine(_environment.ContentRootPath, "wwwroot", "database", "fields"));
+                return MyExtensions.GetManuscriptsWithTexts(Path.Combine(_environment.ContentRootPath, "database", "manuscripts"));
             }
         }
         [BindProperty]
