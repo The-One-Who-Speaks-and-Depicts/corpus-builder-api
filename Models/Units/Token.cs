@@ -80,7 +80,7 @@ namespace ManuscriptsProcessor.Units
             {
                 return "<span title= \"\" data-content=\"\" class=\"" + this.GetType().Name + "\" id=\"" + Id + "\"> " + text + "</span>";
             }
-            return "<span title=\"" + MyExtensions.GetFieldsInText(tagging) + "\" data-content=\"" + MyExtensions.GetFieldsInText(tagging).Replace(" ", "<br />") + "\" class=\"" + this.GetType().Name + "\" id=\"" + Id + "\"> " + text + "</span>";
+            return "<span title=\"" + MyExtensions.GetFieldsInText(tagging) + "\" data-content=\"" + MyExtensions.GetFieldsInText(tagging).Replace("\n", "<br />") + "\" class=\"" + this.GetType().Name + "\" id=\"" + Id + "\"> " + text + "</span>";
         }
 
         public bool Equals(Token other)

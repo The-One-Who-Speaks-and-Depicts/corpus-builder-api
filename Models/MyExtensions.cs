@@ -359,9 +359,9 @@ namespace ManuscriptsProcessor
                         result += fieldValue.name;
                         result += ";";
                     }
-                    result += "||";
+                    result += "\n";
                 }
-                result += "\n";
+                result += "***";
             }
             return result;
         }

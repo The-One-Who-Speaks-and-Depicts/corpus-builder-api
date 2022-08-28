@@ -5,14 +5,6 @@ $(document).ready(function () {
 
     var values = document.getElementById('values');
     splitValues = values.innerText.split('|');
-    for (var i = 0; i < splitValues.length; i++) {
-        $.getJSON("/database/fields/" + splitValues[i], function (data) {
-            jsons.push(data);
-            $("#keys").append("<option>" + data.name + "</option>");
-        });
-    }
-    jsons.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
-    console.log(jsons);
 
     $(".Token").dblclick(function () {
         $('#tagging').text("");
@@ -39,7 +31,7 @@ $(document).ready(function () {
         $("#keys").text("");
         $("#keys").append("<option>Any</option>");
         for (var i = 0; i < jsons.length; i++) {
-            if (jsons[i].type == "Realization") {
+            if (jsons[i].type == "Token") {
                 $("#keys").append("<option>" + jsons[i].name + "</option>");
             }
         }
@@ -86,10 +78,16 @@ $(document).ready(function () {
         $('#info').append("Grapheme:");
         $('#info').append(this.innerHTML);
         $('#info').append("<br /><br /> Features:<br />");
-        var features = $(this).attr('data-content').split('<br />');
-        for (let i = 0; i < features.length; i++) {
-            if (features[i] != "") {
-                $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
+        var taggings = $(this).attr('data-content').split('***');
+        for (let t = 0; t < taggings.length; t++) {
+            if (taggings[t].replace("<br /><br />", "") != "" && taggings[t] != "") {
+                $('#info').append("Tagging " + t + "<br />");
+                var features = taggings[t].split('<br />');
+                for (let i = 0; i < features.length; i++) {
+                    if (features[i] != "") {
+                        $('#info').append('<span><span>' + features[i] + '</span><button class=\"deleteTaggedButton\" type=\"button\">Удалить</button></span><br />');
+                    }
+                }
             }
         }
         $('#info').append("<br /><br /><br />");
@@ -98,7 +96,7 @@ $(document).ready(function () {
         $("#keys").text("");
         $("#keys").append("<option>Any</option>");
         for (var i = 0; i < jsons.length; i++) {
-            if (jsons[i].type == "Grapheme") {
+            if (jsons[i].type === "Grapheme") {
                 $("#keys").append("<option>" + jsons[i].name + "</option>");
             }
         }
@@ -131,10 +129,10 @@ $(document).ready(function () {
     var values = document.getElementById('values');
     splitValues = values.innerText.split('|');
     for (var i = 0; i < splitValues.length; i++) {
-        $.getJSON("/database/fields/" + splitValues[i], function (data) {
-            if (data.type != "Document" && data.type != "Text") {
+        $.getJSON("/database/fields/" + splitValues[i] + ".json", function (data) {
+            if (!["Manuscript", "Section", "Segment"].includes(data.type)) {
                 jsons.push(data);
-                if (data.type == "Realization" && !data.isUserFilled) {
+                if (data.type === "Token" && !data.isUserFilled) {
                     $("#keysFilter").append("<option>" + data.name + "</option>");
                 }
             }
@@ -298,11 +296,11 @@ $(document).ready(function () {
 
     $('#buttonFilter').click(function () {
         var selectedWord = document.getElementById('wordFilter').value;
-        console.log(selectedWord.length);
         var selectedOptions = $('#featureFilter').val();
         if (selectedWord.length > 0 || selectedOptions.length > 0) {
-            var words = document.getElementsByClassName('word');
+            var words = document.getElementsByClassName('Token');
             for (var i = 0; i < words.length; i++) {
+                words[i].setAttribute("style", "opacity:1.0;");
                 var wordFound = false;
                 if (selectedWord.length > 0) {
                     if (!isMatch(selectedWord.toLowerCase(), words[i].innerText.trim().toLowerCase())) {
@@ -325,6 +323,10 @@ $(document).ready(function () {
                     }
                     var wordAttributes = words[i].getAttribute("data-content");
                     var wordTaggings = wordAttributes.split("***").filter(t => t !== '');
+                    if (wordTaggings.length === 0 && !optionsList.filter(o => o !== '').every(kvp => kvp.startsWith("!"))) {
+                        words[i].setAttribute("style", "opacity:0.25;");
+                        continue;
+                    }
                     for (let t = 0; t < wordTaggings.length; t++) {
                         wordAttributes = wordTaggings[t].split(';<br />')
                         var extantAttributes = [];
@@ -386,7 +388,6 @@ $(document).ready(function () {
                         }
                     }
                 }
-
             }
         }
         else {
@@ -394,7 +395,7 @@ $(document).ready(function () {
         }
     });
     $("#buttonFilterDeletion").click(function () {
-        var words = document.getElementsByClassName('word');
+        var words = document.getElementsByClassName('Token');
         for (let i = 0; i < words.length; i++) {
             words[i].setAttribute("style", "opacity:1.0;");
         }
@@ -673,7 +674,7 @@ $(document).ready(function () {
     function save_changes(event) {
         event.preventDefault();
         $('#changedText').text("");
-        var clauses = document.getElementsByClassName('clause');
+        var clauses = document.getElementsByClassName('Clause');
         for (let i = 0; i < clauses.length; i++) {
             if (clauses[i].dataset.content == "") {
                 $('#changedText').append('{' + clauses[i].id + '}');
@@ -683,7 +684,7 @@ $(document).ready(function () {
             }
 
         }
-        var words = document.getElementsByClassName('word');
+        var words = document.getElementsByClassName('Token');
         for (let i = 0; i < words.length; i++) {
             if (words[i].dataset.content == "") {
                 $('#changedText').append('{' + words[i].id + '}');
@@ -693,7 +694,7 @@ $(document).ready(function () {
             }
 
         }
-        var graphemes = document.getElementsByClassName('grapheme')
+        var graphemes = document.getElementsByClassName('Grapheme')
         for (let i = 0; i < graphemes.length; i++) {
             if (graphemes[i].dataset.content == "") {
                 $('#changedText').append('{' + graphemes[i].id + '}');
@@ -729,7 +730,7 @@ $(document).ready(function () {
         $("#keys").text("");
         $("#keys").append("<option>Any</option>");
         for (var i = 0; i < jsons.length; i++) {
-            if (jsons[i].type == "Clause") {
+            if (jsons[i].type === "Clause") {
                 $("#keys").append("<option>" + jsons[i].name + "</option>");
             }
         }
